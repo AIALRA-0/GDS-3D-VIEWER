@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ICViewer Core</title>
+  <style>
+    html,
+    body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #070b11;
+      font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+    }
+
+    .textShadow {
+      text-shadow:
+        -1px -1px 0 rgba(0, 0, 0, 0.68),
+         0   -1px 0 rgba(0, 0, 0, 0.68),
+         1px -1px 0 rgba(0, 0, 0, 0.68),
+         1px  0   0 rgba(0, 0, 0, 0.68),
+         1px  1px 0 rgba(0, 0, 0, 0.68),
+         0    1px 0 rgba(0, 0, 0, 0.68),
+        -1px  1px 0 rgba(0, 0, 0, 0.68),
+        -1px  0   0 rgba(0, 0, 0, 0.68);
+    }
+
+    #loadingStatus {
+      position: fixed;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      color: #f8e7cf;
+      font-size: 15px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      background:
+        radial-gradient(circle at top, rgba(201, 124, 71, 0.16), transparent 25%),
+        rgba(7, 11, 17, 0.78);
+      z-index: 40;
+    }
+
+    body.model-ready #loadingStatus {
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 220ms ease;
+    }
+
+    #crossSection {
+      position: fixed;
+      left: 16px;
+      bottom: 16px;
+      z-index: 12;
+    }
+
+    #viewerMeta {
+      position: fixed;
+      left: 18px;
+      top: 18px;
+      max-width: min(38vw, 520px);
+      color: #f8e7cf;
+      z-index: 12;
+      pointer-events: none;
+    }
+
+    #instanceClassTitle {
+      font-size: clamp(20px, 2vw, 28px);
+      font-weight: 700;
+      line-height: 1.05;
+      margin: 0;
+      overflow-wrap: anywhere;
+    }
+
+    #information {
+      margin-top: 8px;
+      font-size: 13px;
+      line-height: 1.45;
+      color: rgba(248, 231, 207, 0.84);
+      overflow-wrap: anywhere;
+    }
+
+    .lil-gui {
+      --background-color: rgba(10, 14, 20, 0.96);
+      --widget-color: rgba(28, 34, 42, 0.92);
+      --focus-color: #cb7d47;
+      --hover-color: rgba(203, 125, 71, 0.16);
+      --text-color: #f8e7cf;
+      --title-background-color: rgba(14, 19, 27, 0.98);
+      --title-text-color: #f8e7cf;
+      --number-color: #88b2ff;
+      --string-color: #a9d7f1;
+      --font-size: 13px;
+      --name-width: 42%;
+      --width: min(360px, 34vw);
+    }
+
+    .lil-gui.root.autoPlace {
+      position: fixed;
+      top: 0;
+      right: 0;
+      margin: 0;
+      height: 100vh;
+      max-height: 100vh;
+      overflow-y: auto;
+      border-left: 1px solid rgba(203, 125, 71, 0.18);
+      box-shadow: -24px 0 60px rgba(0, 0, 0, 0.42);
+      transform: translateX(calc(100% + 16px));
+      transition: transform 180ms ease;
+      z-index: 30;
+      pointer-events: none;
+    }
+
+    body.controls-open .lil-gui.root.autoPlace {
+      transform: translateX(0);
+      pointer-events: auto;
+    }
+
+    .lil-gui .title {
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .lil-gui .name {
+      overflow-wrap: anywhere;
+    }
+
+    .lil-gui.root.autoPlace::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .lil-gui.root.autoPlace::-webkit-scrollbar-thumb {
+      background: rgba(203, 125, 71, 0.4);
+      border-radius: 999px;
+    }
+
+    #viewerBackdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.24);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 180ms ease;
+      z-index: 20;
+    }
+
+    body.controls-open #viewerBackdrop {
+      opacity: 1;
+      pointer-events: auto;
+    }
+  </style>
+  <script type="module" crossorigin="anonymous" src="./GDS Viewer_files/index.53579e02.js"></script>
+  <script defer src="./icviewer-shell.js"></script>
+</head>
+<body>
+  <div id="loadingStatus">Loading</div>
+  <div id="viewerBackdrop"></div>
+  <div id="crossSection" hidden>
+    <canvas data-engine="three.js r161" id="SECTION_RENDERER" width="400" height="400"></canvas>
+  </div>
+  <div id="viewerMeta">
+    <div id="instanceClassTitle" class="textShadow">Loading</div>
+    <div id="information" class="textShadow"></div>
+  </div>
+</body>
+</html>
