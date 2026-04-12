@@ -64,9 +64,18 @@ async def create_session(
     metrics_bytes = await metrics.read() if metrics else None
     markers_bytes = await markers.read() if markers else None
 
-    manifest_override, manifest_warnings = parse_json_upload(manifest_bytes, manifest.filename or "manifest")
-    metrics_override, metrics_warnings = parse_json_upload(metrics_bytes, metrics.filename or "metrics")
-    markers_override, marker_warnings = parse_json_upload(markers_bytes, markers.filename or "markers")
+    manifest_override, manifest_warnings = parse_json_upload(
+        manifest_bytes,
+        manifest.filename if manifest and manifest.filename else "manifest",
+    )
+    metrics_override, metrics_warnings = parse_json_upload(
+        metrics_bytes,
+        metrics.filename if metrics and metrics.filename else "metrics",
+    )
+    markers_override, marker_warnings = parse_json_upload(
+        markers_bytes,
+        markers.filename if markers and markers.filename else "markers",
+    )
 
     uploaded_files: dict[str, bytes] = {gds.filename: gds_bytes}
     for uploaded, payload in (
@@ -83,13 +92,18 @@ async def create_session(
             if payload:
                 uploaded_files[uploaded.filename] = payload
 
-    response = create_session_from_upload(
-        uploaded_files=uploaded_files,
-        technology=technology,
-        manifest_override=manifest_override,
-        metrics_override=metrics_override,
-        markers_override=markers_override,
-    )
+    try:
+        response = create_session_from_upload(
+            uploaded_files=uploaded_files,
+            technology=technology,
+            manifest_override=manifest_override,
+            metrics_override=metrics_override,
+            markers_override=markers_override,
+        )
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except Exception as exc:
+        raise HTTPException(status_code=422, detail=f"Failed to ingest uploaded GDS bundle: {exc}") from exc
     response.warnings.extend([*manifest_warnings, *metrics_warnings, *marker_warnings])
     return response
 

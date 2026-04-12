@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+import { UI_COPY, type UiLanguage } from "../lib/copy";
 import type { CameraState, LayoutManifest, LayoutNode, PerformanceMode, ReviewMarker } from "../../../../packages/shared/types";
 
 interface ViewerAction {
@@ -12,11 +13,13 @@ interface ViewerAction {
 
 interface SceneViewerProps {
   manifest: LayoutManifest;
+  displayName: string;
   assetUrl?: string | null;
   selectedLayerIds: string[];
   focusedNodeId: string | null;
   selectedMarkerId: string | null;
   performanceMode: PerformanceMode;
+  language: UiLanguage;
   action: ViewerAction | null;
   onNodeSelect: (nodeId: string) => void;
   onMarkerSelect: (markerId: string) => void;
@@ -70,11 +73,13 @@ function roundCameraState(camera: THREE.PerspectiveCamera, target: THREE.Vector3
 
 export default function SceneViewer({
   manifest,
+  displayName,
   assetUrl,
   selectedLayerIds,
   focusedNodeId,
   selectedMarkerId,
   performanceMode,
+  language,
   action,
   onNodeSelect,
   onMarkerSelect,
@@ -93,6 +98,7 @@ export default function SceneViewer({
   const latestMarkerSelectRef = useRef(onMarkerSelect);
   const latestCameraChangeRef = useRef(onCameraChange);
   const lastHandledActionIdRef = useRef<number | null>(null);
+  const copy = UI_COPY[language];
 
   useEffect(() => {
     latestSelectionRef.current = { selectedLayerIds, focusedNodeId, selectedMarkerId, performanceMode };
@@ -674,19 +680,17 @@ export default function SceneViewer({
     <div className="viewer-shell">
       <div className="viewer-meta">
         <div>
-          <p className="eyebrow">Central viewer</p>
-          <h2>{manifest.name}</h2>
+          <p className="eyebrow">{copy.viewer.eyebrow}</p>
+          <h2>{displayName}</h2>
         </div>
-        <p className="viewer-caption">
-          Left drag rotates, right drag pans, wheel zooms to cursor, and double click focuses the selected block or review marker.
-        </p>
+        <p className="viewer-caption">{copy.viewer.caption}</p>
       </div>
       <div className="viewer-canvas" ref={hostRef} data-testid="scene-viewer" />
       <div className="viewer-status">
         <span>{manifest.technology}</span>
-        <span>{manifest.metrics.cellCount} cells</span>
-        <span>{manifest.metrics.instanceCount} instances</span>
-        <span>{manifest.markers?.length ?? 0} markers</span>
+        <span>{manifest.metrics.cellCount} {copy.viewer.cells}</span>
+        <span>{manifest.metrics.instanceCount} {copy.viewer.instances}</span>
+        <span>{manifest.markers?.length ?? 0} {copy.viewer.markers}</span>
       </div>
     </div>
   );

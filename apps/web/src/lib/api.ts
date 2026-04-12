@@ -12,7 +12,16 @@ const API_BASE = import.meta.env.VITE_API_BASE_URL?.trim().replace(/\/$/, "") ??
 async function fetchJson<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(`${API_BASE}${path}`, init);
   if (!response.ok) {
-    throw new Error(`Request failed with ${response.status}`);
+    let message = `Request failed with ${response.status}`;
+    try {
+      const payload = (await response.json()) as { detail?: string };
+      if (payload?.detail) {
+        message = payload.detail;
+      }
+    } catch {
+      // Fall back to the status-based message when the response is not JSON.
+    }
+    throw new Error(message);
   }
   return (await response.json()) as T;
 }
@@ -133,7 +142,16 @@ export async function exportSessionPayload(session: SessionPayload): Promise<Blo
     body: JSON.stringify({ session })
   });
   if (!response.ok) {
-    throw new Error(`Export failed with ${response.status}`);
+    let message = `Export failed with ${response.status}`;
+    try {
+      const payload = (await response.json()) as { detail?: string };
+      if (payload?.detail) {
+        message = payload.detail;
+      }
+    } catch {
+      // Ignore JSON parsing failures and keep the default message.
+    }
+    throw new Error(message);
   }
   return await response.blob();
 }

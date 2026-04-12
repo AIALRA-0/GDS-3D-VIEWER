@@ -83,6 +83,23 @@ def test_create_session_from_fixture_bundle_and_export() -> None:
     assert "sourceSessionId" in exported.text
 
 
+def test_create_session_from_gds_only() -> None:
+    fixture_path = FIXTURE_ROOT / "example" / "example.gds"
+
+    with fixture_path.open("rb") as gds_handle:
+        response = client.post(
+            "/api/sessions",
+            data={"technology": "sky130"},
+            files={"gds": ("example.gds", gds_handle, "application/octet-stream")},
+        )
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["manifest"]["format"] == "gds"
+    assert payload["manifest"]["layers"]
+    assert payload["manifest"]["bookmarks"]
+
+
 def test_create_session_rejects_empty_gds() -> None:
     response = client.post(
         "/api/sessions",

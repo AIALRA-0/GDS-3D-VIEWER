@@ -253,9 +253,40 @@ textarea::placeholder {
 .hierarchy-list,
 .bookmark-list,
 .notes-list,
-.action-stack {
+.action-stack,
+.guide-list,
+.guide-grid {
   display: grid;
   gap: 10px;
+}
+
+.guide-list {
+  margin: 0;
+  padding-left: 1.2rem;
+  color: var(--text-soft);
+  line-height: 1.5;
+}
+
+.guide-grid {
+  margin-top: 16px;
+}
+
+.guide-card {
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: rgba(14, 20, 27, 0.78);
+  padding: 12px 14px;
+}
+
+.guide-card strong {
+  display: block;
+  margin-bottom: 6px;
+}
+
+.guide-card small {
+  display: block;
+  color: var(--text-soft);
+  line-height: 1.5;
 }
 
 .sample-button,

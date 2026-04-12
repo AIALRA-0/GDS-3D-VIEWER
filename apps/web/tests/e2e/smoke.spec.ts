@@ -12,13 +12,13 @@ test("cockpit runs the backend-backed review workflow", async ({ page }) => {
   await expect(page.getByRole("heading", { name: /explainable 3d ic layout review/i })).toBeVisible({ timeout: 30000 });
   await expect(page.getByTestId("sample-list")).toContainText("OpenROAD Bundle Demo", { timeout: 30000 });
   await expect(page.getByText("example.gds")).toBeVisible({ timeout: 30000 });
-  await expect(page.locator(".status-pill")).toContainText("TinyTapeout Example", { timeout: 30000 });
+  await expect(page.locator(".viewer-shell h2")).toContainText("TinyTapeout", { timeout: 30000 });
   await page.waitForLoadState("networkidle");
 
   const sampleResponse = page.waitForResponse((response) => response.url().includes("/api/samples/openroad-demo") && response.status() === 200);
   await page.getByRole("button", { name: /openroad bundle demo/i }).click();
   await sampleResponse;
-  await expect(page.locator(".status-pill")).toContainText("OpenROAD Bundle Demo", { timeout: 30000 });
+  await expect(page.locator(".viewer-shell h2")).toContainText("OpenROAD", { timeout: 30000 });
   await expect(page.getByText("openroad-metrics.json")).toBeVisible({ timeout: 30000 });
 
   await page.locator("[data-testid^='layer-']").first().click();
@@ -50,7 +50,7 @@ test("cockpit runs the backend-backed review workflow", async ({ page }) => {
     path.join(fixtureRoot, "compat/openroad-markers.json")
   ]);
 
-  await expect(page.locator(".status-pill")).toContainText(/Loaded uploaded bundle/i, { timeout: 60000 });
+  await expect(page.locator(".viewer-shell h2")).toContainText("OpenROAD", { timeout: 60000 });
   await expect(page.locator(".load-panel .mini-chip")).toContainText(/upload/i, { timeout: 30000 });
   await expect(page.locator(".metadata-grid")).toContainText("openroad-markers.json");
 });
