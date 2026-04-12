@@ -227,6 +227,10 @@ export default function App() {
     return session.manifest.markers?.find((marker) => marker.id === sceneState.selectedMarkerId) ?? null;
   }, [session, sceneState]);
 
+  const viewerManifest = useMemo(() => {
+    return session?.manifest ?? null;
+  }, [session]);
+
   useEffect(() => {
     if (bootstrappedRef.current) {
       return;
@@ -624,7 +628,7 @@ export default function App() {
     window.setTimeout(() => setCopied(false), 1400);
   }
 
-  if (!hasScenePayload(session) || !sceneState || !explainResult || !operatorResult || !diffResult) {
+  if (!hasScenePayload(session) || !sceneState || !explainResult || !operatorResult || !diffResult || !viewerManifest) {
     return (
       <div className="boot-state">
         <div className="boot-card">
@@ -823,7 +827,7 @@ export default function App() {
           </div>
 
           <SceneViewer
-            manifest={materializeManifest(session, sceneState)}
+            manifest={viewerManifest}
             assetUrl={sceneState.performanceMode === "hierarchy-preview" ? null : session.assetUrl}
             selectedLayerIds={sceneState.selectedLayerIds}
             focusedNodeId={sceneState.focusedNodeId}

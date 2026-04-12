@@ -89,6 +89,7 @@ export default function SceneViewer({
   const latestNodeSelectRef = useRef(onNodeSelect);
   const latestMarkerSelectRef = useRef(onMarkerSelect);
   const latestCameraChangeRef = useRef(onCameraChange);
+  const lastHandledActionIdRef = useRef<number | null>(null);
 
   useEffect(() => {
     latestSelectionRef.current = { selectedLayerIds, focusedNodeId, selectedMarkerId, performanceMode };
@@ -480,11 +481,13 @@ export default function SceneViewer({
       fitBounds(manifest.metrics.bbox);
     }
 
+    const onContextMenu = (event: MouseEvent) => event.preventDefault();
+
     renderer.domElement.addEventListener("pointermove", onPointerMove);
     renderer.domElement.addEventListener("pointerdown", onPointerDown);
     renderer.domElement.addEventListener("pointerup", onPointerUp);
     renderer.domElement.addEventListener("dblclick", onDoubleClick);
-    renderer.domElement.addEventListener("contextmenu", (event) => event.preventDefault());
+    renderer.domElement.addEventListener("contextmenu", onContextMenu);
 
     function animate() {
       const selection = latestSelectionRef.current;
@@ -544,7 +547,11 @@ export default function SceneViewer({
       renderer.domElement.removeEventListener("pointerdown", onPointerDown);
       renderer.domElement.removeEventListener("pointerup", onPointerUp);
       renderer.domElement.removeEventListener("dblclick", onDoubleClick);
+      renderer.domElement.removeEventListener("contextmenu", onContextMenu);
       controls.dispose();
+      if (typeof renderer.forceContextLoss === "function") {
+        renderer.forceContextLoss();
+      }
       renderer.dispose();
       for (const dispose of disposeObjects) {
         dispose();
@@ -579,6 +586,10 @@ export default function SceneViewer({
     if (!runtime || !action) {
       return;
     }
+    if (lastHandledActionIdRef.current === action.id) {
+      return;
+    }
+    lastHandledActionIdRef.current = action.id;
 
     if (action.type === "reset") {
       runtime.resetCamera();
