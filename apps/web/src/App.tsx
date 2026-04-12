@@ -3,6 +3,7 @@ import SceneViewer from "./components/SceneViewer";
 import {
   buildDiffSummary,
   createSessionFromFiles,
+  ensureDetailedSession,
   explainLayout,
   exportSessionPayload,
   loadDefaultSession,
@@ -43,7 +44,7 @@ import type {
   SessionPayload
 } from "../../../packages/shared/types";
 
-type BusyState = "idle" | "loading" | "uploading" | "explaining" | "operating" | "exporting";
+type BusyState = "idle" | "loading" | "uploading" | "explaining" | "operating" | "exporting" | "detailing";
 type ViewerAction =
   | { id: number; type: "fit"; payload?: { nodeId?: string | null; markerId?: string | null } }
   | { id: number; type: "reset" }
@@ -68,6 +69,8 @@ const PANEL_TABS: ScenePanelId[] = [
   "bookmarks",
   "diff"
 ];
+
+type PanelSectionId = "viewer" | "layers" | "overview" | "markers" | "explain" | "operator" | "review";
 
 function formatNumber(value: number | undefined): string {
   if (typeof value !== "number") {
@@ -138,13 +141,51 @@ function createBookmarkLabel(manifest: LayoutManifest, count: number, language: 
     : `${manifest.name.split(" ")[0]} view ${count + 1}`;
 }
 
+function isLargeLayout(manifest: LayoutManifest): boolean {
+  return manifest.metrics.polygonCount >= 25000 || manifest.metrics.instanceCount >= 8000;
+}
+
+function defaultPerformanceMode(session: SessionPayload): PerformanceMode {
+  if (session.exportMetadata && session.state.performanceMode) {
+    return session.state.performanceMode;
+  }
+  return isLargeLayout(session.manifest) ? "simplified" : "full";
+}
+
+function sectionForPanel(panel: ScenePanelId): PanelSectionId {
+  switch (panel) {
+    case "viewer":
+      return "viewer";
+    case "layers":
+      return "layers";
+    case "hierarchy":
+    case "metrics":
+      return "overview";
+    case "markers":
+      return "markers";
+    case "explain":
+      return "explain";
+    case "operator":
+      return "operator";
+    case "notes":
+    case "bookmarks":
+    case "diff":
+      return "review";
+  }
+}
+
+function sectionMatchesPanel(section: PanelSectionId, panel: ScenePanelId): boolean {
+  return sectionForPanel(panel) === section;
+}
+
 function createSceneState(session: SessionPayload): SceneState {
+  const preserveSessionState = Boolean(session.exportMetadata);
   const selectedLayerIds =
-    session.state.selectedLayerIds?.length > 0
+    preserveSessionState && session.state.selectedLayerIds?.length > 0
       ? session.state.selectedLayerIds
-      : session.manifest.layers.filter((layer) => layer.visible).slice(0, 4).map((layer) => layer.id);
-  const focusedNodeId = session.state.focusedNodeId ?? session.manifest.hierarchy[0]?.id ?? null;
-  const selectedMarkerId = session.state.selectedMarkerId ?? session.manifest.markers?.[0]?.id ?? null;
+      : session.manifest.layers.filter((layer) => layer.visible).map((layer) => layer.id);
+  const focusedNodeId = preserveSessionState ? session.state.focusedNodeId ?? null : null;
+  const selectedMarkerId = preserveSessionState ? session.state.selectedMarkerId ?? null : null;
   const bookmarks =
     session.state.bookmarks?.length > 0
       ? session.state.bookmarks
@@ -156,7 +197,7 @@ function createSceneState(session: SessionPayload): SceneState {
               name: "Overview",
               camera: DEFAULT_CAMERA,
               selectedLayerIds,
-              focusedNodeId,
+              focusedNodeId: null,
               note: "Default review anchor.",
               createdAt: new Date().toISOString()
             }
@@ -170,13 +211,14 @@ function createSceneState(session: SessionPayload): SceneState {
     selectedMarkerId,
     notes: session.state.notes ?? [],
     bookmarks,
-    performanceMode: session.state.performanceMode ?? "full",
-    camera: session.state.camera ?? DEFAULT_CAMERA,
-    selectionMetadata:
-      session.state.selectionMetadata ??
-      buildSelectionFromMarker(selectedMarker) ??
-      buildSelectionFromNode(selectedNode) ??
-      null
+    performanceMode: defaultPerformanceMode(session),
+    camera: preserveSessionState ? session.state.camera ?? DEFAULT_CAMERA : DEFAULT_CAMERA,
+    selectionMetadata: preserveSessionState
+      ? session.state.selectionMetadata ??
+        buildSelectionFromMarker(selectedMarker) ??
+        buildSelectionFromNode(selectedNode) ??
+        null
+      : null
   };
 }
 
@@ -209,6 +251,15 @@ export default function App() {
   const [viewerAction, setViewerAction] = useState<ViewerAction | null>(null);
   const bootstrappedRef = useRef(false);
   const previousLanguageRef = useRef<UiLanguage>(language);
+  const panelSectionRefs = useRef<Record<PanelSectionId, HTMLElement | null>>({
+    viewer: null,
+    layers: null,
+    overview: null,
+    markers: null,
+    explain: null,
+    operator: null,
+    review: null
+  });
   const copy = UI_COPY[language];
 
   const selectedNode = useMemo(() => {
@@ -335,12 +386,12 @@ export default function App() {
   }, [referenceManifest, sceneState?.bookmarks, session]);
 
   useEffect(() => {
-    if (!session) {
-      setStatusMessage(copy.status.booting);
+    if (!sceneState) {
       return;
     }
-    setStatusMessage(copy.status.ready(localizeManifestName(session.manifest, language)));
-  }, [copy.status, language, session]);
+    const targetSection = panelSectionRefs.current[sectionForPanel(sceneState.panel)];
+    targetSection?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }, [sceneState?.panel]);
 
   async function loadResolvedSession(nextSession: SessionPayload, label: string) {
     const nextState = readSceneStateFromUrl(createSceneState(nextSession));
@@ -375,11 +426,16 @@ export default function App() {
     try {
       const uploadFiles = Array.from(files);
       const nextSession = await createSessionFromFiles(uploadFiles);
+      const performanceSuffix = isLargeLayout(nextSession.manifest)
+        ? language === "zh"
+          ? " 已自动进入简化模式以保证流畅交互。"
+          : " Started in simplified mode for smooth interaction."
+        : "";
       await loadResolvedSession(
         nextSession,
         nextSession.exportMetadata
-          ? copy.status.importedSession(localizeManifestName(nextSession.manifest, language))
-          : copy.status.uploadedBundle(uploadFiles.map((file) => file.name).join(", "))
+          ? `${copy.status.importedSession(localizeManifestName(nextSession.manifest, language))}${performanceSuffix}`
+          : `${copy.status.uploadedBundle(uploadFiles.map((file) => file.name).join(", "))}${performanceSuffix}`
       );
     } catch (error) {
       setErrorMessage(error instanceof Error ? error.message : copy.status.uploadFailed);
@@ -483,6 +539,8 @@ export default function App() {
         const shouldEnable = action.payload === "true" ? true : action.payload === "false" ? false : !hasLayer;
         return {
           ...current,
+          panel: "layers",
+          performanceMode: current.performanceMode === "full" ? "simplified" : current.performanceMode,
           selectedLayerIds: shouldEnable
             ? Array.from(new Set([...current.selectedLayerIds, action.targetId!]))
             : current.selectedLayerIds.filter((layerId) => layerId !== action.targetId)
@@ -495,6 +553,7 @@ export default function App() {
       updateSelection((current) => ({
         ...current,
         panel: "layers",
+        performanceMode: current.performanceMode === "full" ? "simplified" : current.performanceMode,
         selectedLayerIds: [action.targetId!]
       }));
       return;
@@ -503,6 +562,8 @@ export default function App() {
     if (action.type === "show-all") {
       updateSelection((current) => ({
         ...current,
+        panel: "layers",
+        performanceMode: current.performanceMode === "full" ? "simplified" : current.performanceMode,
         selectedLayerIds: session.manifest.layers.map((layer) => layer.id),
         selectedMarkerId: null
       }));
@@ -542,6 +603,7 @@ export default function App() {
     updateSelection((current) => ({
       ...current,
       panel: "layers",
+      performanceMode: current.performanceMode === "full" ? "simplified" : current.performanceMode,
       selectedLayerIds: current.selectedLayerIds.includes(layerId)
         ? current.selectedLayerIds.filter((candidate) => candidate !== layerId)
         : [...current.selectedLayerIds, layerId]
@@ -549,14 +611,24 @@ export default function App() {
   }
 
   function clearLayers() {
-    updateSelection((current) => ({ ...current, selectedLayerIds: [] }));
+    updateSelection((current) => ({
+      ...current,
+      panel: "layers",
+      performanceMode: current.performanceMode === "full" ? "simplified" : current.performanceMode,
+      selectedLayerIds: []
+    }));
   }
 
   function selectAllLayers() {
     if (!session) {
       return;
     }
-    updateSelection((current) => ({ ...current, selectedLayerIds: session.manifest.layers.map((layer) => layer.id) }));
+    updateSelection((current) => ({
+      ...current,
+      panel: "layers",
+      performanceMode: current.performanceMode === "full" ? "simplified" : current.performanceMode,
+      selectedLayerIds: session.manifest.layers.map((layer) => layer.id)
+    }));
   }
 
   function addNote() {
@@ -617,7 +689,29 @@ export default function App() {
     setViewerAction({ id: Date.now(), type: "restore-camera", payload: bookmark.camera });
   }
 
-  function setPerformanceMode(mode: PerformanceMode) {
+  async function setPerformanceMode(mode: PerformanceMode) {
+    if (!session) {
+      return;
+    }
+
+    if (mode === "full" && !session.assetUrl && !session.exportMetadata) {
+      setBusyState("detailing");
+      setStatusMessage(copy.status.detailGenerating);
+      try {
+        const refreshed = await ensureDetailedSession(session.sessionId);
+        setSession((current) => (current ? { ...current, ...refreshed } : refreshed));
+        updateSelection((current) => (current ? { ...current, performanceMode: "full" } : current));
+        setStatusMessage(copy.status.detailReady);
+      } catch (error) {
+        updateSelection((current) => (current ? { ...current, performanceMode: "simplified" } : current));
+        setErrorMessage(error instanceof Error ? error.message : copy.status.detailFailed);
+        setStatusMessage(copy.status.detailFailed);
+      } finally {
+        setBusyState("idle");
+      }
+      return;
+    }
+
     updateSelection((current) => ({
       ...current,
       performanceMode: mode
@@ -706,6 +800,7 @@ export default function App() {
           </button>
         ))}
       </div>
+      <div className="panel-hint">{copy.panelHelp[sceneState.panel]}</div>
 
       <main className="cockpit-grid">
         <aside className="rail rail-left">
@@ -784,9 +879,21 @@ export default function App() {
                 <strong>{session.warnings?.length ?? 0}</strong>
               </div>
             </div>
+            {session.warnings?.length ? (
+              <div className="warning-list">
+                {session.warnings.map((warning) => (
+                  <small key={warning}>{warning}</small>
+                ))}
+              </div>
+            ) : null}
           </section>
 
-          <section className="panel layers-panel">
+          <section
+            className={`panel layers-panel ${sectionMatchesPanel("layers", sceneState.panel) ? "is-panel-focus" : ""}`}
+            ref={(element) => {
+              panelSectionRefs.current.layers = element;
+            }}
+          >
             <div className="panel-header">
               <div>
                 <p className="eyebrow">{copy.layers.eyebrow}</p>
@@ -819,7 +926,12 @@ export default function App() {
             </div>
           </section>
 
-          <section className="panel markers-panel">
+          <section
+            className={`panel markers-panel ${sectionMatchesPanel("markers", sceneState.panel) ? "is-panel-focus" : ""}`}
+            ref={(element) => {
+              panelSectionRefs.current.markers = element;
+            }}
+          >
             <div className="panel-header">
               <div>
                 <p className="eyebrow">{copy.markers.eyebrow}</p>
@@ -846,7 +958,12 @@ export default function App() {
           </section>
         </aside>
 
-        <section className="center-stage">
+        <section
+          className={`center-stage ${sectionMatchesPanel("viewer", sceneState.panel) ? "is-panel-focus" : ""}`}
+          ref={(element) => {
+            panelSectionRefs.current.viewer = element;
+          }}
+        >
           <div className="panel center-toolbar">
             <div className="toolbar-meta">
               <span className="toolbar-badge">{copy.center.bundle} {session.manifest.id}</span>
@@ -876,12 +993,16 @@ export default function App() {
               <button
                 key={mode}
                 className={`chip-button ${sceneState.performanceMode === mode ? "is-active" : ""}`}
-                onClick={() => setPerformanceMode(mode)}
+                onClick={() => void setPerformanceMode(mode)}
+                disabled={busyState === "detailing"}
                 data-testid={`performance-${mode}`}
               >
                 {localizeModeLabel(mode, language)}
               </button>
             ))}
+            {!session.assetUrl && !session.exportMetadata ? (
+              <span className="mini-chip">{copy.status.detailDeferred}</span>
+            ) : null}
           </div>
 
           <SceneViewer
@@ -932,7 +1053,12 @@ export default function App() {
         </section>
 
         <aside className="rail rail-right">
-          <section className="panel">
+          <section
+            className={`panel ${sectionMatchesPanel("overview", sceneState.panel) ? "is-panel-focus" : ""}`}
+            ref={(element) => {
+              panelSectionRefs.current.overview = element;
+            }}
+          >
             <div className="panel-header">
               <div>
                 <p className="eyebrow">{copy.overview.eyebrow}</p>
@@ -992,7 +1118,12 @@ export default function App() {
             </div>
           </section>
 
-          <section className="panel">
+          <section
+            className={`panel ${sectionMatchesPanel("explain", sceneState.panel) ? "is-panel-focus" : ""}`}
+            ref={(element) => {
+              panelSectionRefs.current.explain = element;
+            }}
+          >
             <div className="panel-header">
               <div>
                 <p className="eyebrow">{copy.explain.eyebrow}</p>
@@ -1015,7 +1146,12 @@ export default function App() {
             </div>
           </section>
 
-          <section className="panel">
+          <section
+            className={`panel ${sectionMatchesPanel("operator", sceneState.panel) ? "is-panel-focus" : ""}`}
+            ref={(element) => {
+              panelSectionRefs.current.operator = element;
+            }}
+          >
             <div className="panel-header">
               <div>
                 <p className="eyebrow">{copy.operator.eyebrow}</p>
@@ -1037,7 +1173,12 @@ export default function App() {
             </div>
           </section>
 
-          <section className="panel">
+          <section
+            className={`panel ${sectionMatchesPanel("review", sceneState.panel) ? "is-panel-focus" : ""}`}
+            ref={(element) => {
+              panelSectionRefs.current.review = element;
+            }}
+          >
             <div className="panel-header">
               <div>
                 <p className="eyebrow">{copy.review.eyebrow}</p>

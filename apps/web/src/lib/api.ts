@@ -66,6 +66,16 @@ export async function loadSampleSession(sampleId: string): Promise<SessionPayloa
   return await fetchJson<SessionPayload>(`/api/samples/${sampleId}`);
 }
 
+export async function loadSession(sessionId: string): Promise<SessionPayload> {
+  return await fetchJson<SessionPayload>(`/api/sessions/${sessionId}`);
+}
+
+export async function ensureDetailedSession(sessionId: string): Promise<SessionPayload> {
+  return await fetchJson<SessionPayload>(`/api/sessions/${sessionId}/detail`, {
+    method: "POST"
+  });
+}
+
 export async function createSessionFromFiles(files: File[]): Promise<SessionPayload> {
   const imported = await readImportedSession(
     pickFile(files, (file) => /session\.json$/i.test(file.name) || /icviewer/i.test(file.name))

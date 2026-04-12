@@ -19,6 +19,66 @@ def _top_layers(manifest: ManifestModel) -> list[str]:
     return [layer.name for layer in ranked[:3]]
 
 
+def _coerce_string_list(value: Any, fallback: list[str]) -> list[str]:
+    if isinstance(value, list):
+      return [str(item) for item in value if str(item).strip()]
+    return fallback
+
+
+def _coerce_confidence(value: Any, fallback: float) -> float:
+    if isinstance(value, (int, float)):
+        return max(0.0, min(float(value), 1.0))
+    if isinstance(value, str):
+        text = value.strip().lower().replace("%", "")
+        mapping = {"low": 0.35, "medium": 0.62, "high": 0.85}
+        if text in mapping:
+            return mapping[text]
+        try:
+            numeric = float(text)
+            if numeric > 1:
+                numeric = numeric / 100
+            return max(0.0, min(numeric, 1.0))
+        except ValueError:
+            return fallback
+    return fallback
+
+
+def _coerce_operator_actions(raw_actions: Any, fallback: list[OperatorActionModel]) -> list[OperatorActionModel]:
+    if not isinstance(raw_actions, list):
+        return fallback
+
+    actions: list[OperatorActionModel] = []
+    for raw_action in raw_actions:
+        if not isinstance(raw_action, dict):
+            continue
+
+        action_type = raw_action.get("type")
+        if not action_type:
+            continue
+
+        label = raw_action.get("label") or raw_action.get("description") or raw_action.get("name") or str(action_type)
+        target_id = raw_action.get("targetId") or raw_action.get("target")
+        payload = raw_action.get("payload")
+        if payload is None and isinstance(raw_action.get("name"), str) and action_type == "bookmark":
+            payload = raw_action.get("name")
+
+        try:
+            actions.append(
+                OperatorActionModel.model_validate(
+                    {
+                        "type": action_type,
+                        "label": label,
+                        "targetId": target_id,
+                        "payload": payload,
+                    }
+                )
+            )
+        except Exception:
+            continue
+
+    return actions or fallback
+
+
 def build_local_explain(manifest: ManifestModel) -> ExplainResultModel:
     layers = _top_layers(manifest)
     marker_count = len(manifest.markers or [])
@@ -165,7 +225,8 @@ async def build_explain(manifest: ManifestModel, prompt: str | None = None) -> E
 
     system_prompt = (
         "You are an IC layout review copilot. Return JSON with keys summary, highlights, concerns, "
-        "nextSteps, confidence. Keep every field concise and engineering-focused."
+        "nextSteps, confidence. Confidence must be a numeric value between 0 and 1. "
+        "Keep every field concise and engineering-focused."
     )
     user_prompt = json.dumps(
         {
@@ -179,10 +240,10 @@ async def build_explain(manifest: ManifestModel, prompt: str | None = None) -> E
             return local
         return ExplainResultModel(
             summary=remote.get("summary", local.summary),
-            highlights=remote.get("highlights", local.highlights),
-            concerns=remote.get("concerns", local.concerns),
-            nextSteps=remote.get("nextSteps", local.nextSteps),
-            confidence=float(remote.get("confidence", 0.78)),
+            highlights=_coerce_string_list(remote.get("highlights"), local.highlights),
+            concerns=_coerce_string_list(remote.get("concerns"), local.concerns),
+            nextSteps=_coerce_string_list(remote.get("nextSteps"), local.nextSteps),
+            confidence=_coerce_confidence(remote.get("confidence"), 0.78),
             source="remote-ai",
         )
     except Exception:
@@ -196,7 +257,9 @@ async def build_command(manifest: ManifestModel, prompt: str) -> OperatorResultM
 
     system_prompt = (
         "You are an IC layout viewer operator. Return JSON with keys title, rationale, actions. "
-        "Each action must use one of: focus, focus-marker, isolate, toggle-layer, annotate, bookmark, show-all, performance-mode."
+        "Each action must be an object with keys type, label, targetId, payload. "
+        "Use only these action types: focus, focus-marker, isolate, toggle-layer, annotate, bookmark, show-all, performance-mode. "
+        "For bookmark actions, place the bookmark name in payload."
     )
     user_prompt = json.dumps(
         {
@@ -210,7 +273,7 @@ async def build_command(manifest: ManifestModel, prompt: str) -> OperatorResultM
         remote = await _try_remote_json(system_prompt, user_prompt)
         if not remote:
             return local
-        actions = [OperatorActionModel.model_validate(action) for action in remote.get("actions", [])]
+        actions = _coerce_operator_actions(remote.get("actions"), local.actions)
         return OperatorResultModel(
             title=remote.get("title", local.title),
             rationale=remote.get("rationale", local.rationale),

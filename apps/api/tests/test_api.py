@@ -3,6 +3,7 @@ from pathlib import Path
 from fastapi.testclient import TestClient
 
 from app.main import app
+from app.services import session_service
 
 
 client = TestClient(app)
@@ -108,6 +109,36 @@ def test_create_session_rejects_empty_gds() -> None:
     )
     assert response.status_code == 400
     assert "empty" in response.json()["detail"].lower()
+
+
+def test_large_layout_detail_can_be_generated_on_demand(monkeypatch) -> None:
+    fixture_path = FIXTURE_ROOT / "example" / "example.gds"
+
+    monkeypatch.setattr(session_service, "DETAIL_POLYGON_THRESHOLD", 1)
+    monkeypatch.setattr(session_service, "DETAIL_INSTANCE_THRESHOLD", 1)
+    monkeypatch.setattr(
+        session_service,
+        "_generate_asset",
+        lambda gds_path, output_dir, technology, asset_prefix: (f"/review-assets/{asset_prefix}/scene.gltf", []),
+    )
+
+    with fixture_path.open("rb") as gds_handle:
+        response = client.post(
+            "/api/sessions",
+            data={"technology": "sky130"},
+            files={"gds": ("example.gds", gds_handle, "application/octet-stream")},
+        )
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["assetUrl"] is None
+    assert any("deferred" in warning.lower() for warning in payload["warnings"])
+
+    detailed = client.post(f"/api/sessions/{payload['sessionId']}/detail")
+    assert detailed.status_code == 200
+    detail_payload = detailed.json()
+    assert detail_payload["assetUrl"]
+    assert not any("deferred" in warning.lower() for warning in detail_payload["warnings"])
 
 
 def test_ai_fallback_endpoints() -> None:

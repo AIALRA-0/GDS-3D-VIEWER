@@ -117,6 +117,7 @@ type UiCopy = {
   };
   sourceLabel: Record<"sample" | "upload", string>;
   panelLabel: Record<ScenePanelId, string>;
+  panelHelp: Record<ScenePanelId, string>;
   modeLabel: Record<PerformanceMode, string>;
   severityLabel: Record<"critical" | "warning" | "info", string>;
   status: {
@@ -140,6 +141,10 @@ type UiCopy = {
     exportDone: string;
     exportFailed: string;
     linkCopied: string;
+    detailDeferred: string;
+    detailGenerating: string;
+    detailReady: string;
+    detailFailed: string;
     ready: (name: string) => string;
   };
   viewer: {
@@ -283,6 +288,18 @@ export const UI_COPY: Record<UiLanguage, UiCopy> = {
       bookmarks: "Bookmarks",
       diff: "Diff"
     },
+    panelHelp: {
+      viewer: "Inspect geometry and navigate the 3D scene here.",
+      layers: "Filter summarized review layers and isolate visibility groups.",
+      hierarchy: "Jump across summarized cells and focus specific hierarchy nodes.",
+      metrics: "Read layout scale, utilization, and engineering summary metrics.",
+      markers: "Review flagged checkpoints and jump directly to them.",
+      explain: "Generate an AI explanation of the current layout session.",
+      operator: "Ask the AI operator to propose or run viewer actions.",
+      notes: "Write review notes tied to the current scene state.",
+      bookmarks: "Save and restore camera viewpoints and review context.",
+      diff: "Compare the current session against the baseline sample."
+    },
     modeLabel: {
       full: "Full",
       simplified: "Simplified",
@@ -314,6 +331,10 @@ export const UI_COPY: Record<UiLanguage, UiCopy> = {
       exportDone: "Exported review session JSON.",
       exportFailed: "Export failed.",
       linkCopied: "Shareable scene link copied.",
+      detailDeferred: "Detailed mesh is available on demand in Full mode.",
+      detailGenerating: "Generating detailed mesh for Full mode.",
+      detailReady: "Detailed mesh is ready.",
+      detailFailed: "Detailed mesh generation failed.",
       ready: (name) => `Loaded session: ${name}.`
     },
     viewer: {
@@ -455,6 +476,18 @@ export const UI_COPY: Record<UiLanguage, UiCopy> = {
       bookmarks: "书签",
       diff: "差异"
     },
+    panelHelp: {
+      viewer: "在这里查看几何体并进行 3D 场景导航。",
+      layers: "过滤审阅用的摘要层，并隔离可见性分组。",
+      hierarchy: "在摘要后的单元层级之间跳转并聚焦特定节点。",
+      metrics: "查看版图尺度、利用率和工程摘要指标。",
+      markers: "查看被标注的检查点并直接跳转过去。",
+      explain: "为当前版图会话生成 AI 解释。",
+      operator: "让 AI 操作器提出或执行 viewer 动作。",
+      notes: "写下与当前场景状态绑定的审阅备注。",
+      bookmarks: "保存和恢复相机视角与审阅上下文。",
+      diff: "把当前会话与基线样例进行比较。"
+    },
     modeLabel: {
       full: "完整",
       simplified: "简化",
@@ -486,6 +519,10 @@ export const UI_COPY: Record<UiLanguage, UiCopy> = {
       exportDone: "已导出审阅会话 JSON。",
       exportFailed: "导出失败。",
       linkCopied: "已复制可分享的场景链接。",
+      detailDeferred: "完整细节网格会在切换到完整模式时按需生成。",
+      detailGenerating: "正在为完整模式生成细节网格。",
+      detailReady: "细节网格已就绪。",
+      detailFailed: "细节网格生成失败。",
       ready: (name) => `已加载会话：${name}。`
     },
     viewer: {

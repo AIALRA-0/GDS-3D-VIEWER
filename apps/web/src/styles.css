@@ -38,6 +38,7 @@ body {
     radial-gradient(circle at 82% 10%, rgba(120, 166, 189, 0.12), transparent 24%),
     linear-gradient(180deg, #10151d 0%, #0b1016 100%);
   overflow: auto;
+  overscroll-behavior: none;
 }
 
 body::before {
@@ -63,6 +64,12 @@ button {
   border: 0;
   color: inherit;
   background: none;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+  transform: none;
 }
 
 textarea,
@@ -153,6 +160,12 @@ textarea::placeholder {
   margin: 18px 0;
 }
 
+.panel-hint {
+  margin: -4px 0 18px;
+  color: var(--text-soft);
+  line-height: 1.5;
+}
+
 .panel-tab,
 .ghost-button,
 .text-button,
@@ -214,6 +227,14 @@ textarea::placeholder {
   background: var(--bg-strong);
 }
 
+.panel.is-panel-focus,
+.center-stage.is-panel-focus .viewer-shell,
+.center-stage.is-panel-focus .center-toolbar,
+.center-stage.is-panel-focus .scene-footbar {
+  border-color: var(--line-strong);
+  box-shadow: 0 0 0 1px rgba(201, 124, 71, 0.16), var(--shadow);
+}
+
 .cockpit-grid {
   display: grid;
   grid-template-columns: minmax(300px, 340px) minmax(0, 1fr) minmax(340px, 390px);
@@ -245,6 +266,18 @@ textarea::placeholder {
   margin: 6px 0 0;
   font-size: 1.08rem;
   letter-spacing: -0.02em;
+}
+
+.warning-list {
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.warning-list small {
+  display: block;
+  color: #f3c993;
+  line-height: 1.45;
 }
 
 .sample-list,
@@ -483,6 +516,9 @@ textarea::placeholder {
 
 .viewer-canvas {
   min-height: 540px;
+  touch-action: none;
+  overscroll-behavior: contain;
+  user-select: none;
 }
 
 .viewer-status {

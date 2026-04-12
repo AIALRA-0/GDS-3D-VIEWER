@@ -35,6 +35,11 @@ SESSION_DIR = DATA_DIR / "sessions"
 SAMPLE_DIR = DATA_DIR / "samples"
 PRESET_DIR = BASE_DIR / "packages" / "shared" / "presets"
 FIXTURE_DIR = BASE_DIR / "fixtures"
+DETAIL_POLYGON_THRESHOLD = 25_000
+DETAIL_INSTANCE_THRESHOLD = 8_000
+DETAIL_DEFERRED_WARNING = (
+    "Detailed mesh generation was deferred for this large layout. Switch to Full mode to generate it on demand."
+)
 
 DEFAULT_SAMPLE_ID = "default"
 SAMPLE_REGISTRY: dict[str, dict[str, Any]] = {
@@ -140,19 +145,19 @@ def _seed_markers(manifest: ManifestModel) -> list[MarkerModel]:
 
 
 def _sample_state(manifest: ManifestModel) -> SessionStateModel:
-    selected_layers = [layer.id for layer in manifest.layers[: min(4, len(manifest.layers))]]
-    focused = manifest.hierarchy[0] if manifest.hierarchy else None
+    selected_layers = [layer.id for layer in manifest.layers]
+    focused = None
     bookmarks = manifest.bookmarks or [_default_bookmark(manifest)]
     return SessionStateModel(
         panel="viewer",
         selectedLayerIds=selected_layers,
-        focusedNodeId=focused.id if focused else None,
-        selectedMarkerId=manifest.markers[0].id if manifest.markers else None,
+        focusedNodeId=None,
+        selectedMarkerId=None,
         notes=[],
         bookmarks=bookmarks,
         performanceMode="full",
         camera=_default_camera(),
-        selectionMetadata=_selection_from_node(focused),
+        selectionMetadata=None,
     )
 
 
@@ -421,6 +426,17 @@ def _load_json_file(path: Path | None) -> dict[str, Any] | None:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def _is_large_layout(manifest: ManifestModel) -> bool:
+    return (
+        manifest.metrics.polygonCount >= DETAIL_POLYGON_THRESHOLD
+        or manifest.metrics.instanceCount >= DETAIL_INSTANCE_THRESHOLD
+    )
+
+
+def _strip_detail_deferred_warning(warnings: list[str]) -> list[str]:
+    return [warning for warning in warnings if warning != DETAIL_DEFERRED_WARNING]
+
+
 def _generate_asset(gds_path: Path, output_dir: Path, technology: str, asset_prefix: str) -> tuple[str | None, list[str]]:
     warnings: list[str] = []
     asset_url: str | None = None
@@ -532,7 +548,11 @@ def create_session_from_upload(
     manifest.source = "upload"
     manifest = _merge_manifest_overrides(manifest, manifest_override, metrics_override, markers_override)
 
-    asset_url, warnings = _generate_asset(gds_path, session_root, technology, f"sessions/{session_id}")
+    if _is_large_layout(manifest):
+        asset_url = None
+        warnings = [DETAIL_DEFERRED_WARNING]
+    else:
+        asset_url, warnings = _generate_asset(gds_path, session_root, technology, f"sessions/{session_id}")
     baseline_manifest = create_sample_session(DEFAULT_SAMPLE_ID).manifest
     response = _build_session_response(
         session_id=session_id,
@@ -559,6 +579,37 @@ def read_session(session_id: str) -> SessionResponseModel:
         return create_sample_session(sample_id)
 
     raise FileNotFoundError(session_id)
+
+
+def ensure_detail_asset(session_id: str) -> SessionResponseModel:
+    session = read_session(session_id)
+
+    if session.assetUrl:
+        return session
+
+    if session_id.startswith("sample-"):
+        sample_id = session_id.removeprefix("sample-")
+        sample = SAMPLE_REGISTRY.get(sample_id)
+        if not sample:
+            raise FileNotFoundError(session_id)
+        gds_path = Path(sample["gds"])
+        storage_root = SAMPLE_DIR / sample_id
+        asset_prefix = f"samples/{sample_id}"
+    else:
+        storage_root = SESSION_DIR / session_id
+        source_dir = storage_root / "sources"
+        gds_candidates = sorted(source_dir.glob("*.gds")) + sorted(source_dir.glob("*.gdsii"))
+        if not gds_candidates:
+            raise FileNotFoundError(f"No GDS source found for session {session_id}")
+        gds_path = gds_candidates[0]
+        asset_prefix = f"sessions/{session_id}"
+
+    asset_url, warnings = _generate_asset(gds_path, storage_root, session.manifest.technology, asset_prefix)
+    session.assetUrl = asset_url
+    session.warnings = _strip_detail_deferred_warning(list(session.warnings))
+    session.warnings.extend(warnings)
+    _save_session_file(storage_root, session)
+    return session
 
 
 def export_session(session: SessionResponseModel) -> tuple[str, bytes]:

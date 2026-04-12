@@ -15,6 +15,14 @@ test("cockpit runs the backend-backed review workflow", async ({ page }) => {
   await expect(page.locator(".viewer-shell h2")).toContainText("TinyTapeout", { timeout: 30000 });
   await page.waitForLoadState("networkidle");
 
+  await page.locator(".panel-tab-row").getByRole("button", { name: "Layers", exact: true }).click();
+  await expect(page.locator(".panel-hint")).toContainText("Filter summarized review layers");
+  await expect(page.locator(".layers-panel")).toHaveClass(/is-panel-focus/);
+
+  await page.locator(".panel-tab-row").getByRole("button", { name: "Explain", exact: true }).click();
+  await expect(page.locator(".panel-hint")).toContainText("Generate an AI explanation");
+  await expect(page.locator(".rail-right .panel").nth(1)).toHaveClass(/is-panel-focus/);
+
   const sampleResponse = page.waitForResponse((response) => response.url().includes("/api/samples/openroad-demo") && response.status() === 200);
   await page.getByRole("button", { name: /openroad bundle demo/i }).click();
   await sampleResponse;

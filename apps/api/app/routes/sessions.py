@@ -7,6 +7,7 @@ from app.services.session_service import (
     DEFAULT_SAMPLE_ID,
     create_sample_session,
     create_session_from_upload,
+    ensure_detail_asset,
     export_session,
     list_sample_summaries,
     parse_json_upload,
@@ -41,6 +42,16 @@ def get_session(session_id: str) -> SessionResponseModel:
         return read_session(session_id)
     except FileNotFoundError as exc:
         raise HTTPException(status_code=404, detail="Session not found") from exc
+
+
+@router.post("/sessions/{session_id}/detail", response_model=SessionResponseModel)
+def generate_detail_asset(session_id: str) -> SessionResponseModel:
+    try:
+        return ensure_detail_asset(session_id)
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=404, detail="Session not found") from exc
+    except Exception as exc:
+        raise HTTPException(status_code=422, detail=f"Failed to generate detailed mesh: {exc}") from exc
 
 
 @router.post("/sessions", response_model=SessionResponseModel)

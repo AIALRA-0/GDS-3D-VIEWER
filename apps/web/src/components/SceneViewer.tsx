@@ -52,6 +52,8 @@ interface ViewerRuntime {
   };
 }
 
+const DETAIL_POLYGON_THRESHOLD = 25000;
+
 function colorForSeverity(severity: ReviewMarker["severity"]): string {
   switch (severity) {
     case "critical":
@@ -127,19 +129,24 @@ export default function SceneViewer({
     }
 
     host.innerHTML = "";
+    host.style.touchAction = "none";
 
     const scene = new THREE.Scene();
-    if (performanceMode !== "simplified") {
-      scene.fog = new THREE.Fog("#10161d", 18, 44);
-    }
+    const detailAssetUrl = assetUrl ?? null;
+    const shouldRenderDetailedGeometry = Boolean(detailAssetUrl) && performanceMode === "full";
+    const isHeavyGeometry = manifest.metrics.polygonCount >= DETAIL_POLYGON_THRESHOLD;
 
     const camera = new THREE.PerspectiveCamera(40, host.clientWidth / Math.max(host.clientHeight, 1), 0.1, 300);
     camera.position.set(12, 11, 16);
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, performanceMode === "simplified" ? 1 : 1.8));
+    const renderer = new THREE.WebGLRenderer({
+      antialias: performanceMode === "full" && !isHeavyGeometry,
+      alpha: true,
+      powerPreference: "high-performance"
+    });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, performanceMode === "full" && !isHeavyGeometry ? 1.2 : 1));
     renderer.setSize(host.clientWidth, host.clientHeight, false);
-    renderer.shadowMap.enabled = performanceMode === "full";
+    renderer.shadowMap.enabled = false;
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     host.appendChild(renderer.domElement);
 
@@ -155,7 +162,7 @@ export default function SceneViewer({
     controls.target.set(0, 0.6, 0);
     controls.mouseButtons = {
       LEFT: THREE.MOUSE.ROTATE,
-      MIDDLE: THREE.MOUSE.DOLLY,
+      MIDDLE: THREE.MOUSE.PAN,
       RIGHT: THREE.MOUSE.PAN
     };
     controls.touches = {
@@ -187,28 +194,7 @@ export default function SceneViewer({
     fillLight.position.set(-12, 8, -10);
     scene.add(fillLight);
 
-    const floor = new THREE.Mesh(
-      new THREE.PlaneGeometry(96, 96),
-      new THREE.MeshStandardMaterial({
-        color: "#0f141b",
-        roughness: 0.98,
-        metalness: 0.02
-      })
-    );
-    floor.rotation.x = -Math.PI / 2;
-    floor.position.y = -1.6;
-    floor.receiveShadow = performanceMode === "full";
-    scene.add(floor);
-
-    if (performanceMode !== "simplified") {
-      const grid = new THREE.GridHelper(96, 48, "#324150", "#202933");
-      grid.position.y = -1.58;
-      scene.add(grid);
-    }
-
     const root = new THREE.Group();
-    root.rotation.x = -0.55;
-    root.rotation.z = -0.05;
     scene.add(root);
 
     const bbox = manifest.metrics.bbox;
@@ -287,7 +273,7 @@ export default function SceneViewer({
         new THREE.LineBasicMaterial({
           color: "#2d3844",
           transparent: true,
-          opacity: performanceMode === "hierarchy-preview" ? 0.84 : 0.42
+          opacity: performanceMode === "hierarchy-preview" ? 0.84 : 0.32
         })
       );
       edges.position.copy(center);
@@ -350,14 +336,23 @@ export default function SceneViewer({
     }
 
     let importedRoot: THREE.Object3D | null = null;
-    if (assetUrl && performanceMode !== "hierarchy-preview") {
+    if (shouldRenderDetailedGeometry) {
       const loader = new GLTFLoader();
       loader.load(
-        assetUrl,
+        detailAssetUrl!,
         (gltf) => {
           importedRoot = gltf.scene;
-          importedRoot.scale.setScalar(Math.max(layoutScale * 1.25, 0.0006));
-          importedRoot.position.set(0, 0, 0);
+          const importedBounds = new THREE.Box3().setFromObject(importedRoot);
+          const importedCenter = importedBounds.getCenter(new THREE.Vector3());
+          const importedSize = importedBounds.getSize(new THREE.Vector3());
+          const importedLargest = Math.max(importedSize.x, importedSize.y, importedSize.z, 1);
+          const scaleFactor = 8.5 / importedLargest;
+          importedRoot.scale.setScalar(scaleFactor);
+          importedRoot.position.set(
+            -importedCenter.x * scaleFactor,
+            -importedCenter.y * scaleFactor,
+            -importedCenter.z * scaleFactor
+          );
           importedRoot.traverse((entry) => {
             if ("material" in entry) {
               const material = entry.material as THREE.Material | THREE.Material[] | undefined;
@@ -365,7 +360,7 @@ export default function SceneViewer({
               for (const item of materials) {
                 if ("transparent" in item) {
                   (item as THREE.MeshStandardMaterial).transparent = true;
-                  (item as THREE.MeshStandardMaterial).opacity = performanceMode === "simplified" ? 0.52 : 0.72;
+                  (item as THREE.MeshStandardMaterial).opacity = 0.92;
                 }
               }
             }
@@ -453,6 +448,9 @@ export default function SceneViewer({
     }
 
     function onPointerDown(event: PointerEvent) {
+      if (event.button === 1 || event.button === 2) {
+        event.preventDefault();
+      }
       pointerStart = { x: event.clientX, y: event.clientY, button: event.button };
       renderer.domElement.style.cursor = event.button === 2 ? "grabbing" : "grab";
     }
@@ -518,6 +516,9 @@ export default function SceneViewer({
     };
 
     const onContextMenu = (event: MouseEvent) => event.preventDefault();
+    const onAuxClick = (event: MouseEvent) => event.preventDefault();
+    const onWheel = (event: WheelEvent) => event.preventDefault();
+    const onGesture = (event: Event) => event.preventDefault();
 
     eventedControls.addEventListener("start", onControlStart);
     eventedControls.addEventListener("change", onControlChange);
@@ -527,6 +528,11 @@ export default function SceneViewer({
     renderer.domElement.addEventListener("pointerup", onPointerUp);
     renderer.domElement.addEventListener("dblclick", onDoubleClick);
     renderer.domElement.addEventListener("contextmenu", onContextMenu);
+    renderer.domElement.addEventListener("auxclick", onAuxClick);
+    renderer.domElement.addEventListener("wheel", onWheel, { passive: false });
+    renderer.domElement.addEventListener("gesturestart", onGesture);
+    renderer.domElement.addEventListener("gesturechange", onGesture);
+    renderer.domElement.addEventListener("gestureend", onGesture);
 
     function animate() {
       const selection = latestSelectionRef.current;
@@ -538,15 +544,19 @@ export default function SceneViewer({
           selection.selectedLayerIds.length === 0 ||
           node.focusLayerIds.some((layerId) => selection.selectedLayerIds.includes(layerId));
         const baseOpacity =
-          selection.performanceMode === "hierarchy-preview"
-            ? isVisibleLayer
-              ? 0.7
-              : 0.18
+          selection.performanceMode === "full"
+            ? isFocused
+              ? 0.18
+              : 0.001
+            : selection.performanceMode === "hierarchy-preview"
+              ? isVisibleLayer
+                ? 0.7
+                : 0.18
             : isVisibleLayer
               ? 0.1
               : 0.03;
         material.opacity = isFocused ? Math.max(baseOpacity, 0.92) : baseOpacity;
-        material.color.set(isFocused ? "#c97c47" : isVisibleLayer ? "#718796" : "#37434f");
+        material.color.set(isFocused ? "#c97c47" : isVisibleLayer ? "#718796" : "#4f6070");
         material.emissive.set(isFocused ? "#f2af72" : "#000000");
         material.emissiveIntensity = isFocused ? 0.34 : 0;
         mesh.scale.setScalar(isFocused ? 1.04 : 1);
@@ -592,6 +602,11 @@ export default function SceneViewer({
       renderer.domElement.removeEventListener("pointerup", onPointerUp);
       renderer.domElement.removeEventListener("dblclick", onDoubleClick);
       renderer.domElement.removeEventListener("contextmenu", onContextMenu);
+      renderer.domElement.removeEventListener("auxclick", onAuxClick);
+      renderer.domElement.removeEventListener("wheel", onWheel);
+      renderer.domElement.removeEventListener("gesturestart", onGesture);
+      renderer.domElement.removeEventListener("gesturechange", onGesture);
+      renderer.domElement.removeEventListener("gestureend", onGesture);
       controls.dispose();
       if (typeof renderer.forceContextLoss === "function") {
         renderer.forceContextLoss();
