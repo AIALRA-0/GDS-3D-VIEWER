@@ -12,15 +12,15 @@ Traditional browser viewers can render geometry, but they usually stop at visual
 - OpenROAD and Virtuoso-export friendly sidecars
 - deployment-ready frontend and API split
 
-## MVP Scope
+## Delivered Scope
 
-- Upload a GDS file and optional sidecars
-- Convert the layout into a browser-renderable glTF scene
-- Inspect layers, hierarchy, bounding box, polygon counts, and design metadata
-- Load metrics and compatibility manifests from OpenROAD-style flows
-- Ask the AI explainer for a summary or ask the AI operator to produce viewer actions
-- Preserve review state with shareable scene parameters
-- Run smoke validation with Playwright and backend tests
+- Upload a `GDS` file with optional `manifest.json`, `metrics.json`, `markers.json`, `DEF`, and `LEF` sidecars
+- Inspect live sample bundles exposed by the backend through `/api/samples`
+- Review layers, hierarchy, bbox, polygon counts, metrics, markers, and bookmarks in one cockpit
+- Use CAD-style interaction: left-drag orbit, right-drag pan, wheel zoom-to-cursor, double-click focus
+- Run `Explain` and `Operator` actions through a DeepSeek-compatible backend with deterministic fallback
+- Save notes and bookmarks, export the full review session JSON, and reload exported sessions
+- Run backend-bound Playwright smoke validation and deployment smoke checks
 
 ## Repository Layout
 
@@ -68,12 +68,16 @@ If those variables are missing, ICViewer falls back to deterministic rule-based 
 
 ## Useful Endpoints
 
+- `GET /api/samples`
 - `GET /health`
 - `GET /api/samples/default`
+- `GET /api/samples/{sample_id}`
 - `POST /api/sessions`
+- `GET /api/sessions/{session_id}`
 - `POST /api/explain`
 - `POST /api/command`
 - `POST /api/diff`
+- `POST /api/export`
 
 ## Verification
 
@@ -84,6 +88,9 @@ cd apps/api
 cd ../web
 npm run build
 npm run test:e2e
+
+cd ../..
+./scripts/smoke.sh
 ```
 
 ## Compatibility Model
@@ -103,5 +110,15 @@ That keeps the hackathon build realistic: we support outputs from commercial and
 - Reverse proxy: Nginx
 - Backend port: `34000`
 - Cloudflare in front of the origin
+- Deploy root: `/srv/icviewer`
+- Backend service: `icviewer.service`
+
+## Live Deployment
+
+```bash
+chmod +x scripts/deploy.sh scripts/smoke.sh
+sudo ./scripts/deploy.sh
+./scripts/smoke.sh https://icviewer.aialra.online
+```
 
 Deployment notes and an Nginx example are documented in [docs/DEPLOYMENT.md](/aialra/ICViewer/repo/docs/DEPLOYMENT.md).

@@ -13,12 +13,20 @@ export default defineConfig({
   },
   webServer: process.env.PLAYWRIGHT_BASE_URL
     ? undefined
-    : {
-        command: "npm run dev -- --host 127.0.0.1 --port 4173",
-        url: baseURL,
-        reuseExistingServer: true,
-        timeout: 120000
-      },
+    : [
+        {
+          command: "cd ../api && ../../.venv/bin/uvicorn app.main:app --host 127.0.0.1 --port 34000",
+          url: "http://127.0.0.1:34000/health",
+          reuseExistingServer: true,
+          timeout: 120000
+        },
+        {
+          command: "npm run dev -- --host 127.0.0.1 --port 4173",
+          url: baseURL,
+          reuseExistingServer: true,
+          timeout: 120000
+        }
+      ],
   projects: [
     {
       name: "chromium",

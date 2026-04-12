@@ -1,0 +1,26 @@
+{
+  "markers": [
+    {
+      "id": "openroad-timing",
+      "title": "Timing focus",
+      "message": "Control logic is the most presentation-friendly timing discussion point.",
+      "severity": "warning",
+      "category": "timing",
+      "position": [4800, 3200, 2],
+      "bbox": [3600, 2600, 0, 6200, 4100, 4],
+      "focusLayerIds": ["L67D20", "L68D20"],
+      "nodeId": "top"
+    },
+    {
+      "id": "openroad-power",
+      "title": "Power mesh",
+      "message": "Metal stack density looks good for a quick power-mesh walkthrough.",
+      "severity": "info",
+      "category": "power",
+      "position": [6000, 4300, 3],
+      "bbox": [5200, 3500, 0, 7000, 5000, 5],
+      "focusLayerIds": ["L68D20", "L69D20"],
+      "nodeId": "top"
+    }
+  ]
+}

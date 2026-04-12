@@ -41,7 +41,8 @@
           "thicknessNm": { "type": "number" },
           "gdsLayer": { "type": "integer" },
           "datatype": { "type": "integer" },
-          "polygonCount": { "type": "integer" }
+          "polygonCount": { "type": "integer" },
+          "source": { "type": "string" }
         }
       }
     },
@@ -73,7 +74,55 @@
         "netCount": { "type": "integer" },
         "layerCount": { "type": "integer" },
         "estimatedAreaMm2": { "type": "number" },
-        "utilizationPercent": { "type": "number" }
+        "utilizationPercent": { "type": "number" },
+        "wirelengthUm": { "type": "number" },
+        "negativeSlackNs": { "type": "number" }
+      }
+    },
+    "markers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "title", "message", "severity", "category", "position", "focusLayerIds"],
+        "properties": {
+          "id": { "type": "string" },
+          "title": { "type": "string" },
+          "message": { "type": "string" },
+          "severity": { "enum": ["info", "warning", "critical"] },
+          "category": { "type": "string" },
+          "position": { "type": "array", "items": { "type": "number" }, "minItems": 3, "maxItems": 3 },
+          "bbox": {
+            "anyOf": [
+              { "type": "null" },
+              { "type": "array", "items": { "type": "number" }, "minItems": 6, "maxItems": 6 }
+            ]
+          },
+          "focusLayerIds": { "type": "array", "items": { "type": "string" } },
+          "nodeId": { "type": ["string", "null"] }
+        }
+      }
+    },
+    "bookmarks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "camera", "selectedLayerIds", "createdAt"],
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "camera": {
+            "type": "object",
+            "required": ["position", "target"],
+            "properties": {
+              "position": { "type": "array", "items": { "type": "number" }, "minItems": 3, "maxItems": 3 },
+              "target": { "type": "array", "items": { "type": "number" }, "minItems": 3, "maxItems": 3 }
+            }
+          },
+          "selectedLayerIds": { "type": "array", "items": { "type": "string" } },
+          "focusedNodeId": { "type": ["string", "null"] },
+          "note": { "type": ["string", "null"] },
+          "createdAt": { "type": "string" }
+        }
       }
     },
     "notes": { "type": "array", "items": { "type": "string" } },

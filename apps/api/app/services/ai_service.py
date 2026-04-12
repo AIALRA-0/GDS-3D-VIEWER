@@ -21,16 +21,19 @@ def _top_layers(manifest: ManifestModel) -> list[str]:
 
 def build_local_explain(manifest: ManifestModel) -> ExplainResultModel:
     layers = _top_layers(manifest)
+    marker_count = len(manifest.markers or [])
+    bookmark_count = len(manifest.bookmarks or [])
     summary = (
         f"{manifest.name} is a {manifest.technology} layout with {manifest.metrics.layerCount} tracked layers, "
-        f"{manifest.metrics.instanceCount} instances, and {manifest.metrics.polygonCount} polygons."
+        f"{manifest.metrics.instanceCount} instances, {manifest.metrics.polygonCount} polygons, "
+        f"and {marker_count} review markers."
     )
     return ExplainResultModel(
         summary=summary,
         highlights=[
             f"Top cell area is approximately {manifest.metrics.estimatedAreaMm2:.4f} mm².",
             f"Most active layers: {', '.join(layers) if layers else 'none detected'}.",
-            f"Hierarchy snapshot contains {len(manifest.hierarchy)} summarized nodes.",
+            f"Hierarchy snapshot contains {len(manifest.hierarchy)} summarized nodes and {bookmark_count} saved viewpoints.",
         ],
         concerns=[
             "Virtuoso-native database inspection is intentionally out of scope; use exported GDS plus sidecars.",
@@ -38,10 +41,10 @@ def build_local_explain(manifest: ManifestModel) -> ExplainResultModel:
         ],
         nextSteps=[
             "Inspect the densest metal layers and macro hierarchy.",
-            "Attach metrics.json or DEF/LEF sidecars for richer engineering context.",
-            "Use the operator panel to isolate suspicious blocks before review.",
+            "Attach metrics.json, markers.json, or DEF/LEF sidecars for richer engineering context.",
+            "Use bookmarks to capture stable demo viewpoints before live review.",
         ],
-        confidence=0.54,
+        confidence=0.58,
         source="local-rule",
     )
 
@@ -75,11 +78,37 @@ def build_local_command(manifest: ManifestModel, prompt: str) -> OperatorResultM
                     OperatorActionModel(type="isolate", label=f"Isolate {layer.name}", targetId=layer.id)
                 )
 
-    if "focus" in prompt_lc or "macro" in prompt_lc or "cell" in prompt_lc:
-        for node in manifest.hierarchy:
-            if node.name.lower() in prompt_lc:
-                actions.append(OperatorActionModel(type="focus", label=f"Focus {node.name}", targetId=node.id))
-                break
+    for node in manifest.hierarchy:
+        if node.name.lower() in prompt_lc:
+            actions.append(OperatorActionModel(type="focus", label=f"Focus {node.name}", targetId=node.id))
+            break
+
+    for marker in manifest.markers or []:
+        if marker.title.lower() in prompt_lc or marker.category.lower() in prompt_lc:
+            actions.append(
+                OperatorActionModel(
+                    type="focus-marker",
+                    label=f"Focus marker {marker.title}",
+                    targetId=marker.id,
+                )
+            )
+            break
+
+    if "bookmark" in prompt_lc or "save view" in prompt_lc:
+        actions.append(OperatorActionModel(type="bookmark", label="Save current bookmark"))
+
+    if "performance" in prompt_lc:
+        mode = "hierarchy-preview" if "preview" in prompt_lc else "simplified"
+        actions.append(
+            OperatorActionModel(
+                type="performance-mode",
+                label=f"Switch to {mode}",
+                payload=mode,
+            )
+        )
+
+    if "show all" in prompt_lc or "reset" in prompt_lc:
+        actions.append(OperatorActionModel(type="show-all", label="Show all layers and clear isolation"))
 
     if "note" in prompt_lc or "annotate" in prompt_lc:
         actions.append(
@@ -167,13 +196,14 @@ async def build_command(manifest: ManifestModel, prompt: str) -> OperatorResultM
 
     system_prompt = (
         "You are an IC layout viewer operator. Return JSON with keys title, rationale, actions. "
-        "Each action must use one of: focus, isolate, toggle-layer, annotate."
+        "Each action must use one of: focus, focus-marker, isolate, toggle-layer, annotate, bookmark, show-all, performance-mode."
     )
     user_prompt = json.dumps(
         {
             "prompt": prompt,
             "layers": [layer.model_dump(mode="json") for layer in manifest.layers],
             "hierarchy": [node.model_dump(mode="json") for node in manifest.hierarchy[:24]],
+            "markers": [marker.model_dump(mode="json") for marker in (manifest.markers or [])[:12]],
         }
     )
     try:

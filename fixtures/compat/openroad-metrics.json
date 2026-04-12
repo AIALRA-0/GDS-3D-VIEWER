@@ -5,5 +5,7 @@
   "netCount": 920,
   "layerCount": 7,
   "estimatedAreaMm2": 0.94,
-  "utilizationPercent": 71.6
+  "utilizationPercent": 71.6,
+  "wirelengthUm": 12842.4,
+  "negativeSlackNs": -0.08
 }

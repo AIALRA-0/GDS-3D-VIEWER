@@ -1,5 +1,11 @@
-import type { DiffSummary, ExplainResult, LayoutManifest, OperatorResult, SessionPayload } from "../../../../packages/shared/types";
-import { createLocalExplainResult, createLocalOperatorResult, createLocalSessionPayload, createLocalDiffSummary } from "./demo";
+import type {
+  DiffSummary,
+  ExplainResult,
+  LayoutManifest,
+  OperatorResult,
+  SampleSummary,
+  SessionPayload
+} from "../../../../packages/shared/types";
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL?.trim().replace(/\/$/, "") ?? "";
 
@@ -15,18 +21,53 @@ function pickFile(files: File[], matcher: (file: File) => boolean): File | null 
   return files.find(matcher) ?? null;
 }
 
-export async function loadDefaultSession(): Promise<SessionPayload> {
-  try {
-    return await fetchJson<SessionPayload>("/api/samples/default");
-  } catch {
-    return createLocalSessionPayload();
+function inferTechnology(files: File[]): string {
+  return files.some((file) => /openroad|openlane|def|lef/i.test(file.name)) ? "openroad-sky130" : "sky130";
+}
+
+function isSessionPayload(value: unknown): value is SessionPayload {
+  if (!value || typeof value !== "object") {
+    return false;
   }
+  const candidate = value as Partial<SessionPayload>;
+  return Boolean(candidate.manifest && candidate.state && candidate.explain && candidate.operator && candidate.diff);
+}
+
+async function readImportedSession(file: File | null): Promise<SessionPayload | null> {
+  if (!file) {
+    return null;
+  }
+  const text = await file.text();
+  const parsed = JSON.parse(text) as unknown;
+  if (!isSessionPayload(parsed)) {
+    return null;
+  }
+  return parsed;
+}
+
+export async function loadSamples(): Promise<SampleSummary[]> {
+  return await fetchJson<SampleSummary[]>("/api/samples");
+}
+
+export async function loadDefaultSession(): Promise<SessionPayload> {
+  return await fetchJson<SessionPayload>("/api/samples/default");
+}
+
+export async function loadSampleSession(sampleId: string): Promise<SessionPayload> {
+  return await fetchJson<SessionPayload>(`/api/samples/${sampleId}`);
 }
 
 export async function createSessionFromFiles(files: File[]): Promise<SessionPayload> {
+  const imported = await readImportedSession(
+    pickFile(files, (file) => /session\.json$/i.test(file.name) || /icviewer/i.test(file.name))
+  );
+  if (imported) {
+    return imported;
+  }
+
   const gds = pickFile(files, (file) => /\.(gds|gdsii)$/i.test(file.name));
   if (!gds) {
-    return createLocalSessionPayload(files);
+    throw new Error("Upload a GDS bundle or an exported session JSON.");
   }
 
   const formData = new FormData();
@@ -34,6 +75,7 @@ export async function createSessionFromFiles(files: File[]): Promise<SessionPayl
 
   const manifest = pickFile(files, (file) => /manifest\.json$/i.test(file.name));
   const metrics = pickFile(files, (file) => /metrics?\.json$/i.test(file.name));
+  const markers = pickFile(files, (file) => /markers?\.json$/i.test(file.name));
   const defFile = pickFile(files, (file) => /\.def$/i.test(file.name));
   const lefFile = pickFile(files, (file) => /\.lef$/i.test(file.name));
 
@@ -43,48 +85,55 @@ export async function createSessionFromFiles(files: File[]): Promise<SessionPayl
   if (metrics) {
     formData.append("metrics", metrics);
   }
+  if (markers) {
+    formData.append("markers", markers);
+  }
   if (defFile) {
     formData.append("def_file", defFile);
   }
   if (lefFile) {
     formData.append("lef_file", lefFile);
   }
-  formData.append("technology", "sky130");
+  formData.append("technology", inferTechnology(files));
 
-  try {
-    return await fetchJson<SessionPayload>("/api/sessions", {
-      method: "POST",
-      body: formData
-    });
-  } catch {
-    return createLocalSessionPayload(files);
-  }
+  return await fetchJson<SessionPayload>("/api/sessions", {
+    method: "POST",
+    body: formData
+  });
 }
 
 export async function explainLayout(manifest: LayoutManifest, prompt: string): Promise<ExplainResult> {
-  try {
-    return await fetchJson<ExplainResult>("/api/explain", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ manifest, prompt })
-    });
-  } catch {
-    return createLocalExplainResult(manifest, prompt);
-  }
+  return await fetchJson<ExplainResult>("/api/explain", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ manifest, prompt })
+  });
 }
 
 export async function runOperator(manifest: LayoutManifest, prompt: string): Promise<OperatorResult> {
-  try {
-    return await fetchJson<OperatorResult>("/api/command", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ manifest, prompt })
-    });
-  } catch {
-    return createLocalOperatorResult(manifest, prompt);
-  }
+  return await fetchJson<OperatorResult>("/api/command", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ manifest, prompt })
+  });
 }
 
-export function buildDiffSummary(current: LayoutManifest, baseline: LayoutManifest): DiffSummary {
-  return createLocalDiffSummary(current, baseline);
+export async function buildDiffSummary(current: LayoutManifest, baseline: LayoutManifest): Promise<DiffSummary> {
+  return await fetchJson<DiffSummary>("/api/diff", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ left: baseline, right: current })
+  });
+}
+
+export async function exportSessionPayload(session: SessionPayload): Promise<Blob> {
+  const response = await fetch(`${API_BASE}/api/export`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ session })
+  });
+  if (!response.ok) {
+    throw new Error(`Export failed with ${response.status}`);
+  }
+  return await response.blob();
 }

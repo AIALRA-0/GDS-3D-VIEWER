@@ -15,6 +15,7 @@ class LayerModel(BaseModel):
     gdsLayer: int = 0
     datatype: int = 0
     polygonCount: int = 0
+    source: str = "gds"
 
 
 class HierarchyNodeModel(BaseModel):
@@ -37,6 +38,46 @@ class MetricsModel(BaseModel):
     layerCount: int = 0
     estimatedAreaMm2: float = 0.0
     utilizationPercent: float = 0.0
+    wirelengthUm: float = 0.0
+    negativeSlackNs: float = 0.0
+
+
+class MarkerModel(BaseModel):
+    id: str
+    title: str
+    message: str = ""
+    severity: Literal["info", "warning", "critical"] = "info"
+    category: str = "review"
+    position: list[float] = Field(default_factory=lambda: [0, 0, 0])
+    bbox: list[float] | None = None
+    focusLayerIds: list[str] = Field(default_factory=list)
+    nodeId: str | None = None
+
+
+class CameraStateModel(BaseModel):
+    position: list[float] = Field(default_factory=lambda: [12.0, 11.0, 16.0])
+    target: list[float] = Field(default_factory=lambda: [0.0, 1.2, 0.0])
+
+
+class BookmarkModel(BaseModel):
+    id: str
+    name: str
+    camera: CameraStateModel = Field(default_factory=CameraStateModel)
+    selectedLayerIds: list[str] = Field(default_factory=list)
+    focusedNodeId: str | None = None
+    note: str | None = None
+    createdAt: str
+
+
+class SelectionMetadataModel(BaseModel):
+    id: str | None = None
+    name: str | None = None
+    kind: str | None = None
+    bbox: list[float] | None = None
+    focusLayerIds: list[str] = Field(default_factory=list)
+    polygonCount: int = 0
+    instanceCount: int = 0
+    markerId: str | None = None
 
 
 class ManifestModel(BaseModel):
@@ -52,7 +93,17 @@ class ManifestModel(BaseModel):
     hierarchy: list[HierarchyNodeModel] = Field(default_factory=list)
     metrics: MetricsModel = Field(default_factory=MetricsModel)
     notes: list[str] = Field(default_factory=list)
+    markers: list[MarkerModel] = Field(default_factory=list)
+    bookmarks: list[BookmarkModel] = Field(default_factory=list)
     generatedAt: str
+
+
+class ReviewNoteModel(BaseModel):
+    id: str
+    author: str
+    message: str
+    layerIds: list[str] = Field(default_factory=list)
+    createdAt: str
 
 
 class ExplainResultModel(BaseModel):
@@ -65,7 +116,16 @@ class ExplainResultModel(BaseModel):
 
 
 class OperatorActionModel(BaseModel):
-    type: Literal["focus", "isolate", "toggle-layer", "annotate"]
+    type: Literal[
+        "focus",
+        "focus-marker",
+        "isolate",
+        "toggle-layer",
+        "annotate",
+        "bookmark",
+        "show-all",
+        "performance-mode",
+    ]
     label: str
     targetId: str | None = None
     payload: str | None = None
@@ -86,11 +146,23 @@ class DiffSummaryModel(BaseModel):
     deltaLines: list[str] = Field(default_factory=list)
 
 
+class ExportMetadataModel(BaseModel):
+    formatVersion: str = "icviewer-session-v1"
+    exportedAt: str
+    exportedBy: str = "ICViewer"
+    sourceSessionId: str | None = None
+
+
 class SessionStateModel(BaseModel):
     panel: str = "viewer"
     selectedLayerIds: list[str] = Field(default_factory=list)
     focusedNodeId: str | None = None
-    notes: list[dict] = Field(default_factory=list)
+    selectedMarkerId: str | None = None
+    notes: list[ReviewNoteModel] = Field(default_factory=list)
+    bookmarks: list[BookmarkModel] = Field(default_factory=list)
+    performanceMode: Literal["full", "simplified", "hierarchy-preview"] = "full"
+    camera: CameraStateModel = Field(default_factory=CameraStateModel)
+    selectionMetadata: SelectionMetadataModel | None = None
 
 
 class SessionResponseModel(BaseModel):
@@ -102,6 +174,18 @@ class SessionResponseModel(BaseModel):
     operator: OperatorResultModel
     diff: DiffSummaryModel
     warnings: list[str] = Field(default_factory=list)
+    exportMetadata: ExportMetadataModel | None = None
+
+
+class SampleSummaryModel(BaseModel):
+    id: str
+    sessionId: str
+    name: str
+    description: str
+    technology: str
+    tags: list[str] = Field(default_factory=list)
+    sourceFiles: list[str] = Field(default_factory=list)
+    generatedAt: str
 
 
 class ExplainRequestModel(BaseModel):
@@ -117,3 +201,7 @@ class CommandRequestModel(BaseModel):
 class DiffRequestModel(BaseModel):
     left: ManifestModel
     right: ManifestModel
+
+
+class ExportRequestModel(BaseModel):
+    session: SessionResponseModel
