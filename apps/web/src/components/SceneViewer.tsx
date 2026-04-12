@@ -44,6 +44,9 @@ interface ViewerRuntime {
   emitCameraState: () => void;
   fitBounds: (bbox: [number, number, number, number, number, number] | number[]) => void;
   resetCamera: () => void;
+  interactionState: {
+    active: boolean;
+  };
 }
 
 function colorForSeverity(severity: ReviewMarker["severity"]): string {
@@ -135,6 +138,10 @@ export default function SceneViewer({
     host.appendChild(renderer.domElement);
 
     const controls = new OrbitControls(camera, renderer.domElement);
+    const eventedControls = controls as OrbitControls & {
+      addEventListener(type: "start" | "change" | "end", listener: () => void): void;
+      removeEventListener(type: "start" | "change" | "end", listener: () => void): void;
+    };
     controls.enableDamping = true;
     controls.dampingFactor = 0.08;
     controls.minDistance = 2.6;
@@ -390,6 +397,9 @@ export default function SceneViewer({
       disposeObjects,
       layoutCenter: { x: centerX, y: centerY, z: centerZ },
       layoutScale,
+      interactionState: {
+        active: false
+      },
       emitCameraState: () => {
         latestCameraChangeRef.current(roundCameraState(camera, controls.target));
       },
@@ -481,8 +491,31 @@ export default function SceneViewer({
       fitBounds(manifest.metrics.bbox);
     }
 
+    const onControlStart = () => {
+      runtime.interactionState.active = true;
+      runtime.targetGoal.copy(controls.target);
+      runtime.cameraGoal.copy(camera.position);
+    };
+
+    const onControlChange = () => {
+      if (!runtime.interactionState.active) {
+        return;
+      }
+      runtime.targetGoal.copy(controls.target);
+      runtime.cameraGoal.copy(camera.position);
+    };
+
+    const onControlEnd = () => {
+      runtime.interactionState.active = false;
+      runtime.targetGoal.copy(controls.target);
+      runtime.cameraGoal.copy(camera.position);
+    };
+
     const onContextMenu = (event: MouseEvent) => event.preventDefault();
 
+    eventedControls.addEventListener("start", onControlStart);
+    eventedControls.addEventListener("change", onControlChange);
+    eventedControls.addEventListener("end", onControlEnd);
     renderer.domElement.addEventListener("pointermove", onPointerMove);
     renderer.domElement.addEventListener("pointerdown", onPointerDown);
     renderer.domElement.addEventListener("pointerup", onPointerUp);
@@ -520,8 +553,10 @@ export default function SceneViewer({
         mesh.scale.setScalar(active ? 1.28 : 1);
       }
 
-      controls.target.lerp(runtime.targetGoal, 0.12);
-      camera.position.lerp(runtime.cameraGoal, 0.12);
+      if (!runtime.interactionState.active) {
+        controls.target.lerp(runtime.targetGoal, 0.12);
+        camera.position.lerp(runtime.cameraGoal, 0.12);
+      }
       controls.update();
       renderer.render(scene, camera);
 
@@ -543,6 +578,9 @@ export default function SceneViewer({
     return () => {
       window.cancelAnimationFrame(runtime.frame);
       runtime.observer.disconnect();
+      eventedControls.removeEventListener("start", onControlStart);
+      eventedControls.removeEventListener("change", onControlChange);
+      eventedControls.removeEventListener("end", onControlEnd);
       renderer.domElement.removeEventListener("pointermove", onPointerMove);
       renderer.domElement.removeEventListener("pointerdown", onPointerDown);
       renderer.domElement.removeEventListener("pointerup", onPointerUp);
