@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://icviewer.aialra.online/schemas/manifest.schema.json",
+  "title": "ICViewer Layout Manifest",
+  "type": "object",
+  "required": [
+    "id",
+    "name",
+    "source",
+    "format",
+    "technology",
+    "description",
+    "tags",
+    "sourceFiles",
+    "layers",
+    "hierarchy",
+    "metrics",
+    "notes",
+    "generatedAt"
+  ],
+  "properties": {
+    "id": { "type": "string" },
+    "name": { "type": "string" },
+    "source": { "enum": ["sample", "upload", "remote"] },
+    "format": { "enum": ["gds", "gltf", "bundle"] },
+    "technology": { "type": "string" },
+    "description": { "type": "string" },
+    "tags": { "type": "array", "items": { "type": "string" } },
+    "sourceFiles": { "type": "array", "items": { "type": "string" } },
+    "layers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "color", "visible", "purpose", "thicknessNm"],
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "color": { "type": "string" },
+          "visible": { "type": "boolean" },
+          "purpose": { "type": "string" },
+          "thicknessNm": { "type": "number" },
+          "gdsLayer": { "type": "integer" },
+          "datatype": { "type": "integer" },
+          "polygonCount": { "type": "integer" }
+        }
+      }
+    },
+    "hierarchy": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "kind", "childCount", "instanceCount", "polygonCount", "bbox", "focusLayerIds"],
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "kind": { "enum": ["chip", "macro", "cell", "leaf"] },
+          "childCount": { "type": "integer" },
+          "instanceCount": { "type": "integer" },
+          "polygonCount": { "type": "integer" },
+          "bbox": { "type": "array", "items": { "type": "number" }, "minItems": 6, "maxItems": 6 },
+          "focusLayerIds": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+    "metrics": {
+      "type": "object",
+      "required": ["bbox", "cellCount", "instanceCount", "polygonCount", "netCount", "layerCount", "estimatedAreaMm2", "utilizationPercent"],
+      "properties": {
+        "bbox": { "type": "array", "items": { "type": "number" }, "minItems": 6, "maxItems": 6 },
+        "cellCount": { "type": "integer" },
+        "instanceCount": { "type": "integer" },
+        "polygonCount": { "type": "integer" },
+        "netCount": { "type": "integer" },
+        "layerCount": { "type": "integer" },
+        "estimatedAreaMm2": { "type": "number" },
+        "utilizationPercent": { "type": "number" }
+      }
+    },
+    "notes": { "type": "array", "items": { "type": "string" } },
+    "generatedAt": { "type": "string" }
+  }
+}

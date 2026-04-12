@@ -1,0 +1,13 @@
+{
+  "id": "openroad-sky130",
+  "name": "OpenROAD Sky130",
+  "sourceTool": "openroad",
+  "layers": [
+    { "id": "substrate", "gdsLayer": 235, "datatype": 4, "name": "substrate", "color": "#4a4a4a", "rgba": [0.18, 0.18, 0.18, 1.0], "visible": true, "purpose": "base", "thicknessNm": 2000, "zmin": -2.0, "zmax": 0.0 },
+    { "id": "nwell", "gdsLayer": 64, "datatype": 20, "name": "nwell", "color": "#5e5e5e", "rgba": [0.37, 0.37, 0.37, 1.0], "visible": true, "purpose": "well", "thicknessNm": 520, "zmin": -0.5, "zmax": 0.01 },
+    { "id": "poly", "gdsLayer": 66, "datatype": 20, "name": "poly", "color": "#c95c77", "rgba": [0.79, 0.35, 0.43, 1.0], "visible": true, "purpose": "gate", "thicknessNm": 180, "zmin": 0.0, "zmax": 0.18 },
+    { "id": "met1", "gdsLayer": 68, "datatype": 20, "name": "met1", "color": "#2979ff", "rgba": [0.17, 0.42, 0.88, 1.0], "visible": true, "purpose": "routing", "thicknessNm": 360, "zmin": 1.376, "zmax": 1.736 },
+    { "id": "met2", "gdsLayer": 69, "datatype": 20, "name": "met2", "color": "#8ab4f8", "rgba": [0.64, 0.74, 0.91, 1.0], "visible": true, "purpose": "routing", "thicknessNm": 360, "zmin": 2.0, "zmax": 2.36 },
+    { "id": "met3", "gdsLayer": 70, "datatype": 20, "name": "met3", "color": "#1ea7b6", "rgba": [0.18, 0.62, 0.86, 1.0], "visible": true, "purpose": "routing", "thicknessNm": 420, "zmin": 2.786, "zmax": 3.631 }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "id": "example",
+  "name": "TinyTapeout Example",
+  "source": "sample",
+  "format": "gds",
+  "technology": "sky130",
+  "description": "Reference example layout bundled with the repository for fast backend smoke tests.",
+  "tags": ["sample", "tiny-tapeout", "reference"],
+  "sourceFiles": ["reference/example.gds"],
+  "layers": [
+    { "id": "met1", "name": "met1", "color": "#2979ff", "visible": true, "purpose": "routing", "thicknessNm": 360 },
+    { "id": "poly", "name": "poly", "color": "#c95c77", "visible": true, "purpose": "gate", "thicknessNm": 180 }
+  ],
+  "hierarchy": [],
+  "metrics": {
+    "bbox": [0, 0, 0, 0, 0, 0],
+    "cellCount": 1,
+    "instanceCount": 0,
+    "polygonCount": 0,
+    "netCount": 0,
+    "layerCount": 2,
+    "estimatedAreaMm2": 0.0,
+    "utilizationPercent": 0.0
+  },
+  "notes": ["Fixture manifest that points at the repository reference GDS."],
+  "generatedAt": "2026-04-12T18:09:00Z"
+}

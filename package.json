@@ -1,0 +1,17 @@
+{
+  "name": "icviewer",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "apps/web"
+  ],
+  "scripts": {
+    "build:web": "npm run build --workspace @icviewer/web",
+    "dev:web": "npm run dev --workspace @icviewer/web",
+    "preview:web": "npm run preview --workspace @icviewer/web",
+    "test:e2e": "npm run test:e2e --workspace @icviewer/web"
+  },
+  "devDependencies": {
+    "@types/three": "^0.183.1"
+  }
+}

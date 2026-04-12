@@ -1,0 +1,9 @@
+{
+  "technology": "openroad-sky130",
+  "description": "Compatibility sidecar for OpenROAD-style bundle uploads.",
+  "tags": ["openroad", "compat", "sidecar"],
+  "notes": [
+    "Attach alongside GDS, DEF, LEF, and metrics JSON.",
+    "ICViewer uses this sidecar to name layers and enrich the review story."
+  ]
+}

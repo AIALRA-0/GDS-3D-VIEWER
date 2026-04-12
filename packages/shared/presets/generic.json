@@ -1,0 +1,8 @@
+{
+  "id": "generic",
+  "name": "Generic",
+  "layers": [
+    { "id": "substrate", "gdsLayer": 235, "datatype": 4, "name": "substrate", "color": "#4a4a4a", "rgba": [0.18, 0.18, 0.18, 1.0], "visible": true, "purpose": "base", "thicknessNm": 2000, "zmin": -2.0, "zmax": 0.0 },
+    { "id": "met1", "gdsLayer": 68, "datatype": 20, "name": "met1", "color": "#2979ff", "rgba": [0.17, 0.42, 0.88, 1.0], "visible": true, "purpose": "routing", "thicknessNm": 360, "zmin": 1.376, "zmax": 1.736 }
+  ]
+}
