@@ -191,6 +191,10 @@ def _local_polygon_count(cell: gdstk.Cell) -> int:
     return count
 
 
+def _default_layer_visible(layer_name: str) -> bool:
+    return layer_name not in {"substrate", "nwell", "li1"}
+
+
 def _cell_focus_layers(cell: gdstk.Cell) -> list[tuple[int, int]]:
     focus: list[tuple[int, int]] = []
     seen: set[tuple[int, int]] = set()
@@ -231,12 +235,13 @@ def inspect_gds_file(gds_path: Path, technology: str, source_files: list[str]) -
         layer_info = preset.get((gds_layer, datatype), {})
         zmax = float(layer_info.get("zmax", 0.4))
         max_z = max(max_z, zmax)
+        layer_name = layer_info.get("name", f"layer-{gds_layer}:{datatype}")
         layers.append(
             LayerModel(
                 id=f"L{gds_layer}D{datatype}",
-                name=layer_info.get("name", f"layer-{gds_layer}:{datatype}"),
+                name=layer_name,
                 color=layer_info.get("color", _color_from_spec(gds_layer, datatype)),
-                visible=True,
+                visible=_default_layer_visible(str(layer_name)),
                 purpose=layer_info.get("purpose", "drawing"),
                 thicknessNm=int(layer_info.get("thicknessNm", max(int((zmax * 1000) or 120), 80))),
                 gdsLayer=gds_layer,

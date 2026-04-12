@@ -242,6 +242,10 @@ textarea::placeholder {
   min-height: calc(100vh - 190px);
 }
 
+.workspace-layout {
+  grid-template-columns: minmax(240px, 280px) minmax(0, 1fr) minmax(320px, 360px);
+}
+
 .rail,
 .center-stage {
   display: flex;
@@ -252,6 +256,14 @@ textarea::placeholder {
 
 .panel {
   padding: 18px;
+}
+
+.inline-load-panel {
+  padding-bottom: 14px;
+}
+
+.hierarchy-panel {
+  min-height: calc(100vh - 220px);
 }
 
 .panel-header {
@@ -278,6 +290,12 @@ textarea::placeholder {
   display: block;
   color: #f3c993;
   line-height: 1.45;
+}
+
+.empty-copy {
+  color: var(--text-soft);
+  line-height: 1.6;
+  margin: 0;
 }
 
 .sample-list,
@@ -521,6 +539,21 @@ textarea::placeholder {
   user-select: none;
 }
 
+.viewer-empty {
+  min-height: 540px;
+  display: grid;
+  place-items: center;
+  gap: 10px;
+  text-align: center;
+  color: var(--text-soft);
+  padding: 28px;
+}
+
+.viewer-empty strong {
+  color: var(--text);
+  font-size: 1.12rem;
+}
+
 .viewer-status {
   padding: 0 18px 18px;
   color: var(--text-soft);
@@ -560,6 +593,10 @@ textarea::placeholder {
 
 .selection-card {
   margin: 14px 0;
+}
+
+.ai-context-card {
+  margin: 14px 0 10px;
 }
 
 .note-card p {

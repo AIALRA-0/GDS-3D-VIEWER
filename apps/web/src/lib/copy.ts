@@ -43,6 +43,7 @@ type UiCopy = {
     eyebrow: string;
     title: string;
     working: string;
+    uploadBadge: string;
     sourceFiles: string;
     format: string;
     technology: string;
@@ -54,10 +55,12 @@ type UiCopy = {
     title: string;
     all: string;
     none: string;
+    empty: string;
   };
   markers: {
     eyebrow: string;
     title: string;
+    empty: string;
   };
   center: {
     bundle: string;
@@ -76,6 +79,8 @@ type UiCopy = {
   overview: {
     eyebrow: string;
     title: string;
+    hierarchyTitle: string;
+    metricsTitle: string;
     layers: string;
     cells: string;
     instances: string;
@@ -87,19 +92,28 @@ type UiCopy = {
     selectionHelp: string;
     instancesShort: string;
     noSelection: string;
+    emptyHierarchy: string;
   };
   explain: {
     eyebrow: string;
     title: string;
     run: string;
+    runSelection: string;
     running: string;
     confidence: string;
+    selectionLabel: string;
+    selectionIdle: string;
+    empty: string;
   };
   operator: {
     eyebrow: string;
     title: string;
     run: string;
+    runSelection: string;
     running: string;
+    selectionLabel: string;
+    selectionIdle: string;
+    empty: string;
   };
   review: {
     eyebrow: string;
@@ -138,10 +152,11 @@ type UiCopy = {
     noteAdded: string;
     bookmarkSaved: (label: string) => string;
     performanceMode: (mode: string) => string;
-    exportDone: string;
-    exportFailed: string;
-    linkCopied: string;
-    detailDeferred: string;
+      exportDone: string;
+      exportFailed: string;
+      linkCopied: string;
+      readyBlank: string;
+      detailDeferred: string;
     detailGenerating: string;
     detailReady: string;
     detailFailed: string;
@@ -153,6 +168,10 @@ type UiCopy = {
     cells: string;
     instances: string;
     markers: string;
+    emptyBadge: string;
+    emptyHint: string;
+    emptyTitle: string;
+    emptySelection: string;
   };
 };
 
@@ -198,8 +217,9 @@ export const UI_COPY: Record<UiLanguage, UiCopy> = {
     },
     load: {
       eyebrow: "Load",
-      title: "Sample gallery",
+      title: "Upload bundle",
       working: "Working",
+      uploadBadge: "Upload",
       sourceFiles: "Source files",
       format: "Format",
       technology: "Technology",
@@ -210,11 +230,13 @@ export const UI_COPY: Record<UiLanguage, UiCopy> = {
       eyebrow: "Layers",
       title: "Visibility rail",
       all: "All",
-      none: "None"
+      none: "None",
+      empty: "Upload a layout to enable layer filters."
     },
     markers: {
       eyebrow: "Markers",
-      title: "Review stops"
+      title: "Review stops",
+      empty: "Upload a layout to enable review markers."
     },
     center: {
       bundle: "Bundle",
@@ -233,6 +255,8 @@ export const UI_COPY: Record<UiLanguage, UiCopy> = {
     overview: {
       eyebrow: "Overview",
       title: "Metrics and hierarchy",
+      hierarchyTitle: "Hierarchy",
+      metricsTitle: "Metrics",
       layers: "layers",
       cells: "Cells",
       instances: "Instances",
@@ -243,20 +267,29 @@ export const UI_COPY: Record<UiLanguage, UiCopy> = {
       selectionMetadata: "Selection metadata",
       selectionHelp: "Focus a hierarchy node or marker to inspect its engineering context.",
       instancesShort: "inst",
-      noSelection: "No selection"
+      noSelection: "No selection",
+      emptyHierarchy: "Upload a layout to populate the hierarchy."
     },
     explain: {
       eyebrow: "Explain",
       title: "AI explainer",
       run: "Run explain",
+      runSelection: "Explain selection",
       running: "Explaining",
-      confidence: "Confidence"
+      confidence: "Confidence",
+      selectionLabel: "AI scope",
+      selectionIdle: "No active selection. The AI will explain the whole loaded layout.",
+      empty: "Upload a layout first, then click Run explain."
     },
     operator: {
       eyebrow: "Operator",
       title: "AI action planner",
       run: "Run operator",
-      running: "Running"
+      runSelection: "Plan around selection",
+      running: "Running",
+      selectionLabel: "Action scope",
+      selectionIdle: "No active selection. The operator will plan against the whole loaded layout.",
+      empty: "Upload a layout first, then ask the operator for actions."
     },
     review: {
       eyebrow: "Review",
@@ -331,6 +364,7 @@ export const UI_COPY: Record<UiLanguage, UiCopy> = {
       exportDone: "Exported review session JSON.",
       exportFailed: "Export failed.",
       linkCopied: "Shareable scene link copied.",
+      readyBlank: "Upload a GDS bundle to start.",
       detailDeferred: "Detailed mesh is available on demand in Full mode.",
       detailGenerating: "Generating detailed mesh for Full mode.",
       detailReady: "Detailed mesh is ready.",
@@ -342,7 +376,11 @@ export const UI_COPY: Record<UiLanguage, UiCopy> = {
       caption: "Left drag rotates, right drag pans, wheel zooms to cursor, and double click focuses the selected block or review marker.",
       cells: "cells",
       instances: "instances",
-      markers: "markers"
+      markers: "markers",
+      emptyBadge: "Upload required",
+      emptyHint: "Upload a GDS bundle to start the workspace.",
+      emptyTitle: "No layout loaded",
+      emptySelection: "No layout"
     }
   },
   zh: {
@@ -386,8 +424,9 @@ export const UI_COPY: Record<UiLanguage, UiCopy> = {
     },
     load: {
       eyebrow: "加载",
-      title: "样例库",
+      title: "上传 bundle",
       working: "处理中",
+      uploadBadge: "上传",
       sourceFiles: "源文件",
       format: "格式",
       technology: "工艺",
@@ -398,11 +437,13 @@ export const UI_COPY: Record<UiLanguage, UiCopy> = {
       eyebrow: "层",
       title: "可见性栏",
       all: "全部",
-      none: "清空"
+      none: "清空",
+      empty: "先上传一个版图，再启用层过滤。"
     },
     markers: {
       eyebrow: "标记",
-      title: "审阅站点"
+      title: "审阅站点",
+      empty: "先上传一个版图，再启用审阅标记。"
     },
     center: {
       bundle: "Bundle",
@@ -421,6 +462,8 @@ export const UI_COPY: Record<UiLanguage, UiCopy> = {
     overview: {
       eyebrow: "总览",
       title: "指标与层级",
+      hierarchyTitle: "层级",
+      metricsTitle: "指标",
       layers: "层",
       cells: "单元",
       instances: "实例",
@@ -431,20 +474,29 @@ export const UI_COPY: Record<UiLanguage, UiCopy> = {
       selectionMetadata: "选择元数据",
       selectionHelp: "聚焦一个 hierarchy 节点或 marker 来查看它对应的工程上下文。",
       instancesShort: "实例",
-      noSelection: "暂无选择"
+      noSelection: "暂无选择",
+      emptyHierarchy: "先上传一个版图来生成层级。"
     },
     explain: {
       eyebrow: "解释",
       title: "AI 解释器",
       run: "运行解释",
+      runSelection: "解释当前选择",
       running: "解释中",
-      confidence: "置信度"
+      confidence: "置信度",
+      selectionLabel: "AI 范围",
+      selectionIdle: "当前没有激活选择，AI 会解释整个已加载版图。",
+      empty: "先上传一个版图，然后点击运行解释。"
     },
     operator: {
       eyebrow: "操作器",
       title: "AI 动作规划器",
       run: "运行操作器",
-      running: "运行中"
+      runSelection: "围绕当前选择规划",
+      running: "运行中",
+      selectionLabel: "动作范围",
+      selectionIdle: "当前没有激活选择，操作器会针对整个已加载版图进行规划。",
+      empty: "先上传一个版图，然后让操作器给出动作。"
     },
     review: {
       eyebrow: "审阅",
@@ -519,6 +571,7 @@ export const UI_COPY: Record<UiLanguage, UiCopy> = {
       exportDone: "已导出审阅会话 JSON。",
       exportFailed: "导出失败。",
       linkCopied: "已复制可分享的场景链接。",
+      readyBlank: "上传一个 GDS bundle 开始使用。",
       detailDeferred: "完整细节网格会在切换到完整模式时按需生成。",
       detailGenerating: "正在为完整模式生成细节网格。",
       detailReady: "细节网格已就绪。",
@@ -530,7 +583,11 @@ export const UI_COPY: Record<UiLanguage, UiCopy> = {
       caption: "左键拖拽旋转，右键拖拽平移，滚轮按光标缩放，双击聚焦当前选中的模块或审阅标记。",
       cells: "个单元",
       instances: "个实例",
-      markers: "个标记"
+      markers: "个标记",
+      emptyBadge: "需要上传",
+      emptyHint: "上传一个 GDS bundle 来启动工作区。",
+      emptyTitle: "尚未加载版图",
+      emptySelection: "尚未加载"
     }
   }
 };

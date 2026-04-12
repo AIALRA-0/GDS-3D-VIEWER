@@ -101,6 +101,7 @@ export default function SceneViewer({
   const latestCameraChangeRef = useRef(onCameraChange);
   const lastHandledActionIdRef = useRef<number | null>(null);
   const copy = UI_COPY[language];
+  const hasGeometry = manifest.metrics.layerCount > 0 || manifest.hierarchy.length > 0 || Boolean(assetUrl);
 
   useEffect(() => {
     latestSelectionRef.current = { selectedLayerIds, focusedNodeId, selectedMarkerId, performanceMode };
@@ -130,11 +131,21 @@ export default function SceneViewer({
 
     host.innerHTML = "";
     host.style.touchAction = "none";
+    if (!hasGeometry) {
+      return;
+    }
 
     const scene = new THREE.Scene();
     const detailAssetUrl = assetUrl ?? null;
     const shouldRenderDetailedGeometry = Boolean(detailAssetUrl) && performanceMode === "full";
+    const showNodeSummaries = !shouldRenderDetailedGeometry;
     const isHeavyGeometry = manifest.metrics.polygonCount >= DETAIL_POLYGON_THRESHOLD;
+    const layerMatchers = manifest.layers.map((layer) => ({
+      layerId: layer.id,
+      suffix: `_${layer.name.toLowerCase()}`
+    }));
+    const layerNames = new Map(manifest.layers.map((layer) => [layer.name.toLowerCase(), layer.id]));
+    const materialCache = new Map<string, THREE.MeshBasicMaterial>();
 
     const camera = new THREE.PerspectiveCamera(40, host.clientWidth / Math.max(host.clientHeight, 1), 0.1, 300);
     camera.position.set(12, 11, 16);
@@ -144,10 +155,13 @@ export default function SceneViewer({
       alpha: true,
       powerPreference: "high-performance"
     });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, performanceMode === "full" && !isHeavyGeometry ? 1.2 : 1));
+    renderer.setPixelRatio(
+      Math.min(window.devicePixelRatio, performanceMode === "full" ? (isHeavyGeometry ? 0.72 : 0.9) : 0.85)
+    );
     renderer.setSize(host.clientWidth, host.clientHeight, false);
     renderer.shadowMap.enabled = false;
     renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.sortObjects = false;
     host.appendChild(renderer.domElement);
 
     const controls = new OrbitControls(camera, renderer.domElement);
@@ -155,8 +169,7 @@ export default function SceneViewer({
       addEventListener(type: "start" | "change" | "end", listener: () => void): void;
       removeEventListener(type: "start" | "change" | "end", listener: () => void): void;
     };
-    controls.enableDamping = true;
-    controls.dampingFactor = 0.08;
+    controls.enableDamping = false;
     controls.minDistance = 2.6;
     controls.maxDistance = 68;
     controls.target.set(0, 0.6, 0);
@@ -181,18 +194,6 @@ export default function SceneViewer({
     tunedControls.panSpeed = 1.1;
     tunedControls.rotateSpeed = 0.92;
     tunedControls.zoomSpeed = 1.08;
-
-    const ambient = new THREE.AmbientLight("#efe5d1", performanceMode === "simplified" ? 1.25 : 1.55);
-    scene.add(ambient);
-
-    const keyLight = new THREE.DirectionalLight("#fff2d9", 2.8);
-    keyLight.position.set(10, 14, 12);
-    keyLight.castShadow = performanceMode === "full";
-    scene.add(keyLight);
-
-    const fillLight = new THREE.DirectionalLight("#7796b2", 1.05);
-    fillLight.position.set(-12, 8, -10);
-    scene.add(fillLight);
 
     const root = new THREE.Group();
     scene.add(root);
@@ -244,27 +245,26 @@ export default function SceneViewer({
       }
       runtime.targetGoal.copy(center);
       runtime.cameraGoal.copy(center.clone().add(direction.multiplyScalar(radius * 2.35)));
+      commitCameraGoal();
     }
 
     function resetCamera() {
       runtime.targetGoal.set(0, 0.6, 0);
       runtime.cameraGoal.set(12, 11, 16);
+      commitCameraGoal();
     }
 
     function buildNodeGeometry(node: LayoutNode) {
       const { center, size } = toWorldBounds(node.bbox);
       const geometry = new THREE.BoxGeometry(size.x, size.y, size.z);
-      const material = new THREE.MeshStandardMaterial({
+      const material = new THREE.MeshBasicMaterial({
         color: new THREE.Color("#708392"),
         transparent: true,
         opacity: performanceMode === "hierarchy-preview" ? 0.74 : 0.08,
-        roughness: 0.5,
-        metalness: 0.18
+        depthWrite: false
       });
       const mesh = new THREE.Mesh(geometry, material);
       mesh.position.copy(center);
-      mesh.castShadow = performanceMode === "full";
-      mesh.receiveShadow = performanceMode === "full";
       mesh.userData = { nodeId: node.id };
       root.add(mesh);
 
@@ -278,6 +278,8 @@ export default function SceneViewer({
       );
       edges.position.copy(center);
       root.add(edges);
+      mesh.updateMatrix();
+      edges.updateMatrix();
 
       hitMeshes.set(node.id, { mesh, node });
       disposeObjects.push(() => {
@@ -295,12 +297,8 @@ export default function SceneViewer({
       markerGroup.userData = { markerId: marker.id };
 
       const sphereGeometry = new THREE.SphereGeometry(0.12, 24, 24);
-      const sphereMaterial = new THREE.MeshStandardMaterial({
+      const sphereMaterial = new THREE.MeshBasicMaterial({
         color: new THREE.Color(colorForSeverity(marker.severity)),
-        emissive: new THREE.Color(colorForSeverity(marker.severity)),
-        emissiveIntensity: 0.15,
-        roughness: 0.35,
-        metalness: 0.1
       });
       const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
       sphere.userData = { markerId: marker.id };
@@ -317,6 +315,7 @@ export default function SceneViewer({
       markerGroup.add(pillar);
       markerPillars.push(pillar);
 
+      markerGroup.updateMatrixWorld(true);
       root.add(markerGroup);
       markerMeshes.set(marker.id, { mesh: sphere, marker });
       disposeObjects.push(() => {
@@ -327,8 +326,10 @@ export default function SceneViewer({
       });
     }
 
-    for (const node of manifest.hierarchy) {
-      buildNodeGeometry(node);
+    if (showNodeSummaries) {
+      for (const node of manifest.hierarchy) {
+        buildNodeGeometry(node);
+      }
     }
 
     for (const marker of manifest.markers ?? []) {
@@ -336,6 +337,7 @@ export default function SceneViewer({
     }
 
     let importedRoot: THREE.Object3D | null = null;
+    let transitionFrame = 0;
     if (shouldRenderDetailedGeometry) {
       const loader = new GLTFLoader();
       loader.load(
@@ -354,18 +356,53 @@ export default function SceneViewer({
             -importedCenter.z * scaleFactor
           );
           importedRoot.traverse((entry) => {
+            const entryName = "name" in entry && typeof entry.name === "string" ? entry.name.toLowerCase() : "";
+            const matchedLayer = layerMatchers.find(({ suffix }) => entryName.endsWith(suffix));
+            let matchedLayerId = matchedLayer?.layerId;
             if ("material" in entry) {
               const material = entry.material as THREE.Material | THREE.Material[] | undefined;
               const materials = Array.isArray(material) ? material : material ? [material] : [];
-              for (const item of materials) {
-                if ("transparent" in item) {
-                  (item as THREE.MeshStandardMaterial).transparent = true;
-                  (item as THREE.MeshStandardMaterial).opacity = 0.92;
+              if (!matchedLayerId) {
+                for (const item of materials) {
+                  if (item.name && layerNames.has(item.name.toLowerCase())) {
+                    matchedLayerId = layerNames.get(item.name.toLowerCase()) ?? matchedLayerId;
+                    break;
+                  }
                 }
               }
+              const replacements = materials.map((item) => {
+                const cached = materialCache.get(item.uuid);
+                if (cached) {
+                  return cached;
+                }
+                const basic = new THREE.MeshBasicMaterial({
+                  color: "color" in item ? (item.color as THREE.Color).clone() : new THREE.Color("#c8d2dd"),
+                  transparent: true,
+                  opacity: 0.96,
+                  depthWrite: true
+                });
+                materialCache.set(item.uuid, basic);
+                disposeObjects.push(() => basic.dispose());
+                return basic;
+              });
+              entry.material = Array.isArray(material) ? replacements : replacements[0];
+            }
+            if (matchedLayerId) {
+              entry.userData.layerId = matchedLayerId;
+            }
+            if ("frustumCulled" in entry) {
+              entry.frustumCulled = true;
+            }
+            if ("matrixAutoUpdate" in entry) {
+              entry.matrixAutoUpdate = false;
+            }
+            if ("updateMatrix" in entry && typeof entry.updateMatrix === "function") {
+              entry.updateMatrix();
             }
           });
+          importedRoot.updateMatrixWorld(true);
           root.add(importedRoot);
+          renderScene(true);
         },
         undefined,
         () => {
@@ -388,6 +425,7 @@ export default function SceneViewer({
         camera.aspect = width / height;
         camera.updateProjectionMatrix();
         renderer.setSize(width, height, false);
+        renderScene(true);
       }),
       hitMeshes,
       markerMeshes,
@@ -413,8 +451,55 @@ export default function SceneViewer({
     const raycaster = new THREE.Raycaster();
     const pointer = new THREE.Vector2();
     let pointerStart = { x: 0, y: 0, button: 0 };
-    let lastEmitted = "";
-    let lastEmitAt = 0;
+
+    function renderScene(forceEmit = false) {
+      renderer.render(scene, camera);
+      if (forceEmit) {
+        runtime.emitCameraState();
+      }
+    }
+
+    function commitCameraGoal(immediate = false) {
+      if (transitionFrame) {
+        window.cancelAnimationFrame(transitionFrame);
+        transitionFrame = 0;
+      }
+      if (immediate) {
+        controls.target.copy(runtime.targetGoal);
+        camera.position.copy(runtime.cameraGoal);
+        controls.update();
+        renderScene(true);
+        return;
+      }
+      scheduleTransition();
+    }
+
+    function stepTransition() {
+      transitionFrame = 0;
+      const targetDelta = controls.target.distanceTo(runtime.targetGoal);
+      const cameraDelta = camera.position.distanceTo(runtime.cameraGoal);
+
+      if (targetDelta < 0.01 && cameraDelta < 0.01) {
+        controls.target.copy(runtime.targetGoal);
+        camera.position.copy(runtime.cameraGoal);
+        controls.update();
+        renderScene(true);
+        return;
+      }
+
+      controls.target.lerp(runtime.targetGoal, 0.18);
+      camera.position.lerp(runtime.cameraGoal, 0.18);
+      controls.update();
+      renderScene(false);
+      transitionFrame = window.requestAnimationFrame(stepTransition);
+    }
+
+    function scheduleTransition() {
+      if (transitionFrame) {
+        return;
+      }
+      transitionFrame = window.requestAnimationFrame(stepTransition);
+    }
 
     function updatePointer(event: PointerEvent | MouseEvent) {
       const rect = renderer.domElement.getBoundingClientRect();
@@ -502,17 +587,16 @@ export default function SceneViewer({
     };
 
     const onControlChange = () => {
-      if (!runtime.interactionState.active) {
-        return;
-      }
       runtime.targetGoal.copy(controls.target);
       runtime.cameraGoal.copy(camera.position);
+      renderScene(false);
     };
 
     const onControlEnd = () => {
       runtime.interactionState.active = false;
       runtime.targetGoal.copy(controls.target);
       runtime.cameraGoal.copy(camera.position);
+      renderScene(true);
     };
 
     const onContextMenu = (event: MouseEvent) => event.preventDefault();
@@ -534,65 +618,67 @@ export default function SceneViewer({
     renderer.domElement.addEventListener("gesturechange", onGesture);
     renderer.domElement.addEventListener("gestureend", onGesture);
 
-    function animate() {
+    function refreshVisualState() {
       const selection = latestSelectionRef.current;
+      const selectedSet = new Set(selection.selectedLayerIds);
 
       for (const { mesh, node } of hitMeshes.values()) {
-        const material = mesh.material as THREE.MeshStandardMaterial;
+        const material = mesh.material as THREE.MeshBasicMaterial;
         const isFocused = selection.focusedNodeId === node.id;
         const isVisibleLayer =
-          selection.selectedLayerIds.length === 0 ||
+          selection.selectedLayerIds.length > 0 &&
           node.focusLayerIds.some((layerId) => selection.selectedLayerIds.includes(layerId));
         const baseOpacity =
-          selection.performanceMode === "full"
-            ? isFocused
-              ? 0.18
-              : 0.001
-            : selection.performanceMode === "hierarchy-preview"
-              ? isVisibleLayer
-                ? 0.7
-                : 0.18
+          selection.performanceMode === "hierarchy-preview"
+            ? isVisibleLayer
+              ? 0.72
+              : 0.14
             : isVisibleLayer
-              ? 0.1
-              : 0.03;
-        material.opacity = isFocused ? Math.max(baseOpacity, 0.92) : baseOpacity;
-        material.color.set(isFocused ? "#c97c47" : isVisibleLayer ? "#718796" : "#4f6070");
-        material.emissive.set(isFocused ? "#f2af72" : "#000000");
-        material.emissiveIntensity = isFocused ? 0.34 : 0;
-        mesh.scale.setScalar(isFocused ? 1.04 : 1);
+              ? 0.08
+              : 0.02;
+        material.opacity = isFocused ? 0.24 : baseOpacity;
+        material.color.set(isFocused ? "#7b8ea2" : isVisibleLayer ? "#718796" : "#4f6070");
+        mesh.scale.setScalar(isFocused ? 1.02 : 1);
       }
 
       for (const { mesh, marker } of markerMeshes.values()) {
-        const material = mesh.material as THREE.MeshStandardMaterial;
         const active = selection.selectedMarkerId === marker.id;
-        material.emissiveIntensity = active ? 0.62 : 0.16;
         mesh.scale.setScalar(active ? 1.28 : 1);
       }
 
-      if (!runtime.interactionState.active) {
-        controls.target.lerp(runtime.targetGoal, 0.12);
-        camera.position.lerp(runtime.cameraGoal, 0.12);
-      }
-      controls.update();
-      renderer.render(scene, camera);
-
-      const now = performance.now();
-      const cameraPayload = JSON.stringify(roundCameraState(camera, controls.target));
-      if (cameraPayload !== lastEmitted && now - lastEmitAt > 120) {
-        lastEmitted = cameraPayload;
-        lastEmitAt = now;
-        runtime.emitCameraState();
+      if (runtime.importedRoot) {
+        runtime.importedRoot.traverse((entry) => {
+          const layerId = (entry.userData as { layerId?: string }).layerId;
+          if (layerId) {
+            entry.visible = selectedSet.has(layerId);
+          }
+        });
       }
 
-      runtime.frame = window.requestAnimationFrame(animate);
+      renderScene(true);
     }
 
     resetCamera();
-    fitBounds(manifest.metrics.bbox);
-    animate();
+    if (manifest.metrics.layerCount > 0) {
+      const { center, size } = toWorldBounds(manifest.metrics.bbox);
+      const radius = Math.max(size.length() * 0.5, 1.35);
+      const direction = camera.position.clone().sub(controls.target).normalize();
+      if (!Number.isFinite(direction.lengthSq()) || direction.lengthSq() === 0) {
+        direction.set(0.86, 0.72, 0.94).normalize();
+      }
+      runtime.targetGoal.copy(center);
+      runtime.cameraGoal.copy(center.clone().add(direction.multiplyScalar(radius * 2.35)));
+      commitCameraGoal(true);
+    } else {
+      controls.update();
+      renderScene(true);
+    }
+    refreshVisualState();
 
     return () => {
-      window.cancelAnimationFrame(runtime.frame);
+      if (transitionFrame) {
+        window.cancelAnimationFrame(transitionFrame);
+      }
       runtime.observer.disconnect();
       eventedControls.removeEventListener("start", onControlStart);
       eventedControls.removeEventListener("change", onControlChange);
@@ -618,7 +704,7 @@ export default function SceneViewer({
       host.innerHTML = "";
       runtimeRef.current = null;
     };
-  }, [assetUrl, manifest, performanceMode]);
+  }, [assetUrl, hasGeometry, manifest, performanceMode]);
 
   useEffect(() => {
     const runtime = runtimeRef.current;
@@ -642,6 +728,46 @@ export default function SceneViewer({
 
   useEffect(() => {
     const runtime = runtimeRef.current;
+    if (!runtime) {
+      return;
+    }
+    const selection = latestSelectionRef.current;
+    const selectedSet = new Set(selection.selectedLayerIds);
+    for (const { mesh, node } of runtime.hitMeshes.values()) {
+      const material = mesh.material as THREE.MeshBasicMaterial;
+      const isFocused = selection.focusedNodeId === node.id;
+      const isVisibleLayer =
+        selection.selectedLayerIds.length > 0 &&
+        node.focusLayerIds.some((layerId) => selection.selectedLayerIds.includes(layerId));
+      const baseOpacity =
+        selection.performanceMode === "hierarchy-preview"
+          ? isVisibleLayer
+            ? 0.72
+            : 0.14
+          : isVisibleLayer
+            ? 0.08
+            : 0.02;
+      material.opacity = isFocused ? 0.24 : baseOpacity;
+      material.color.set(isFocused ? "#7b8ea2" : isVisibleLayer ? "#718796" : "#4f6070");
+      mesh.scale.setScalar(isFocused ? 1.02 : 1);
+    }
+    for (const { mesh, marker } of runtime.markerMeshes.values()) {
+      const active = selection.selectedMarkerId === marker.id;
+      mesh.scale.setScalar(active ? 1.28 : 1);
+    }
+    if (runtime.importedRoot) {
+      runtime.importedRoot.traverse((entry) => {
+        const layerId = (entry.userData as { layerId?: string }).layerId;
+        if (layerId) {
+          entry.visible = selectedSet.has(layerId);
+        }
+      });
+    }
+    runtime.renderer.render(runtime.scene, runtime.camera);
+  }, [focusedNodeId, performanceMode, selectedLayerIds, selectedMarkerId]);
+
+  useEffect(() => {
+    const runtime = runtimeRef.current;
     if (!runtime || !action) {
       return;
     }
@@ -658,6 +784,11 @@ export default function SceneViewer({
     if (action.type === "restore-camera" && action.payload && "position" in action.payload) {
       runtime.targetGoal.set(action.payload.target[0], action.payload.target[1], action.payload.target[2]);
       runtime.cameraGoal.set(action.payload.position[0], action.payload.position[1], action.payload.position[2]);
+      runtime.controls.target.copy(runtime.targetGoal);
+      runtime.camera.position.copy(runtime.cameraGoal);
+      runtime.controls.update();
+      runtime.renderer.render(runtime.scene, runtime.camera);
+      runtime.emitCameraState();
       return;
     }
 
@@ -700,7 +831,14 @@ export default function SceneViewer({
         </div>
         <p className="viewer-caption">{copy.viewer.caption}</p>
       </div>
-      <div className="viewer-canvas" ref={hostRef} data-testid="scene-viewer" />
+      {hasGeometry ? (
+        <div className="viewer-canvas" ref={hostRef} data-testid="scene-viewer" />
+      ) : (
+        <div className="viewer-empty" data-testid="scene-viewer">
+          <strong>{copy.viewer.emptyTitle}</strong>
+          <small>{copy.viewer.emptyHint}</small>
+        </div>
+      )}
       <div className="viewer-status">
         <span>{manifest.technology}</span>
         <span>{manifest.metrics.cellCount} {copy.viewer.cells}</span>

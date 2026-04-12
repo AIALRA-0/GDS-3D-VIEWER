@@ -7,8 +7,6 @@ import {
   explainLayout,
   exportSessionPayload,
   loadDefaultSession,
-  loadSampleSession,
-  loadSamples,
   runOperator
 } from "./lib/api";
 import {
@@ -16,15 +14,11 @@ import {
   DEFAULT_OPERATOR_PROMPTS,
   localizeManifestName,
   localizeModeLabel,
-  localizePanelLabel,
-  localizeSampleDescription,
-  localizeSampleName,
   localizeSeverityLabel,
-  localizeSourceLabel,
   type UiLanguage,
   UI_COPY
 } from "./lib/copy";
-import { readBundleHintFromUrl, readSceneStateFromUrl, writeSceneStateToUrl } from "./lib/url";
+import { readSceneStateFromUrl, writeSceneStateToUrl } from "./lib/url";
 import type {
   CameraState,
   DiffSummary,
@@ -36,9 +30,7 @@ import type {
   PerformanceMode,
   ReviewMarker,
   ReviewNote,
-  SampleSummary,
   SceneBookmark,
-  ScenePanelId,
   SceneState,
   SelectionMetadata,
   SessionPayload
@@ -56,21 +48,6 @@ const DEFAULT_CAMERA: CameraState = {
   target: [0, 1.2, 0]
 };
 const BUILD_STAMP = "2026-04-12T20:10Z";
-
-const PANEL_TABS: ScenePanelId[] = [
-  "viewer",
-  "layers",
-  "hierarchy",
-  "metrics",
-  "markers",
-  "explain",
-  "operator",
-  "notes",
-  "bookmarks",
-  "diff"
-];
-
-type PanelSectionId = "viewer" | "layers" | "overview" | "markers" | "explain" | "operator" | "review";
 
 function formatNumber(value: number | undefined): string {
   if (typeof value !== "number") {
@@ -152,32 +129,6 @@ function defaultPerformanceMode(session: SessionPayload): PerformanceMode {
   return isLargeLayout(session.manifest) ? "simplified" : "full";
 }
 
-function sectionForPanel(panel: ScenePanelId): PanelSectionId {
-  switch (panel) {
-    case "viewer":
-      return "viewer";
-    case "layers":
-      return "layers";
-    case "hierarchy":
-    case "metrics":
-      return "overview";
-    case "markers":
-      return "markers";
-    case "explain":
-      return "explain";
-    case "operator":
-      return "operator";
-    case "notes":
-    case "bookmarks":
-    case "diff":
-      return "review";
-  }
-}
-
-function sectionMatchesPanel(section: PanelSectionId, panel: ScenePanelId): boolean {
-  return sectionForPanel(panel) === section;
-}
-
 function createSceneState(session: SessionPayload): SceneState {
   const preserveSessionState = Boolean(session.exportMetadata);
   const selectedLayerIds =
@@ -222,8 +173,125 @@ function createSceneState(session: SessionPayload): SceneState {
   };
 }
 
-function hasScenePayload(session: SessionPayload | null): session is SessionPayload {
-  return Boolean(session);
+function createEmptySession(): SessionPayload {
+  const generatedAt = new Date().toISOString();
+  return {
+    sessionId: "workspace-empty",
+    assetUrl: null,
+    manifest: {
+      id: "workspace-empty",
+      name: "Upload a GDS bundle",
+      source: "remote",
+      format: "gds",
+      technology: "n/a",
+      description: "Upload a GDS bundle to start reviewing a design.",
+      tags: [],
+      sourceFiles: [],
+      layers: [],
+      hierarchy: [],
+      metrics: {
+        bbox: [0, 0, 0, 0, 0, 0],
+        cellCount: 0,
+        instanceCount: 0,
+        polygonCount: 0,
+        netCount: 0,
+        layerCount: 0,
+        estimatedAreaMm2: 0,
+        utilizationPercent: 0,
+        wirelengthUm: 0,
+        negativeSlackNs: 0
+      },
+      notes: [],
+      markers: [],
+      bookmarks: [],
+      generatedAt
+    },
+    state: {
+      panel: "viewer",
+      selectedLayerIds: [],
+      focusedNodeId: null,
+      selectedMarkerId: null,
+      notes: [],
+      bookmarks: [],
+      performanceMode: "simplified",
+      camera: DEFAULT_CAMERA,
+      selectionMetadata: null
+    },
+    explain: {
+      summary: "Upload a layout to enable AI explain.",
+      highlights: [],
+      concerns: [],
+      nextSteps: [],
+      confidence: 0,
+      source: "local-rule"
+    },
+    operator: {
+      title: "Upload required",
+      rationale: "Upload a layout to enable AI operator actions.",
+      actions: [],
+      source: "local-rule"
+    },
+    diff: {
+      title: "No diff available",
+      added: [],
+      removed: [],
+      changed: [],
+      deltaLines: []
+    },
+    warnings: [],
+    exportMetadata: null
+  };
+}
+
+function buildAiScopeSummary(session: SessionPayload, state: SceneState, language: UiLanguage): string {
+  const selection = state.selectionMetadata;
+  const layerNames = session.manifest.layers
+    .filter((layer) => state.selectedLayerIds.includes(layer.id))
+    .map((layer) => layer.name);
+  const scopeParts: string[] = [];
+
+  if (selection?.name) {
+    const kind = selection.kind ?? (language === "zh" ? "对象" : "item");
+    scopeParts.push(language === "zh" ? `${kind}：${selection.name}` : `${kind}: ${selection.name}`);
+  }
+
+  if (selection?.markerId) {
+    scopeParts.push(language === "zh" ? `标记：${selection.markerId}` : `marker: ${selection.markerId}`);
+  }
+
+  if (layerNames.length > 0) {
+    const visibleNames = layerNames.slice(0, 6).join(", ");
+    const suffix = layerNames.length > 6 ? (language === "zh" ? " 等" : " + more") : "";
+    scopeParts.push(language === "zh" ? `层：${visibleNames}${suffix}` : `layers: ${visibleNames}${suffix}`);
+  }
+
+  if (scopeParts.length === 0) {
+    return language === "zh" ? "整个已加载版图" : "the whole loaded layout";
+  }
+
+  return scopeParts.join(language === "zh" ? "；" : " | ");
+}
+
+function buildAiPrompt(basePrompt: string, session: SessionPayload, state: SceneState, language: UiLanguage): string {
+  const trimmed = basePrompt.trim();
+  const scope = buildAiScopeSummary(session, state, language);
+  const selection = state.selectionMetadata;
+  const focusLayers = selection?.focusLayerIds?.length ? selection.focusLayerIds : state.selectedLayerIds;
+  const detailLines = [
+    language === "zh" ? "当前工作区上下文：" : "Current cockpit context:",
+    language === "zh" ? `范围：${scope}` : `Scope: ${scope}`,
+    language === "zh"
+      ? `选中层 ID：${focusLayers.length > 0 ? focusLayers.join(", ") : "无"}`
+      : `Selected layer IDs: ${focusLayers.length > 0 ? focusLayers.join(", ") : "none"}`,
+  ];
+
+  if (selection?.bbox?.length === 6) {
+    detailLines.push(
+      language === "zh" ? `边界框：${selection.bbox.join(", ")}` : `Bounding box: ${selection.bbox.join(", ")}`
+    );
+  }
+
+  return `${trimmed}\n\n${detailLines.join("\n")}`.trim();
 }
 
 export default function App() {
@@ -233,17 +301,16 @@ export default function App() {
     }
     return window.localStorage.getItem("icviewer-language") === "zh" ? "zh" : "en";
   });
-  const [samples, setSamples] = useState<SampleSummary[]>([]);
-  const [session, setSession] = useState<SessionPayload | null>(null);
-  const [sceneState, setSceneState] = useState<SceneState | null>(null);
+  const [session, setSession] = useState<SessionPayload>(() => createEmptySession());
+  const [sceneState, setSceneState] = useState<SceneState>(() => createSceneState(createEmptySession()));
   const [referenceManifest, setReferenceManifest] = useState<LayoutManifest | null>(null);
   const [explainPrompt, setExplainPrompt] = useState(DEFAULT_EXPLAIN_PROMPTS.en);
   const [operatorPrompt, setOperatorPrompt] = useState(DEFAULT_OPERATOR_PROMPTS.en);
   const [reviewDraft, setReviewDraft] = useState("");
   const [bookmarkDraft, setBookmarkDraft] = useState("");
-  const [explainResult, setExplainResult] = useState<ExplainResult | null>(null);
-  const [operatorResult, setOperatorResult] = useState<OperatorResult | null>(null);
-  const [diffResult, setDiffResult] = useState<DiffSummary | null>(null);
+  const [explainResult, setExplainResult] = useState<ExplainResult>(() => createEmptySession().explain);
+  const [operatorResult, setOperatorResult] = useState<OperatorResult>(() => createEmptySession().operator);
+  const [diffResult, setDiffResult] = useState<DiffSummary>(() => createEmptySession().diff);
   const [statusMessage, setStatusMessage] = useState(UI_COPY.en.status.booting);
   const [busyState, setBusyState] = useState<BusyState>("loading");
   const [copied, setCopied] = useState(false);
@@ -251,34 +318,33 @@ export default function App() {
   const [viewerAction, setViewerAction] = useState<ViewerAction | null>(null);
   const bootstrappedRef = useRef(false);
   const previousLanguageRef = useRef<UiLanguage>(language);
-  const panelSectionRefs = useRef<Record<PanelSectionId, HTMLElement | null>>({
-    viewer: null,
-    layers: null,
-    overview: null,
-    markers: null,
-    explain: null,
-    operator: null,
-    review: null
-  });
   const copy = UI_COPY[language];
+  const workspaceLoaded = session.manifest.id !== "workspace-empty";
 
   const selectedNode = useMemo(() => {
-    if (!session || !sceneState) {
+    if (!sceneState) {
       return null;
     }
-    return session.manifest.hierarchy.find((node) => node.id === sceneState.focusedNodeId) ?? session.manifest.hierarchy[0] ?? null;
+    if (!sceneState.focusedNodeId) {
+      return null;
+    }
+    return session.manifest.hierarchy.find((node) => node.id === sceneState.focusedNodeId) ?? null;
   }, [session, sceneState]);
 
   const selectedMarker = useMemo(() => {
-    if (!session || !sceneState) {
+    if (!sceneState) {
       return null;
     }
     return session.manifest.markers?.find((marker) => marker.id === sceneState.selectedMarkerId) ?? null;
   }, [session, sceneState]);
 
   const viewerManifest = useMemo(() => {
-    return session?.manifest ?? null;
+    return session.manifest;
   }, [session]);
+  const aiScopeSummary = useMemo(
+    () => buildAiScopeSummary(session, sceneState, language),
+    [language, sceneState, session]
+  );
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -309,23 +375,16 @@ export default function App() {
 
     async function bootstrap() {
       try {
-        const [sampleInventory, defaultSession] = await Promise.all([loadSamples(), loadDefaultSession()]);
-
-        const hintedBundle = readBundleHintFromUrl();
-        const shouldLoadHint = hintedBundle && sampleInventory.some((entry) => entry.id === hintedBundle);
-        const currentSession = shouldLoadHint ? await loadSampleSession(hintedBundle) : defaultSession;
-
-        const defaultState = createSceneState(currentSession);
-        const nextState = readSceneStateFromUrl(defaultState);
-        setSamples(sampleInventory);
+        const defaultSession = await loadDefaultSession();
+        const emptySession = createEmptySession();
         setReferenceManifest(materializeManifest(defaultSession, createSceneState(defaultSession)));
-        setSession(currentSession);
-        setSceneState(nextState);
-        setExplainResult(currentSession.explain);
-        setOperatorResult(currentSession.operator);
-        setDiffResult(currentSession.diff);
+        setSession(emptySession);
+        setSceneState(readSceneStateFromUrl(createSceneState(emptySession)));
+        setExplainResult(emptySession.explain);
+        setOperatorResult(emptySession.operator);
+        setDiffResult(emptySession.diff);
         setBusyState("idle");
-        setStatusMessage(copy.status.backendLoaded(localizeManifestName(currentSession.manifest, language)));
+        setStatusMessage(copy.status.readyBlank);
         setErrorMessage(null);
       } catch (error) {
         setBusyState("idle");
@@ -338,7 +397,7 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    if (!session || !sceneState) {
+    if (!sceneState) {
       return;
     }
 
@@ -351,18 +410,16 @@ export default function App() {
   }, [session, sceneState]);
 
   useEffect(() => {
-    if (!session || !sceneState) {
+    if (!sceneState) {
       return;
     }
     writeSceneStateToUrl(sceneState, {
-      bundle: samples.some((entry) => entry.sessionId === session.sessionId)
-        ? samples.find((entry) => entry.sessionId === session.sessionId)?.id ?? session.manifest.id
-        : session.manifest.id
+      bundle: workspaceLoaded ? session.manifest.id : null
     });
-  }, [samples, sceneState, session]);
+  }, [sceneState, session, workspaceLoaded]);
 
   useEffect(() => {
-    if (!session || !sceneState || !referenceManifest) {
+    if (!sceneState || !referenceManifest || !workspaceLoaded) {
       return;
     }
 
@@ -385,16 +442,8 @@ export default function App() {
     };
   }, [referenceManifest, sceneState?.bookmarks, session]);
 
-  useEffect(() => {
-    if (!sceneState) {
-      return;
-    }
-    const targetSection = panelSectionRefs.current[sectionForPanel(sceneState.panel)];
-    targetSection?.scrollIntoView({ behavior: "smooth", block: "nearest" });
-  }, [sceneState?.panel]);
-
   async function loadResolvedSession(nextSession: SessionPayload, label: string) {
-    const nextState = readSceneStateFromUrl(createSceneState(nextSession));
+    const nextState = createSceneState(nextSession);
     setSession(nextSession);
     setSceneState(nextState);
     setExplainResult(nextSession.explain);
@@ -402,19 +451,6 @@ export default function App() {
     setDiffResult(nextSession.diff);
     setStatusMessage(label);
     setErrorMessage(null);
-  }
-
-  async function handleSampleLoad(sampleId: string) {
-    setBusyState("loading");
-    try {
-      const nextSession = await loadSampleSession(sampleId);
-      await loadResolvedSession(nextSession, copy.status.sampleLoaded(localizeManifestName(nextSession.manifest, language)));
-    } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : copy.status.sampleFailed);
-      setStatusMessage(copy.status.sampleFailed);
-    } finally {
-      setBusyState("idle");
-    }
   }
 
   async function handleUpload(files: FileList | null) {
@@ -446,12 +482,12 @@ export default function App() {
   }
 
   async function handleExplain() {
-    if (!session || !sceneState) {
+    if (!sceneState || !workspaceLoaded) {
       return;
     }
     setBusyState("explaining");
     try {
-      const result = await explainLayout(materializeManifest(session, sceneState), explainPrompt);
+      const result = await explainLayout(materializeManifest(session, sceneState), buildAiPrompt(explainPrompt, session, sceneState, language));
       setExplainResult(result);
       setStatusMessage(result.source === "remote-ai" ? copy.status.explainRemote : copy.status.explainLocal);
     } catch (error) {
@@ -463,12 +499,12 @@ export default function App() {
   }
 
   async function handleOperator() {
-    if (!session || !sceneState) {
+    if (!sceneState || !workspaceLoaded) {
       return;
     }
     setBusyState("operating");
     try {
-      const result = await runOperator(materializeManifest(session, sceneState), operatorPrompt);
+      const result = await runOperator(materializeManifest(session, sceneState), buildAiPrompt(operatorPrompt, session, sceneState, language));
       setOperatorResult(result);
       setStatusMessage(result.source === "remote-ai" ? copy.status.operatorRemote : copy.status.operatorLocal);
     } catch (error) {
@@ -486,7 +522,7 @@ export default function App() {
   }
 
   function focusNode(nodeId: string) {
-    if (!session) {
+    if (!workspaceLoaded) {
       return;
     }
     const node = session.manifest.hierarchy.find((entry) => entry.id === nodeId);
@@ -501,7 +537,7 @@ export default function App() {
   }
 
   function focusMarker(markerId: string) {
-    if (!session) {
+    if (!workspaceLoaded) {
       return;
     }
     const marker = session.manifest.markers?.find((entry) => entry.id === markerId);
@@ -519,7 +555,7 @@ export default function App() {
   }
 
   function applyOperatorAction(action: OperatorAction) {
-    if (!session || !sceneState) {
+    if (!sceneState || !workspaceLoaded) {
       return;
     }
 
@@ -620,7 +656,7 @@ export default function App() {
   }
 
   function selectAllLayers() {
-    if (!session) {
+    if (!workspaceLoaded) {
       return;
     }
     updateSelection((current) => ({
@@ -652,7 +688,7 @@ export default function App() {
   }
 
   function saveBookmark(proposedLabel?: string) {
-    if (!session || !sceneState) {
+    if (!sceneState || !workspaceLoaded) {
       return;
     }
     const label = (proposedLabel ?? bookmarkDraft).trim() || createBookmarkLabel(session.manifest, sceneState.bookmarks.length, language);
@@ -720,7 +756,7 @@ export default function App() {
   }
 
   async function exportCurrentSession() {
-    if (!session || !sceneState || !explainResult || !operatorResult || !diffResult) {
+    if (!sceneState || !explainResult || !operatorResult || !diffResult || !workspaceLoaded) {
       return;
     }
 
@@ -749,7 +785,7 @@ export default function App() {
     window.setTimeout(() => setCopied(false), 1400);
   }
 
-  if (!hasScenePayload(session) || !sceneState || !explainResult || !operatorResult || !diffResult || !viewerManifest) {
+  if (busyState === "loading" || !sceneState || !explainResult || !operatorResult || !diffResult || !viewerManifest) {
     return (
       <div className="boot-state">
         <div className="boot-card">
@@ -779,7 +815,12 @@ export default function App() {
           >
             {copy.topbar.switchLanguage}
           </button>
-          <button className="ghost-button" onClick={exportCurrentSession} disabled={busyState === "exporting"} data-testid="export-session-button">
+          <button
+            className="ghost-button"
+            onClick={exportCurrentSession}
+            disabled={busyState === "exporting" || !workspaceLoaded}
+            data-testid="export-session-button"
+          >
             {busyState === "exporting" ? copy.topbar.exporting : copy.topbar.exportSession}
           </button>
           <button className="ghost-button" onClick={copyShareLink} data-testid="copy-link-button">
@@ -789,67 +830,48 @@ export default function App() {
         </div>
       </header>
 
-      <div className="panel-tab-row">
-        {PANEL_TABS.map((panel) => (
-          <button
-            key={panel}
-            className={`panel-tab ${sceneState.panel === panel ? "is-active" : ""}`}
-            onClick={() => updateSelection((current) => ({ ...current, panel }))}
-          >
-            {localizePanelLabel(panel, language)}
-          </button>
-        ))}
-      </div>
-      <div className="panel-hint">{copy.panelHelp[sceneState.panel]}</div>
-
-      <main className="cockpit-grid">
+      <main className="cockpit-grid workspace-layout">
         <aside className="rail rail-left">
-          <section className="panel guide-panel">
+          <section className="panel hierarchy-panel">
             <div className="panel-header">
               <div>
-                <p className="eyebrow">{copy.quickstart.eyebrow}</p>
-                <h2>{copy.quickstart.title}</h2>
+                <p className="eyebrow">{copy.overview.eyebrow}</p>
+                <h2>{copy.overview.hierarchyTitle}</h2>
               </div>
+              <span className="mini-chip">{workspaceLoaded ? session.manifest.hierarchy.length : 0}</span>
             </div>
-            <ol className="guide-list">
-              {copy.quickstart.steps.map((step) => (
-                <li key={step}>{step}</li>
-              ))}
-            </ol>
-            <div className="guide-grid">
-              {copy.quickstart.areas.map((area) => (
-                <article key={area.title} className="guide-card">
-                  <strong>{area.title}</strong>
-                  <small>{area.detail}</small>
-                </article>
-              ))}
-            </div>
+            {workspaceLoaded ? (
+              <div className="hierarchy-list">
+                {session.manifest.hierarchy.map((node) => (
+                  <button
+                    key={node.id}
+                    className={`hierarchy-row ${sceneState.focusedNodeId === node.id ? "is-active" : ""}`}
+                    onClick={() => focusNode(node.id)}
+                  >
+                    <span>
+                      <strong>{node.name}</strong>
+                      <small>{node.kind}</small>
+                    </span>
+                    <small>{formatNumber(node.instanceCount)} {copy.overview.instancesShort}</small>
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <p className="empty-copy">{copy.overview.emptyHierarchy}</p>
+            )}
           </section>
+        </aside>
 
-          <section className="panel load-panel">
+        <section className="center-stage">
+          <section className="panel load-panel inline-load-panel">
             <div className="panel-header">
               <div>
                 <p className="eyebrow">{copy.load.eyebrow}</p>
                 <h2>{copy.load.title}</h2>
               </div>
               <span className="mini-chip">
-                {busyState === "uploading" || busyState === "loading" ? copy.load.working : localizeSourceLabel(session.manifest.source, language)}
+                {busyState === "uploading" ? copy.load.working : copy.load.uploadBadge}
               </span>
-            </div>
-            <div className="sample-list" data-testid="sample-list">
-              {samples.map((entry) => (
-                <button
-                  key={entry.id}
-                  className={`sample-button ${entry.sessionId === session.sessionId ? "is-active" : ""}`}
-                  onClick={() => void handleSampleLoad(entry.id)}
-                >
-                  <span>
-                    <strong>{localizeSampleName(entry, language)}</strong>
-                    <small>{localizeSampleDescription(entry, language)}</small>
-                  </span>
-                  <small>{entry.technology}</small>
-                </button>
-              ))}
             </div>
             <label className="upload-dropzone" data-testid="upload-zone">
               <input
@@ -861,24 +883,26 @@ export default function App() {
               />
               <span>{copy.load.uploadHint}</span>
             </label>
-            <div className="metadata-grid">
-              <div>
-                <label>{copy.load.sourceFiles}</label>
-                <strong>{session.manifest.sourceFiles.join(", ")}</strong>
+            {workspaceLoaded ? (
+              <div className="metadata-grid">
+                <div>
+                  <label>{copy.load.sourceFiles}</label>
+                  <strong>{session.manifest.sourceFiles.join(", ")}</strong>
+                </div>
+                <div>
+                  <label>{copy.load.format}</label>
+                  <strong>{session.manifest.format.toUpperCase()}</strong>
+                </div>
+                <div>
+                  <label>{copy.load.technology}</label>
+                  <strong>{session.manifest.technology}</strong>
+                </div>
+                <div>
+                  <label>{copy.load.warnings}</label>
+                  <strong>{session.warnings?.length ?? 0}</strong>
+                </div>
               </div>
-              <div>
-                <label>{copy.load.format}</label>
-                <strong>{session.manifest.format.toUpperCase()}</strong>
-              </div>
-              <div>
-                <label>{copy.load.technology}</label>
-                <strong>{session.manifest.technology}</strong>
-              </div>
-              <div>
-                <label>{copy.load.warnings}</label>
-                <strong>{session.warnings?.length ?? 0}</strong>
-              </div>
-            </div>
+            ) : null}
             {session.warnings?.length ? (
               <div className="warning-list">
                 {session.warnings.map((warning) => (
@@ -888,101 +912,37 @@ export default function App() {
             ) : null}
           </section>
 
-          <section
-            className={`panel layers-panel ${sectionMatchesPanel("layers", sceneState.panel) ? "is-panel-focus" : ""}`}
-            ref={(element) => {
-              panelSectionRefs.current.layers = element;
-            }}
-          >
-            <div className="panel-header">
-              <div>
-                <p className="eyebrow">{copy.layers.eyebrow}</p>
-                <h2>{copy.layers.title}</h2>
-              </div>
-              <div className="inline-actions">
-                <button className="text-button" onClick={selectAllLayers}>{copy.layers.all}</button>
-                <button className="text-button" onClick={clearLayers}>{copy.layers.none}</button>
-              </div>
-            </div>
-            <div className="layer-list">
-              {session.manifest.layers.map((layer) => {
-                const active = sceneState.selectedLayerIds.includes(layer.id);
-                return (
-                  <button
-                    key={layer.id}
-                    className={`layer-row ${active ? "is-active" : ""}`}
-                    onClick={() => toggleLayer(layer.id)}
-                    data-testid={`layer-${layer.id}`}
-                  >
-                    <span className="layer-swatch" style={{ background: layer.color }} />
-                    <span className="layer-copy">
-                      <strong>{layer.name}</strong>
-                      <small>{layer.purpose}</small>
-                    </span>
-                    <span className="layer-thickness">{layer.thicknessNm} nm</span>
-                  </button>
-                );
-              })}
-            </div>
-          </section>
-
-          <section
-            className={`panel markers-panel ${sectionMatchesPanel("markers", sceneState.panel) ? "is-panel-focus" : ""}`}
-            ref={(element) => {
-              panelSectionRefs.current.markers = element;
-            }}
-          >
-            <div className="panel-header">
-              <div>
-                <p className="eyebrow">{copy.markers.eyebrow}</p>
-                <h2>{copy.markers.title}</h2>
-              </div>
-              <span className="mini-chip">{session.manifest.markers?.length ?? 0}</span>
-            </div>
-            <div className="marker-list">
-              {(session.manifest.markers ?? []).map((marker) => (
-                <button
-                  key={marker.id}
-                  className={`marker-row ${sceneState.selectedMarkerId === marker.id ? "is-active" : ""}`}
-                  onClick={() => focusMarker(marker.id)}
-                >
-                  <span className={`severity severity-${marker.severity}`} />
-                  <span className="marker-copy">
-                    <strong>{marker.title}</strong>
-                    <small>{marker.category}</small>
-                  </span>
-                  <span className="marker-pill">{localizeSeverityLabel(marker.severity, language)}</span>
-                </button>
-              ))}
-            </div>
-          </section>
-        </aside>
-
-        <section
-          className={`center-stage ${sectionMatchesPanel("viewer", sceneState.panel) ? "is-panel-focus" : ""}`}
-          ref={(element) => {
-            panelSectionRefs.current.viewer = element;
-          }}
-        >
           <div className="panel center-toolbar">
             <div className="toolbar-meta">
-              <span className="toolbar-badge">{copy.center.bundle} {session.manifest.id}</span>
-              <span>{session.manifest.tags.slice(0, 3).join(" · ")}</span>
+              <span className="toolbar-badge">
+                {workspaceLoaded ? `${copy.center.bundle} ${session.manifest.id}` : copy.viewer.emptyBadge}
+              </span>
+              <span>{workspaceLoaded ? session.manifest.tags.slice(0, 3).join(" · ") : copy.viewer.emptyHint}</span>
             </div>
             <div className="inline-actions toolbar-actions">
-              <button className="text-button" onClick={() => setViewerAction({ id: Date.now(), type: "fit", payload: { nodeId: sceneState.focusedNodeId, markerId: sceneState.selectedMarkerId } })}>
+              <button
+                className="text-button"
+                disabled={!workspaceLoaded}
+                onClick={() =>
+                  setViewerAction({ id: Date.now(), type: "fit", payload: { nodeId: sceneState.focusedNodeId, markerId: sceneState.selectedMarkerId } })
+                }
+              >
                 {copy.center.fit}
               </button>
               <button className="text-button" onClick={() => setViewerAction({ id: Date.now(), type: "reset" })}>
                 {copy.center.reset}
               </button>
-              <button className="text-button" onClick={() => {
-                selectAllLayers();
-                setViewerAction({ id: Date.now(), type: "fit", payload: { nodeId: sceneState.focusedNodeId } });
-              }}>
+              <button
+                className="text-button"
+                disabled={!workspaceLoaded}
+                onClick={() => {
+                  selectAllLayers();
+                  setViewerAction({ id: Date.now(), type: "fit", payload: { nodeId: sceneState.focusedNodeId } });
+                }}
+              >
                 {copy.center.showAll}
               </button>
-              <button className="primary-button" onClick={() => saveBookmark()} data-testid="save-bookmark-button">
+              <button className="primary-button" onClick={() => saveBookmark()} data-testid="save-bookmark-button" disabled={!workspaceLoaded}>
                 {copy.center.saveBookmark}
               </button>
             </div>
@@ -994,21 +954,21 @@ export default function App() {
                 key={mode}
                 className={`chip-button ${sceneState.performanceMode === mode ? "is-active" : ""}`}
                 onClick={() => void setPerformanceMode(mode)}
-                disabled={busyState === "detailing"}
+                disabled={busyState === "detailing" || !workspaceLoaded}
                 data-testid={`performance-${mode}`}
               >
                 {localizeModeLabel(mode, language)}
               </button>
             ))}
-            {!session.assetUrl && !session.exportMetadata ? (
+            {!session.assetUrl && workspaceLoaded && !session.exportMetadata ? (
               <span className="mini-chip">{copy.status.detailDeferred}</span>
             ) : null}
           </div>
 
           <SceneViewer
             manifest={viewerManifest}
-            displayName={localizedManifestName}
-            assetUrl={sceneState.performanceMode === "hierarchy-preview" ? null : session.assetUrl}
+            displayName={workspaceLoaded ? localizedManifestName : copy.viewer.emptyTitle}
+            assetUrl={workspaceLoaded && sceneState.performanceMode !== "hierarchy-preview" ? session.assetUrl : null}
             selectedLayerIds={sceneState.selectedLayerIds}
             focusedNodeId={sceneState.focusedNodeId}
             selectedMarkerId={sceneState.selectedMarkerId ?? null}
@@ -1035,7 +995,7 @@ export default function App() {
           <div className="panel scene-footbar">
             <div>
               <label>{copy.sceneFoot.selection}</label>
-              <strong>{sceneState.selectionMetadata?.name ?? selectedNode?.name ?? copy.sceneFoot.overview}</strong>
+              <strong>{workspaceLoaded ? sceneState.selectionMetadata?.name ?? selectedNode?.name ?? copy.sceneFoot.overview : copy.viewer.emptySelection}</strong>
             </div>
             <div>
               <label>{copy.sceneFoot.mode}</label>
@@ -1053,16 +1013,84 @@ export default function App() {
         </section>
 
         <aside className="rail rail-right">
-          <section
-            className={`panel ${sectionMatchesPanel("overview", sceneState.panel) ? "is-panel-focus" : ""}`}
-            ref={(element) => {
-              panelSectionRefs.current.overview = element;
-            }}
-          >
+          <section className="panel">
+            <div className="panel-header">
+              <div>
+                <p className="eyebrow">{copy.explain.eyebrow}</p>
+                <h2>{copy.explain.title}</h2>
+              </div>
+              <span className="mini-chip">{explainResult.source}</span>
+            </div>
+            <textarea value={explainPrompt} onChange={(event) => setExplainPrompt(event.target.value)} rows={3} />
+            <div className="selection-card ai-context-card">
+              <label>{copy.explain.selectionLabel}</label>
+              <strong>{workspaceLoaded ? aiScopeSummary : copy.explain.selectionIdle}</strong>
+              <small>{workspaceLoaded ? copy.overview.selectionHelp : copy.explain.empty}</small>
+            </div>
+            <button className="primary-button" onClick={() => void handleExplain()} disabled={busyState === "explaining" || !workspaceLoaded} data-testid="explain-button">
+              {busyState === "explaining"
+                ? copy.explain.running
+                : sceneState.selectionMetadata?.name
+                  ? copy.explain.runSelection
+                  : copy.explain.run}
+            </button>
+            <div className="response-copy" data-testid="explain-output">
+              {workspaceLoaded ? (
+                <>
+                  <strong>{explainResult.summary}</strong>
+                  <small>{copy.explain.confidence} {Math.round(explainResult.confidence * 100)}%</small>
+                  <ul className="plain-list">
+                    {explainResult.highlights.map((line) => (
+                      <li key={line}>{line}</li>
+                    ))}
+                  </ul>
+                </>
+              ) : (
+                <strong>{copy.explain.empty}</strong>
+              )}
+            </div>
+          </section>
+
+          <section className="panel">
+            <div className="panel-header">
+              <div>
+                <p className="eyebrow">{copy.operator.eyebrow}</p>
+                <h2>{copy.operator.title}</h2>
+              </div>
+              <span className="mini-chip">{operatorResult.source}</span>
+            </div>
+            <textarea value={operatorPrompt} onChange={(event) => setOperatorPrompt(event.target.value)} rows={3} />
+            <div className="selection-card ai-context-card">
+              <label>{copy.operator.selectionLabel}</label>
+              <strong>{workspaceLoaded ? aiScopeSummary : copy.operator.selectionIdle}</strong>
+              <small>{workspaceLoaded ? copy.overview.selectionHelp : copy.operator.empty}</small>
+            </div>
+            <button className="primary-button" onClick={() => void handleOperator()} disabled={busyState === "operating" || !workspaceLoaded} data-testid="operator-button">
+              {busyState === "operating"
+                ? copy.operator.running
+                : sceneState.selectionMetadata?.name
+                  ? copy.operator.runSelection
+                  : copy.operator.run}
+            </button>
+            <div className="action-stack">
+              {workspaceLoaded ? (
+                operatorResult.actions.map((action) => (
+                  <button key={`${action.type}-${action.label}-${action.targetId ?? ""}`} className="action-button" onClick={() => applyOperatorAction(action)}>
+                    <strong>{action.label}</strong>
+                    <small>{action.type}</small>
+                  </button>
+                ))
+              ) : (
+                <p className="empty-copy">{copy.operator.empty}</p>
+              )}
+            </div>
+          </section>
+
+          <section className="panel">
             <div className="panel-header">
               <div>
                 <p className="eyebrow">{copy.overview.eyebrow}</p>
-                <h2>{copy.overview.title}</h2>
+                <h2>{copy.overview.metricsTitle}</h2>
               </div>
               <span className="mini-chip">{session.manifest.metrics.layerCount} {copy.overview.layers}</span>
             </div>
@@ -1100,85 +1128,76 @@ export default function App() {
                 {(sceneState.selectionMetadata?.focusLayerIds ?? []).join(", ") || copy.overview.selectionHelp}
               </small>
             </div>
-
-            <div className="hierarchy-list">
-              {session.manifest.hierarchy.map((node) => (
-                <button
-                  key={node.id}
-                  className={`hierarchy-row ${sceneState.focusedNodeId === node.id ? "is-active" : ""}`}
-                  onClick={() => focusNode(node.id)}
-                >
-                  <span>
-                    <strong>{node.name}</strong>
-                    <small>{node.kind}</small>
-                  </span>
-                  <small>{formatNumber(node.instanceCount)} {copy.overview.instancesShort}</small>
-                </button>
-              ))}
-            </div>
           </section>
 
-          <section
-            className={`panel ${sectionMatchesPanel("explain", sceneState.panel) ? "is-panel-focus" : ""}`}
-            ref={(element) => {
-              panelSectionRefs.current.explain = element;
-            }}
-          >
+          <section className="panel">
             <div className="panel-header">
               <div>
-                <p className="eyebrow">{copy.explain.eyebrow}</p>
-                <h2>{copy.explain.title}</h2>
+                <p className="eyebrow">{copy.layers.eyebrow}</p>
+                <h2>{copy.layers.title}</h2>
               </div>
-              <span className="mini-chip">{explainResult.source}</span>
+              <div className="inline-actions">
+                <button className="text-button" onClick={selectAllLayers} disabled={!workspaceLoaded}>{copy.layers.all}</button>
+                <button className="text-button" onClick={clearLayers} disabled={!workspaceLoaded}>{copy.layers.none}</button>
+              </div>
             </div>
-            <textarea value={explainPrompt} onChange={(event) => setExplainPrompt(event.target.value)} rows={3} />
-            <button className="primary-button" onClick={() => void handleExplain()} disabled={busyState === "explaining"} data-testid="explain-button">
-              {busyState === "explaining" ? copy.explain.running : copy.explain.run}
-            </button>
-            <div className="response-copy" data-testid="explain-output">
-              <strong>{explainResult.summary}</strong>
-              <small>{copy.explain.confidence} {Math.round(explainResult.confidence * 100)}%</small>
-              <ul className="plain-list">
-                {explainResult.highlights.map((line) => (
-                  <li key={line}>{line}</li>
-                ))}
-              </ul>
+            <div className="layer-list">
+              {workspaceLoaded ? (
+                session.manifest.layers.map((layer) => {
+                  const active = sceneState.selectedLayerIds.includes(layer.id);
+                  return (
+                    <button
+                      key={layer.id}
+                      className={`layer-row ${active ? "is-active" : ""}`}
+                      onClick={() => toggleLayer(layer.id)}
+                      data-testid={`layer-${layer.id}`}
+                    >
+                      <span className="layer-swatch" style={{ background: layer.color }} />
+                      <span className="layer-copy">
+                        <strong>{layer.name}</strong>
+                        <small>{layer.purpose}</small>
+                      </span>
+                      <span className="layer-thickness">{layer.thicknessNm} nm</span>
+                    </button>
+                  );
+                })
+              ) : (
+                <p className="empty-copy">{copy.layers.empty}</p>
+              )}
             </div>
           </section>
 
-          <section
-            className={`panel ${sectionMatchesPanel("operator", sceneState.panel) ? "is-panel-focus" : ""}`}
-            ref={(element) => {
-              panelSectionRefs.current.operator = element;
-            }}
-          >
+          <section className="panel">
             <div className="panel-header">
               <div>
-                <p className="eyebrow">{copy.operator.eyebrow}</p>
-                <h2>{copy.operator.title}</h2>
+                <p className="eyebrow">{copy.markers.eyebrow}</p>
+                <h2>{copy.markers.title}</h2>
               </div>
-              <span className="mini-chip">{operatorResult.source}</span>
+              <span className="mini-chip">{session.manifest.markers?.length ?? 0}</span>
             </div>
-            <textarea value={operatorPrompt} onChange={(event) => setOperatorPrompt(event.target.value)} rows={3} />
-            <button className="primary-button" onClick={() => void handleOperator()} disabled={busyState === "operating"} data-testid="operator-button">
-              {busyState === "operating" ? copy.operator.running : copy.operator.run}
-            </button>
-            <div className="action-stack">
-              {operatorResult.actions.map((action) => (
-                <button key={`${action.type}-${action.label}-${action.targetId ?? ""}`} className="action-button" onClick={() => applyOperatorAction(action)}>
-                  <strong>{action.label}</strong>
-                  <small>{action.type}</small>
-                </button>
-              ))}
+            <div className="marker-list">
+              {workspaceLoaded ? (
+                (session.manifest.markers ?? []).map((marker) => (
+                  <button
+                    key={marker.id}
+                    className={`marker-row ${sceneState.selectedMarkerId === marker.id ? "is-active" : ""}`}
+                    onClick={() => focusMarker(marker.id)}
+                  >
+                    <span className={`severity severity-${marker.severity}`} />
+                    <span className="marker-copy">
+                      <strong>{marker.title}</strong>
+                      <small>{marker.category}</small>
+                    </span>
+                    <span className="marker-pill">{localizeSeverityLabel(marker.severity, language)}</span>
+                  </button>
+                ))
+              ) : (
+                <p className="empty-copy">{copy.markers.empty}</p>
+              )}
             </div>
           </section>
 
-          <section
-            className={`panel ${sectionMatchesPanel("review", sceneState.panel) ? "is-panel-focus" : ""}`}
-            ref={(element) => {
-              panelSectionRefs.current.review = element;
-            }}
-          >
+          <section className="panel">
             <div className="panel-header">
               <div>
                 <p className="eyebrow">{copy.review.eyebrow}</p>
@@ -1193,7 +1212,7 @@ export default function App() {
                 onChange={(event) => setBookmarkDraft(event.target.value)}
                 placeholder={copy.review.bookmarkLabel}
               />
-              <button className="text-button" onClick={() => saveBookmark()}>
+              <button className="text-button" onClick={() => saveBookmark()} disabled={!workspaceLoaded}>
                 {copy.review.save}
               </button>
             </div>
@@ -1217,7 +1236,7 @@ export default function App() {
               placeholder={copy.review.notePlaceholder}
               data-testid="note-input"
             />
-            <button className="primary-button" onClick={addNote} data-testid="note-add-button">
+            <button className="primary-button" onClick={addNote} data-testid="note-add-button" disabled={!workspaceLoaded}>
               {copy.review.addNote}
             </button>
 
