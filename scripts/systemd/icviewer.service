@@ -5,9 +5,9 @@ After=network.target
 [Service]
 Type=simple
 User=root
-WorkingDirectory=/srv/icviewer/apps/api
+WorkingDirectory=/opt/icviewer/apps/api
 EnvironmentFile=-/etc/icviewer.env
-ExecStart=/srv/icviewer/apps/api/.venv/bin/uvicorn app.main:app --host 127.0.0.1 --port 34000
+ExecStart=/opt/icviewer/apps/api/.venv/bin/uvicorn app.main:app --host 127.0.0.1 --port 34000
 Restart=always
 RestartSec=3
 

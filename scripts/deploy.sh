@@ -2,9 +2,9 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-DEPLOY_ROOT="${DEPLOY_ROOT:-/srv/icviewer}"
+DEPLOY_ROOT="${DEPLOY_ROOT:-/opt/icviewer}"
 SERVICE_NAME="${SERVICE_NAME:-icviewer}"
-SITE_NAME="${SITE_NAME:-icviewer.aialra.online}"
+SITE_NAME="${SITE_NAME:-icviewer.example.com}"
 SITE_AVAILABLE="/etc/nginx/sites-available/${SITE_NAME}"
 SITE_ENABLED="/etc/nginx/sites-enabled/${SITE_NAME}"
 SYSTEMD_TARGET="/etc/systemd/system/${SERVICE_NAME}.service"

@@ -12,4 +12,4 @@
 - added backend sample inventory, OpenROAD sidecar ingestion, session export, marker merge, bookmark persistence, and stronger diff output
 - upgraded the viewer to CAD-style controls with left-drag orbit, right-drag pan, wheel zoom-to-cursor, and double-click focus
 - added backend-bound sample switching, review markers, bookmarks, export/import UX, and stricter end-to-end smoke coverage
-- added systemd and deployment automation for live cutover to `icviewer.aialra.online`
+- added systemd and configurable deployment automation without publishing a production domain

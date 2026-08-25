@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://icviewer.aialra.online/schemas/manifest.schema.json",
+  "$id": "https://example.com/icviewer/schemas/manifest.schema.json",
   "title": "ICViewer Layout Manifest",
   "type": "object",
   "required": [

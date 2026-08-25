@@ -9,7 +9,7 @@
 - [x] stats panel with bbox, cell count, instance count, and polygon count
 - [x] `/health` endpoint
 - [x] Playwright smoke test
-- [x] deployment configuration for `icviewer.aialra.online`
+- [x] configurable deployment template for a private operator-supplied domain
 
 ## P1
 
@@ -24,5 +24,5 @@
 
 - [x] metadata diff
 - [x] review notes
-- [ ] JSON export
+- [x] JSON export
 - [ ] performance mode and simplified rendering

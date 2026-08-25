@@ -24,7 +24,7 @@ Use this to give agents scoped file access to the repository root instead of the
 
 Recommended package:
 
-- `npx -y @modelcontextprotocol/server-filesystem /aialra/ICViewer/repo`
+- `npx -y @modelcontextprotocol/server-filesystem /path/to/IC-Viewer`
 
 ### GitHub MCP
 
@@ -43,4 +43,4 @@ Recommended image:
 
 ## Repository Config Example
 
-See [configs/codex.mcp.config.toml.example](/aialra/ICViewer/repo/configs/codex.mcp.config.toml.example).
+See [`configs/codex.mcp.config.toml.example`](../configs/codex.mcp.config.toml.example).

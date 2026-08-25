@@ -10,7 +10,7 @@ args = ["@playwright/mcp@latest"]
 
 [mcp_servers.filesystem]
 command = "npx"
-args = ["-y", "@modelcontextprotocol/server-filesystem", "/aialra/ICViewer/repo"]
+args = ["-y", "@modelcontextprotocol/server-filesystem", "/path/to/IC-Viewer"]
 
 # Optional GitHub MCP. Prefer least-privilege repo and actions scopes only.
 # [mcp_servers.github]
