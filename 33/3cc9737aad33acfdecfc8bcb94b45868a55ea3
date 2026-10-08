@@ -1,0 +1,21 @@
+docs/VERIFICATION-PUBLIC.md
+  s_175b4d132123f9::t_4e0d73601361c1 38-39
+apps/web/tests/public/viewer-tools.spec.ts
+  s_175b4d132123f9::t_4e0d73601361c1 80-85,88-89,94-97,99
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "333cc9737aad33acfdecfc8bcb94b45868a55ea3",
+  "prompts": {},
+  "sessions": {
+    "s_175b4d132123f9": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a11903-4e6d-7740-9d79-7a585557e2c2",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "AIALRA-0 <aialra@163.com>"
+    }
+  }
+}
