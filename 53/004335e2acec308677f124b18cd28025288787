@@ -1,0 +1,77 @@
+apps/web/src/public/explanation.ts
+  s_175b4d132123f9::t_34cd36ead891f6 5,18
+docs/VERIFICATION-PUBLIC.md
+  s_175b4d132123f9::t_f20d3b5965342a 9,20-22,26,30
+docs/security/publication-risk-notes.md
+  s_175b4d132123f9::t_af2682c8ea52c8 14-16
+apps/web/tests/public/source-layers.spec.ts
+  s_175b4d132123f9::t_8e8c36354d6cf2 58
+  s_175b4d132123f9::t_12535f7bc856e8 1-57,59-61
+docs/agent-locks.md
+  s_175b4d132123f9::t_f20d3b5965342a 5,21
+apps/web/src/public/layerNames.ts
+  s_175b4d132123f9::t_9625e46f431ed9 1-28
+docs/assets/readme/PROVENANCE.md
+  s_175b4d132123f9::t_388cfbfed7d893 21-22
+apps/web/src/public/SourceData.tsx
+  s_175b4d132123f9::t_9625e46f431ed9 1-4,7-43,45-47
+  s_175b4d132123f9::t_b954ce19d2d64b 5-6,44
+apps/web/src/public/types.ts
+  s_175b4d132123f9::t_f8602beee86404 16,51-59
+README.en.md
+  s_175b4d132123f9::t_2225bf182c6cb1 30-33,152
+  s_175b4d132123f9::t_388cfbfed7d893 148
+apps/web/src/public/Viewer.tsx
+  s_175b4d132123f9::t_34cd36ead891f6 41,44,344
+apps/web/src/public/gds.ts
+  s_175b4d132123f9::t_f8602beee86404 24-27,33,63-65,149-151,159,170-172,175-177,182,192,202,213,227-231,233-235,278-296,412,500,503,529
+  s_175b4d132123f9::t_5494761fa0150f 165,169,226,232
+apps/web/src/public/Icon.tsx
+  s_175b4d132123f9::t_1c1af1bf8c0865 24
+docs/GDS-RECORDS.md
+  s_175b4d132123f9::t_93e1cbe6fd10be 1-25
+apps/web/src/public/Workbench.tsx
+  s_175b4d132123f9::t_258b90207a0a77 15-16,99-103,299-300,323-326,404,484-485,503-512,580,654,678,688,691,693,854-859,861,867,878,885,904-913,969-970,1025-1027,1041-1044,1108-1110,1116-1118,1122-1123,1140,1143
+  s_175b4d132123f9::t_25042f7be53778 322
+  s_175b4d132123f9::t_af2682c8ea52c8 689
+  s_175b4d132123f9::t_34cd36ead891f6 903,1277-1278
+apps/web/src/public/ExplanationPanel.tsx
+  s_175b4d132123f9::t_5494761fa0150f 8
+  s_175b4d132123f9::t_34cd36ead891f6 21,26
+apps/web/tests/public/parsers.spec.ts
+  s_175b4d132123f9::t_af2682c8ea52c8 94,99
+apps/web/tests/public/metadata-fixture.ts
+  s_175b4d132123f9::t_12535f7bc856e8 1-21
+README.md
+  s_175b4d132123f9::t_800c9fa750fb38 30,32-34,148,152
+apps/web/src/public/translations.en.ts
+  s_175b4d132123f9::t_4e9084e63e1f38 320-372
+apps/web/src/public/workbench.css
+  s_175b4d132123f9::t_37f481a1ac7204 1179-1193
+apps/web/tests/public/inspection.spec.ts
+  s_175b4d132123f9::t_be55e481cbf63b 61,69,106,113
+apps/web/tests/public/language-markdown.spec.ts
+  s_175b4d132123f9::t_799cc9e3f03f7e 21-22,49
+apps/web/tests/public/workbench.spec.ts
+  s_175b4d132123f9::t_3aa5861fcfe4c7 77
+docs/PUBLIC-PREVIEW.md
+  s_175b4d132123f9::t_3b91259bee37e8 28,30-31
+docs/coordination.md
+  s_175b4d132123f9::t_ff87e1c314bd50 35-37
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "53004335e2acec308677f124b18cd28025288787",
+  "prompts": {},
+  "sessions": {
+    "s_175b4d132123f9": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a11903-4e6d-7740-9d79-7a585557e2c2",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "AIALRA-0 <aialra@163.com>"
+    }
+  }
+}
