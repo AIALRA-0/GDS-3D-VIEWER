@@ -651,9 +651,9 @@ export default function Workbench() {
         {panel === "layers" && (
           <>
             <div className="group-actions">
-              <button className="text-button quiet" disabled={!layout || layout.format !== "gds"} onClick={() => mappingInput.current?.click()}>{t("导入层映射")}</button>
+              <button className="text-button" disabled={!layout || layout.format !== "gds"} onClick={() => mappingInput.current?.click()}>{t("导入层映射")}</button>
               <button
-                className="text-button quiet"
+                className="text-button"
                 onClick={() =>
                   setVisible(layout?.layers.map((l) => l.id) ?? [])
                 }
@@ -661,7 +661,7 @@ export default function Workbench() {
               >
                  {t("显示全部")} </button>
               <button
-                className="text-button quiet"
+                className="text-button"
                 onClick={() => setVisible([])}
                 disabled={!layout}
               >
@@ -696,7 +696,7 @@ export default function Workbench() {
                     </small>
                   </button>
                   <button
-                    className="isolate"
+                    className="icon-button isolate"
                     title={t("只看 {{0}}", {"0": layer.name})}
                     aria-label={t("只看 {{0}}", {"0": layer.name})}
                     onClick={() => {
@@ -904,11 +904,11 @@ export default function Workbench() {
             <div className="layer-rename">
               <p className="muted">{selectedLayer.id} · {t("名称由用户或层映射提供，层号保持不变")}</p>
               <label>{t("图层名称")}<input aria-label={t("图层名称")} maxLength={128} value={rename?.id === selectedLayer.id ? rename.value : layerNames[selectedLayer.id] ?? ""} placeholder={selectedLayer.name} onChange={(e) => setRename({ id: selectedLayer.id, value: e.target.value })} /></label>
-              <div className="group-actions"><button className="text-button quiet" onClick={() => {
+              <div className="group-actions"><button className="text-button" onClick={() => {
                 const value = rename?.id === selectedLayer.id ? rename.value.trim() : layerNames[selectedLayer.id] ?? "";
                 try { const names = value ? validateLayerNames({ ...layerNames, [selectedLayer.id]: value }) : Object.fromEntries(Object.entries(layerNames).filter(([id]) => id !== selectedLayer.id)); setLayerNames(names); setRename(null); }
                 catch (e) { setError(e instanceof Error ? e.message : "图层映射无法读取"); }
-              }}>{t("保存名称")}</button><button className="text-button quiet" onClick={() => { setLayerNames(Object.fromEntries(Object.entries(layerNames).filter(([id]) => id !== selectedLayer.id))); setRename(null); }}>{t("恢复默认")}</button></div>
+              }}>{t("保存名称")}</button><button className="text-button" onClick={() => { setLayerNames(Object.fromEntries(Object.entries(layerNames).filter(([id]) => id !== selectedLayer.id))); setRename(null); }}>{t("恢复默认")}</button></div>
             </div>
           )}
           {selectedLayer && (
@@ -1042,18 +1042,6 @@ export default function Workbench() {
         <div role="tabpanel" id="inspector-panel-ai" aria-labelledby="inspector-tab-ai" hidden={inspectorTab !== "ai"}>
         <ExplanationPanel layout={layout} object={selectedObject?.feature} layerNames={layerNames} />
         </div>
-        <a
-          className="portal-link"
-          href="https://aialra.online"
-          target="_blank"
-          rel="noreferrer"
-        >
-          <Icon name="chip" />
-          <span>
-            AIALRA<span> {t("工具与项目首页")} </span>
-          </span>
-          <Icon name="arrow" />
-        </a>
       </div>
       <div className="pane-foot">
         <Icon name="shield" />

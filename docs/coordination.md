@@ -1,5 +1,7 @@
 # Coordination Log
 
+Sidebar presentation follow-up (2026-10-07 America/Los_Angeles): `apps/web/src/public/Workbench.tsx` and `workbench.css` unify action controls and remove the inspector portal card; `README.md`, `README.en.md` and eleven synthetic product screenshots reflect that UI and a clearer four-layer separation example. The AIALRA portal card retains its destination with updated bilingual feature text. No geometry, review schema, provider transport or backend contract changes.
+
 | time | owner | note |
 |------|-------|------|
 | 2026-04-12 18:10 UTC | main | Initialized repo skeleton, planning docs, and shared collaboration contract. |

@@ -74,9 +74,9 @@
 
 <div align="center">
 
-![分层展示帮助观察遮挡关系，显示高度不代表真实工艺厚度](docs/assets/readme/exploded-layers.png)
+![将层间距调到 10，以较低视角清楚观察四层分离，显示高度不代表真实工艺厚度](docs/assets/readme/exploded-layers.png)
 
-图 6 分层展示帮助观察遮挡关系，显示高度不代表真实工艺厚度
+图 6 将层间距调到 10，以较低视角清楚观察四层分离，显示高度不代表真实工艺厚度
 
 </div>
 
@@ -214,7 +214,10 @@ npm run build:legacy
 
 公开入口由 Cloudflare 代理，源站仅提供静态文件，不暴露上传接口、原有后端或共享会话
 主页正常访问仍会请求站点服务；可选讲解会向用户确认的模型服务发送摘要
-入口也已加入 [AIALRA 工具首页](https://aialra.online)，工作台顶部的独立源码图标链接到本仓库
+
+- [AIALRA 工具首页](https://aialra.online) 的项目卡片同步当前功能与在线入口
+- 工作台顶部的独立源码图标链接到本仓库
+- 查看器内的工具首页入口仅保留为使用说明中的文字链接
 
 仓库尚未声明项目开源许可证，公开可见不等于获得任意再分发授权
 随公开构建提供的第三方声明见 [`NOTICE.txt`](apps/web/public-static/NOTICE.txt)

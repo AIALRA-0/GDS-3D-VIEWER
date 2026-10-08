@@ -73,9 +73,9 @@ Figure 5 Inspect smaller cells independently, including designs exceeding the fu
 
 <div align="center">
 
-![Separated layers reveal occlusion; display heights are not physical thicknesses](docs/assets/readme/exploded-layers.png)
+![Layer separation set to 10 with a lower viewing angle clearly reveals four layers; display heights are not physical thicknesses](docs/assets/readme/exploded-layers.png)
 
-Figure 6 Separated layers reveal occlusion; display heights are not physical thicknesses
+Figure 6 Layer separation set to 10 with a lower viewing angle clearly reveals four layers; display heights are not physical thicknesses
 
 </div>
 
@@ -213,7 +213,10 @@ Follow [`AGENTS.md`](AGENTS.md) before changing shared contracts
 
 Cloudflare proxies the public entry. The origin serves static files only, without an upload API, legacy backend or shared sessions
 Normal website requests still reach the site; optional explanations send confirmed summaries to the selected model provider
-The viewer is listed on the [AIALRA portal](https://aialra.online), and its separate toolbar source icon opens this repository
+
+- The project card on the [AIALRA portal](https://aialra.online) reflects the current features and live entry
+- The separate toolbar source icon opens this repository
+- Within the viewer, the portal entry is retained only as a text link in Help
 
 No project open-source license has been declared; public visibility alone does not grant unrestricted redistribution
 The build retains [third-party notices](apps/web/public-static/NOTICE.txt)
