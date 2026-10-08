@@ -59,14 +59,14 @@ jobs:
       - name: Start API
         working-directory: apps/api
         run: |
-          uvicorn app.main:app --host 127.0.0.1 --port 34000 > /tmp/icviewer-api.log 2>&1 &
-          echo $! > /tmp/icviewer-api.pid
+          uvicorn app.main:app --host 127.0.0.1 --port 34000 > /tmp/gds-3d-viewer-api.log 2>&1 &
+          echo $! > /tmp/gds-3d-viewer-api.pid
 
       - name: Start web dev server
         working-directory: apps/web
         run: |
-          npm run dev -- --mode legacy --host 127.0.0.1 --port 4173 > /tmp/icviewer-web.log 2>&1 &
-          echo $! > /tmp/icviewer-web.pid
+          npm run dev -- --mode legacy --host 127.0.0.1 --port 4173 > /tmp/gds-3d-viewer-web.log 2>&1 &
+          echo $! > /tmp/gds-3d-viewer-web.pid
 
       - name: Wait for services
         run: |
@@ -99,6 +99,6 @@ jobs:
         if: failure()
         run: |
           echo '===== API LOG ====='
-          cat /tmp/icviewer-api.log || true
+          cat /tmp/gds-3d-viewer-api.log || true
           echo '===== WEB LOG ====='
-          cat /tmp/icviewer-web.log || true
+          cat /tmp/gds-3d-viewer-web.log || true

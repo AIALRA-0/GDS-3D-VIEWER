@@ -1,15 +1,15 @@
 <div align="center">
 
-<h1>ICViewer</h1>
+<h1>GDS-3D-VIEWER</h1>
 
 <p><strong>在浏览器里打开芯片版图，看清图层、单元和每一处几何</strong></p>
 
 <p>无需登录 · 文件留在浏览器 · 悬停与点击详情 · 可选对象讲解</p>
 
 <p>
-  <a href="https://icviewer.aialra.online">打开在线预览</a> ·
-  <a href="https://github.com/AIALRA-0/IC-Viewer">查看源码</a> ·
-  <a href="https://github.com/AIALRA-0/IC-Viewer/archive/refs/heads/main.zip">下载源码</a> ·
+  <a href="https://gds3d.aialra.online">打开在线预览</a> ·
+  <a href="https://github.com/AIALRA-0/GDS-3D-VIEWER">查看源码</a> ·
+  <a href="https://github.com/AIALRA-0/GDS-3D-VIEWER/archive/refs/heads/main.zip">下载源码</a> ·
   <a href="README.en.md">English</a>
 </p>
 
@@ -21,12 +21,14 @@
 
 ## 1 第一次打开
 
-- 第一步，访问 [在线预览](https://icviewer.aialra.online)，点击“加载示例”查看合成版图
+- 第一步，访问 [在线预览](https://gds3d.aialra.online)，点击“加载示例”查看合成版图
 - 第二步，点击“打开文件”或拖入本地文件，支持 `.gds`、`.gds2`、`.gdsii`、`.gltf` 和 `.glb`，后缀不区分大小写
 - 第三步，切换图层或选择单元，把鼠标停在几何上查看提示，点击后在检查器中固定详细信息
 - 第四步，调整三维、俯视和层间距，把观察写入审阅记录，导出记录供以后恢复
 
 文件在当前浏览器内解析，打开和查看不需要账号或密钥
+网页默认中文，顶部 `EN` / `中文` 按钮切换界面与后续 AI 讲解语言，浏览器仅保存语言偏好
+切换语言保留已打开的版图、图层选择和审阅内容，原始单元名称与已有讲解不做自动翻译
 刷新后需重新打开源文件；导出的审阅记录保存观察和视角，不包含源版图
 
 ## 2 产品展示
@@ -99,13 +101,31 @@
 
 </div>
 
+<div align="center">
+
+![英文界面保留相同的版图与操作，顶部按钮随时切回中文](docs/assets/readme/public-english.png)
+
+图 10 英文界面保留相同的版图与操作，顶部按钮随时切回中文
+
+</div>
+
+<div align="center">
+
+![讲解支持 Markdown 标题、强调、表格和列表；这里使用测试拦截的格式演示，没有调用真实模型](docs/assets/readme/ai-markdown.png)
+
+图 11 讲解的 Markdown 排版，响应为合成摘要的测试演示，没有调用真实模型，密钥已清空
+
+</div>
+
 ## 3 对象讲解与密钥
 
 - AI 人工智能（Artificial Intelligence）：这里用于把所选对象的结构化事实转成文字说明；浏览器把用户确认的摘要交给其指定的模型服务，再显示返回的文字；只有主动配置并确认发送才会请求服务，几何查看本身不需要模型；讲解中的推测需要独立核对，不能作为电气连接或工艺规则的证明
 
-“AI 讲解”支持当前单元以及点击选中的几何，使用固定框架 `icviewer-explain-v1`
+“AI 讲解”支持当前单元以及点击选中的几何，使用固定框架 `gds-3d-viewer-explain-v1`
 框架依次说明已知事实、几何与层级、可能用途、无法确认和建议观察
 它明确区分路径形状与有连接资料的电气网络，缺少资料时要求说明未知
+讲解以 Markdown 排版，支持标题、强调、列表、引用、表格和代码块，模型输出中的 HTML、图片和可点击外链不会激活
+生成与取消按钮在窄侧栏中自动换行，切换语言会取消进行中的请求并要求重新确认发送
 
 - 密钥仅保存在当前页面内存，输入框掩码显示，刷新、离开页面或点击“清除密钥”即丢弃
 - 密钥不进入本地存储、审阅导出或网站服务器；浏览器直接使用密钥向用户选定的模型服务认证
@@ -176,11 +196,11 @@ npm run build:legacy
 | --- | --- |
 | [`apps/web/src/public/`](apps/web/src/public/) | 浏览器解析、几何选择、讲解框架与新界面 |
 | [`apps/web/tests/public/`](apps/web/tests/public/) | 公开版解析和真实浏览器回归 |
-| [`scripts/nginx/icviewer-public.conf`](scripts/nginx/icviewer-public.conf) | 独立静态站点与请求隔离配置 |
+| [`scripts/nginx/gds-3d-viewer-public.conf`](scripts/nginx/gds-3d-viewer-public.conf) | 独立静态站点与请求隔离配置 |
 | [公开版说明](docs/PUBLIC-PREVIEW.md) | 文件支持、安全边界与部署恢复 |
 | [讲解接口说明](docs/AI-HARNESS.md) | 固定框架和页面密钥约定 |
 | [兼容规范](docs/COMPATIBILITY_SPEC.md) | 原有本地后端工作流的工程上下文 |
-| [问题反馈](https://github.com/AIALRA-0/IC-Viewer/issues) | 缺陷复现与功能建议，请使用有权公开的合成数据 |
+| [问题反馈](https://github.com/AIALRA-0/GDS-3D-VIEWER/issues) | 缺陷复现与功能建议，请使用有权公开的合成数据 |
 
 </div>
 

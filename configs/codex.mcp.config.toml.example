@@ -1,4 +1,4 @@
-# Example Codex MCP configuration for ICViewer development.
+# Example Codex MCP configuration for GDS-3D-VIEWER development.
 # Merge into ~/.codex/config.toml and replace placeholder paths as needed.
 
 [mcp_servers.openaiDeveloperDocs]
@@ -10,7 +10,7 @@ args = ["@playwright/mcp@latest"]
 
 [mcp_servers.filesystem]
 command = "npx"
-args = ["-y", "@modelcontextprotocol/server-filesystem", "/path/to/IC-Viewer"]
+args = ["-y", "@modelcontextprotocol/server-filesystem", "/path/to/GDS-3D-VIEWER"]
 
 # Optional GitHub MCP. Prefer least-privilege repo and actions scopes only.
 # [mcp_servers.github]

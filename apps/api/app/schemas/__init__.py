@@ -1,1 +1,1 @@
-"""Schema package for ICViewer API."""
+"""Schema package for GDS-3D-VIEWER API."""

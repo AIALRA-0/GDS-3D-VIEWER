@@ -60,7 +60,7 @@ test("missing reference preview retains wire, hover and exact click facts", asyn
   await expect(page.locator(".object-inspection")).toContainText("WIRE_DEMO");
   await page.locator(".missing-references summary").click();
   await expect(page.locator(".missing-references")).toContainText("ABSENT_CELL");
-  await expect(page.getByRole("link", { name: "查看源码" })).toHaveAttribute("href", "https://github.com/AIALRA-0/IC-Viewer");
+  await expect(page.getByRole("link", { name: "查看源码" })).toHaveAttribute("href", "https://github.com/AIALRA-0/GDS-3D-VIEWER");
   expect(errors).toEqual([]);
 });
 test("AI requires consent, sends bounded facts directly, masks responses and drops key on refresh", async ({ page }) => {
@@ -90,7 +90,7 @@ test("AI requires consent, sends bounded facts directly, masks responses and dro
   expect(requests[0].headers.authorization).toBe(`Bearer ${key}`);
   expect(requests[0].headers.referer).toBeUndefined();
   const context = JSON.parse(requests[0].body.messages[1].content);
-  expect(context.harness).toBe("icviewer-explain-v1"); expect(context.target).toBe("geometry");
+  expect(context.harness).toBe("gds-3d-viewer-explain-v1"); expect(context.target).toBe("geometry");
   expect(context.geometry.pathWidth).toBe(30); expect(context.incomplete).toBe(true);
   expect(JSON.stringify(context)).not.toContain(key); expect(JSON.stringify(context)).not.toContain("synthetic-wire.gds2");
   expect(context.geometry.positions).toBeUndefined();

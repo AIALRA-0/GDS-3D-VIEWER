@@ -4,6 +4,6 @@
   "tags": ["openroad", "compat", "sidecar"],
   "notes": [
     "Attach alongside GDS, DEF, LEF, and metrics JSON.",
-    "ICViewer uses this sidecar to name layers and enrich the review story."
+    "GDS-3D-VIEWER uses this sidecar to name layers and enrich the review story."
   ]
 }

@@ -1,0 +1,15 @@
+[Unit]
+Description=GDS-3D-VIEWER FastAPI backend
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/gds-3d-viewer/apps/api
+EnvironmentFile=-/etc/gds-3d-viewer.env
+ExecStart=/opt/gds-3d-viewer/apps/api/.venv/bin/uvicorn app.main:app --host 127.0.0.1 --port 34000
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

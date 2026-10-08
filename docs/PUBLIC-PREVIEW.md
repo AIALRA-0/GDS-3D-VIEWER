@@ -1,6 +1,6 @@
-# ICViewer public preview
+# GDS-3D-VIEWER public preview
 
-Public entry: https://icviewer.aialra.online
+Public entry: https://gds3d.aialra.online
 
 The public preview is a static browser application behind a Cloudflare-proxied DNS record. It does not require a password. The origin serves only the reviewed contents of `apps/web/dist`; it does not run or proxy the Python API. Cloudflare Workers/Pages is not used by this deployment.
 
@@ -28,7 +28,7 @@ The synthetic sample is authored by `scripts/generate-browser-demo.py`. It conta
 - GDS supports boundaries, boxes, flush/square/custom-extension paths, reflection, rotation, magnification and arrays. Round-ended paths, absolute path width, absolute reference transformations and NODE elements require conversion in a layout tool. Text labels are omitted with a warning
 - glTF/GLB supports static, uncompressed triangle meshes with embedded binary buffers. External buffer URLs, images, required extensions, sparse accessors, invalid indices, recursive nodes and invalid coordinates are refused. Animation is not played
 - Layer heights are illustrative. Layer separation and quantitative comparisons are visual aids, not physical process data, geometry XOR, design-rule checking or sign-off
-- Preferences contain only theme, panel widths and panel placement. Source files, notes and camera bookmarks are in memory. Review export contains annotations and view state; retain the source geometry separately
+- Preferences contain only theme, panel widths, panel placement and language. Chinese is the default; the header toggles English and Chinese without reparsing geometry or changing source names and user notes. Source files, notes and camera bookmarks are in memory. Review export contains annotations and view state; retain the source geometry separately. The new `gds-3d-viewer-review` export format still accepts previous `icviewer-review` imports
 - Ordinary requests to fetch the website still reach the CDN/origin. No analytics script or file upload request is included
 - The origin denies non-GET/HEAD requests, dotfiles, API paths, legacy routes and directory listings. Scripts and Workers remain same-origin; connections allow HTTPS model providers and explicit HTTP loopback addresses. Embedding is prohibited and browsing contexts are isolated
 
@@ -44,6 +44,8 @@ The local workflow still supports the existing bundle inputs, backend explanatio
 
 ## Deploy and recover
 
-Deploy only `apps/web/dist` into a new release directory, promote an atomic `current` symlink, and use `scripts/nginx/icviewer-public.conf` for the dedicated hostname. Validate the Nginx configuration before reloading. The certificate and Cloudflare DNS credentials remain outside the repository and outside the static directory. Retain the previous symlink target for rollback.
+Deploy only `apps/web/dist` into a new release directory, promote an atomic `current` symlink, and use `scripts/nginx/gds-3d-viewer-public.conf` for the dedicated hostname. Validate the Nginx configuration before reloading. The certificate and Cloudflare DNS credentials remain outside the repository and outside the static directory. Retain the previous symlink target for rollback.
 
-Add a single `icviewer` entry to the existing AIALRA portal `APPS` array after the preview responds successfully. Check the actual homepage bytes before replacement so concurrent homepage changes are not overwritten. The portal's other cards and existing dirty changes are preserved.
+Add a single `gds-3d-viewer` entry to the existing AIALRA portal `APPS` array after the preview responds successfully. Check the actual homepage bytes before replacement so concurrent homepage changes are not overwritten. The portal's other cards and existing dirty changes are preserved.
+
+The previous `icviewer.aialra.online` hostname redirects to the new entry using `scripts/nginx/icviewer-redirect.conf`. Retain its certificate, previous static release and configuration for existing bookmarks and rollback. Both hostnames reject legacy API paths and public mutations.

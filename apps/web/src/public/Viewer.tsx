@@ -1,3 +1,4 @@
+import { useI18n } from "./i18n";
 import {
   forwardRef,
   useEffect,
@@ -42,6 +43,7 @@ export const Viewer = forwardRef<ViewerHandle, Props>(function Viewer(
   { layout, visible, explode, theme, onSelect, onPick, selectedObject },
   ref,
 ) {
+  const { t } = useI18n();
   const host = useRef<HTMLDivElement>(null),
     runtime = useRef<{
       renderer: THREE.WebGLRenderer;
@@ -107,7 +109,7 @@ export const Viewer = forwardRef<ViewerHandle, Props>(function Viewer(
           const url = URL.createObjectURL(blob),
             a = document.createElement("a");
           a.href = url;
-          a.download = "icviewer-view.png";
+          a.download = "gds-3d-viewer-view.png";
           a.click();
           setTimeout(() => URL.revokeObjectURL(url), 1000);
         });
@@ -336,15 +338,15 @@ export const Viewer = forwardRef<ViewerHandle, Props>(function Viewer(
   return (
     <div className="viewer-host" ref={host} data-testid="viewer-canvas">
       {hover && <div className="geometry-tooltip" role="tooltip" style={{ left: Math.min(hover.screen[0] + 14, Math.max(8, (host.current?.clientWidth ?? 300) - 262)), top: Math.min(hover.screen[1] + 14, Math.max(8, (host.current?.clientHeight ?? 300) - 150)) }}>
-        <strong>{featureKind(hover.feature?.kind)}</strong>
-        <span>{hover.feature?.cell ?? "模型"} · {hover.layerId}</span>
+        <strong>{t(featureKind(hover.feature?.kind))}</strong>
+        <span>{hover.feature?.cell ?? t("模型")} · {hover.layerId}</span>
         <span>X {hover.point[0].toFixed(3)} · Y {hover.point[1].toFixed(3)} {layout?.unit}</span>
-        {hover.feature?.pathWidth !== undefined && <span>路径宽度 {hover.feature.pathWidth.toFixed(3)} {layout?.unit}</span>}
-        <small>点击固定到检查器</small>
+        {hover.feature?.pathWidth !== undefined && <span> {t("路径宽度")} {hover.feature.pathWidth.toFixed(3)} {layout?.unit}</span>}
+        <small> {t("点击固定到检查器")} </small>
       </div>}
       {error && (
         <div className="canvas-error" role="alert">
-          {error}
+          {t(error)}
         </div>
       )}
     </div>

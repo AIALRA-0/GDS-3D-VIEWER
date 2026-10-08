@@ -16,7 +16,7 @@ export default defineConfig(({ mode }) => {
         input: mode === "legacy" ? "legacy.html" : "index.html",
         output: {
           manualChunks(id) {
-            if (id.includes("node_modules/react")) {
+            if (/node_modules\/(react|react-dom|scheduler)\//.test(id)) {
               return "react-vendor";
             }
             if (id.includes("node_modules/three")) {

@@ -147,9 +147,9 @@ class DiffSummaryModel(BaseModel):
 
 
 class ExportMetadataModel(BaseModel):
-    formatVersion: str = "icviewer-session-v1"
+    formatVersion: str = "gds-3d-viewer-session-v1"
     exportedAt: str
-    exportedBy: str = "ICViewer"
+    exportedBy: str = "GDS-3D-VIEWER"
     sourceSessionId: str | None = None
 
 

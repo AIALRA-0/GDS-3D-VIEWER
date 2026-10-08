@@ -178,12 +178,12 @@ type UiCopy = {
 export const UI_COPY: Record<UiLanguage, UiCopy> = {
   en: {
     boot: {
-      eyebrow: "ICViewer cockpit",
+      eyebrow: "GDS-3D-VIEWER cockpit",
       title: "Loading the review cockpit.",
       subtitle: "Fetching sample inventory, baseline session, and viewer assets."
     },
     topbar: {
-      eyebrow: "ICViewer cockpit",
+      eyebrow: "GDS-3D-VIEWER cockpit",
       title: "Explainable 3D IC layout review for GDS, sidecars, and AI-assisted inspection.",
       hero: "Backend-backed sample sessions, OpenROAD-compatible sidecars, CAD-style camera controls, and exportable review state in one cockpit.",
       exportSession: "Export session",
@@ -194,7 +194,7 @@ export const UI_COPY: Record<UiLanguage, UiCopy> = {
     },
     quickstart: {
       eyebrow: "Quickstart",
-      title: "How to use ICViewer",
+      title: "How to use GDS-3D-VIEWER",
       steps: [
         "1. Load a sample bundle or upload a GDS file with optional manifest, metrics, markers, DEF, and LEF sidecars.",
         "2. Inspect the central viewer with left drag to orbit, right drag to pan, wheel to zoom to cursor, and double click to focus.",
@@ -344,7 +344,7 @@ export const UI_COPY: Record<UiLanguage, UiCopy> = {
       info: "info"
     },
     status: {
-      booting: "Booting ICViewer cockpit.",
+      booting: "Booting GDS-3D-VIEWER cockpit.",
       backendLoaded: (name) => `Loaded backend session: ${name}.`,
       backendFailed: "Backend bootstrap failed.",
       sampleLoaded: (name) => `Loaded sample bundle: ${name}.`,
@@ -385,12 +385,12 @@ export const UI_COPY: Record<UiLanguage, UiCopy> = {
   },
   zh: {
     boot: {
-      eyebrow: "ICViewer 驾驶舱",
+      eyebrow: "GDS-3D-VIEWER 驾驶舱",
       title: "正在加载审阅驾驶舱。",
       subtitle: "正在获取样例清单、基线会话和 viewer 资源。"
     },
     topbar: {
-      eyebrow: "ICViewer 驾驶舱",
+      eyebrow: "GDS-3D-VIEWER 驾驶舱",
       title: "面向 GDS、sidecar 与 AI 辅助审阅的可解释 3D IC 版图审阅平台。",
       hero: "把真实后端样例会话、兼容 OpenROAD 的 sidecar、接近 CAD 的相机控制和可导出的审阅状态放进同一个驾驶舱。",
       exportSession: "导出会话",
@@ -401,7 +401,7 @@ export const UI_COPY: Record<UiLanguage, UiCopy> = {
     },
     quickstart: {
       eyebrow: "快速上手",
-      title: "如何使用 ICViewer",
+      title: "如何使用 GDS-3D-VIEWER",
       steps: [
         "1. 加载一个样例 bundle，或上传一个 GDS 文件，并可选附带 manifest、metrics、markers、DEF、LEF sidecar。",
         "2. 在中央 viewer 里检查模型：左键拖拽旋转，右键拖拽平移，滚轮按光标缩放，双击聚焦。",
@@ -551,7 +551,7 @@ export const UI_COPY: Record<UiLanguage, UiCopy> = {
       info: "信息"
     },
     status: {
-      booting: "正在启动 ICViewer 驾驶舱。",
+      booting: "正在启动 GDS-3D-VIEWER 驾驶舱。",
       backendLoaded: (name) => `已加载后端会话：${name}。`,
       backendFailed: "后端初始化失败。",
       sampleLoaded: (name) => `已加载样例 bundle：${name}。`,

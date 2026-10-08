@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://example.com/icviewer/schemas/manifest.schema.json",
-  "title": "ICViewer Layout Manifest",
+  "$id": "https://example.com/gds-3d-viewer/schemas/manifest.schema.json",
+  "title": "GDS-3D-VIEWER Layout Manifest",
   "type": "object",
   "required": [
     "id",

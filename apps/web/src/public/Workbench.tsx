@@ -1,3 +1,4 @@
+import { useI18n } from "./i18n";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type {
   CSSProperties,
@@ -58,6 +59,7 @@ function Modal({
   children: ReactNode;
   onClose: () => void;
 }) {
+  const { t } = useI18n();
   const ref = useRef<HTMLDialogElement>(null);
   useEffect(() => {
     const previous = document.activeElement;
@@ -79,18 +81,18 @@ function Modal({
     >
       <div className="modal-head">
         <h2>{title}</h2>
-        <Button icon="close" label="关闭" onClick={onClose} />
+        <Button icon="close" label={t("关闭")} onClick={onClose} />
       </div>
       <div className="modal-body">{children}</div>
       <div className="modal-foot">
         <button className="text-button" onClick={onClose}>
-          返回工作台
-        </button>
+           {t("返回工作台")} </button>
       </div>
     </dialog>
   );
 }
 export default function Workbench() {
+  const { t, locale, setLocale } = useI18n();
   const [selectedObject, setSelectedObject] = useState<PickInfo | null>(null);
   const [layout, setLayout] = useState<Layout | null>(null),
     [visible, setVisible] = useState<string[]>([]),
@@ -144,7 +146,7 @@ export default function Workbench() {
   useEffect(() => {
     try {
       const saved = JSON.parse(
-        localStorage.getItem("icviewer.preferences.v1") ?? "null",
+        localStorage.getItem("gds-3d-viewer.preferences.v1") ?? "null",
       );
       if (saved) {
         if (["dark", "light"].includes(saved.theme)) setTheme(saved.theme);
@@ -223,7 +225,7 @@ export default function Workbench() {
     }
     try {
       localStorage.setItem(
-        "icviewer.preferences.v1",
+        "gds-3d-viewer.preferences.v1",
         JSON.stringify({ theme, widths, swapped }),
       );
     } catch {
@@ -380,7 +382,7 @@ export default function Workbench() {
     saveBlob(
       JSON.stringify(
         {
-          format: "icviewer-review",
+          format: "gds-3d-viewer-review",
           version: 1,
           file: layout.name,
           top: layout.top,
@@ -435,7 +437,7 @@ export default function Workbench() {
             typeof x === "string" && current.layers.some((l) => l.id === x),
         );
       if (
-        data.format !== "icviewer-review" ||
+        !["gds-3d-viewer-review", "icviewer-review"].includes(data.format) ||
         data.version !== 1 ||
         data.file !== current.name ||
         data.top !== current.top ||
@@ -558,7 +560,7 @@ export default function Workbench() {
     <>
       <Button
         icon="fit"
-        label="适应整个版图"
+        label={t("适应整个版图")}
         onClick={() => viewer.current?.view("iso")}
         disabled={!layout}
       />
@@ -567,56 +569,53 @@ export default function Workbench() {
         onClick={() => viewer.current?.view("top")}
         disabled={!layout}
       >
-        俯视
-      </button>
+         {t("俯视")} </button>
       <button
         className="text-button quiet"
         onClick={() => viewer.current?.view("front")}
         disabled={!layout}
       >
-        正视
-      </button>
+         {t("正视")} </button>
       <button
         className="text-button quiet"
         onClick={() => viewer.current?.view("iso")}
         disabled={!layout}
       >
-        三维
-      </button>
+         {t("三维")} </button>
     </>
   );
   const navigator = (
     <aside
       className={`pane navigation-pane ${swapped ? "on-right" : ""}`}
-      aria-label="版图导航"
+      aria-label={t("版图导航")}
     >
       <div className="pane-head">
         <h2>
           {
             {
-              layers: "图层",
-              cells: "单元",
-              notes: "审阅记录",
-              bookmarks: "视角书签",
+              layers: t("图层"),
+              cells: t("单元"),
+              notes: t("审阅记录"),
+              bookmarks: t("视角书签"),
             }[panel]
           }
         </h2>
-        <Button icon="close" label="收起导航" onClick={() => setLeft(false)} />
+        <Button icon="close" label={t("收起导航")} onClick={() => setLeft(false)} />
       </div>
       <div className="pane-content">
         {(panel === "layers" || panel === "cells") && (
           <div className="filter-box">
             <Icon name="search" />
             <input
-              aria-label={panel === "layers" ? "筛选图层" : "筛选单元"}
+              aria-label={panel === "layers" ? t("筛选图层") : t("筛选单元")}
               value={search}
-              placeholder={panel === "layers" ? "筛选图层…" : "筛选单元…"}
+              placeholder={panel === "layers" ? t("筛选图层…") : t("筛选单元…")}
               onChange={(e) => setSearch(e.target.value)}
             />
             {search && (
               <Button
                 icon="close"
-                label="清除筛选"
+                label={t("清除筛选")}
                 onClick={() => setSearch("")}
               />
             )}
@@ -632,15 +631,13 @@ export default function Workbench() {
                 }
                 disabled={!layout}
               >
-                显示全部
-              </button>
+                 {t("显示全部")} </button>
               <button
                 className="text-button quiet"
                 onClick={() => setVisible([])}
                 disabled={!layout}
               >
-                隐藏全部
-              </button>
+                 {t("隐藏全部")} </button>
             </div>
             <div className="layer-list">
               {shownLayers.map((layer) => (
@@ -650,7 +647,7 @@ export default function Workbench() {
                 >
                   <input
                     type="checkbox"
-                    aria-label={`显示 ${layer.name}`}
+                    aria-label={t("显示 {{0}}", {"0": layer.name})}
                     checked={visible.includes(layer.id)}
                     onChange={() => toggleLayer(layer.id)}
                   />
@@ -666,13 +663,13 @@ export default function Workbench() {
                     {layer.name}
                     <small>
                       {layer.polygons.toLocaleString()}{" "}
-                      {layout?.format === "gds" ? "多边形" : "三角形"}
+                      {layout?.format === "gds" ? t("多边形") : t("三角形")}
                     </small>
                   </button>
                   <button
                     className="isolate"
-                    title={`只看 ${layer.name}`}
-                    aria-label={`只看 ${layer.name}`}
+                    title={t("只看 {{0}}", {"0": layer.name})}
+                    aria-label={t("只看 {{0}}", {"0": layer.name})}
                     onClick={() => {
                       setVisible([layer.id]);
                       setSelected(layer.id);
@@ -686,7 +683,7 @@ export default function Workbench() {
             </div>
             {!shownLayers.length && (
               <p className="muted empty-panel">
-                {layout ? "没有匹配图层" : "打开版图后显示图层"}
+                {layout ? t("没有匹配图层") : t("打开版图后显示图层")}
               </p>
             )}
           </>
@@ -695,8 +692,8 @@ export default function Workbench() {
           <>
             <p className="muted field-help">
               {layout?.format === "gds"
-                ? "选择单元可独立查看其几何与引用"
-                : "模型节点与引用数量"}
+                ? t("选择单元可独立查看其几何与引用")
+                : t("模型节点与引用数量")}
             </p>
             <div className="cell-list">
               {shownCells.slice(0, 300).map((cell, index) => (
@@ -714,35 +711,34 @@ export default function Workbench() {
                   <span>
                     {cell.name}
                     <small>
-                      {cell.polygons} 个直接多边形 · {cell.references} 个引用
-                    </small>
+                      {cell.polygons}  {t("个直接多边形 ·")} {cell.references}  {t("个引用")} </small>
                   </span>
                   {layout?.top === cell.name && (
-                    <span className="current-label">当前</span>
+                    <span className="current-label"> {t("当前")} </span>
                   )}
                 </button>
               ))}
             </div>
             {shownCells.length > 300 && (
-              <p className="muted">显示前 300 项，请使用筛选定位</p>
+              <p className="muted"> {t("显示前 300 项，请使用筛选定位")} </p>
             )}
             {!shownCells.length && (
               <p className="muted empty-panel">
-                {layout ? "没有匹配单元" : "打开版图后显示单元"}
+                {layout ? t("没有匹配单元") : t("打开版图后显示单元")}
               </p>
             )}
           </>
         )}
         {panel === "notes" && (
           <div className="notes-content">
-            <label htmlFor="review-note">新增记录</label>
+            <label htmlFor="review-note"> {t("新增记录")} </label>
             <textarea
               id="review-note"
               value={note}
               onChange={(e) => setNote(e.target.value)}
               maxLength={4000}
               rows={5}
-              placeholder="记录当前观察与待核对问题…"
+              placeholder={t("记录当前观察与待核对问题…")}
             />
             <button
               className="text-button primary"
@@ -753,16 +749,15 @@ export default function Workbench() {
                 setStatus("记录已加入当前会话，请导出以保留");
               }}
             >
-              加入记录
-            </button>
-            <p className="muted">关闭页面后会话会清空，请导出记录</p>
+               {t("加入记录")} </button>
+            <p className="muted"> {t("关闭页面后会话会清空，请导出记录")} </p>
             {notes.map((n, i) => (
               <article className="note-item" key={i}>
-                <small>记录 {i + 1}</small>
+                <small> {t("记录")} {i + 1}</small>
                 <p>{n}</p>
               </article>
             ))}
-            {!notes.length && <p className="muted">暂无审阅记录</p>}
+            {!notes.length && <p className="muted"> {t("暂无审阅记录")} </p>}
           </div>
         )}
         {panel === "bookmarks" && (
@@ -784,8 +779,7 @@ export default function Workbench() {
                   ]);
               }}
             >
-              保存当前视角
-            </button>
+               {t("保存当前视角")} </button>
             {bookmarks.map((b, i) => (
               <button
                 className="cell-row"
@@ -801,70 +795,70 @@ export default function Workbench() {
               </button>
             ))}
             {!bookmarks.length && (
-              <p className="muted">保存相机位置、图层选择与展开距离</p>
+              <p className="muted"> {t("保存相机位置、图层选择与展开距离")} </p>
             )}
           </div>
         )}
       </div>
       <div className="pane-foot">
         {panel === "layers"
-          ? `${shownLayers.length} / ${layout?.layers.length ?? 0} 个图层 · ${visible.length} 个显示`
+          ? t("{{0}} / {{1}} 个图层 · {{2}} 个显示", {"0": shownLayers.length, "1": layout?.layers.length ?? 0, "2": visible.length})
           : panel === "cells"
-            ? `${shownCells.length} / ${layout?.cells.length ?? 0} 个单元`
-            : "记录仅保存在当前会话"}
+            ? t("{{0}} / {{1}} 个单元", {"0": shownCells.length, "1": layout?.cells.length ?? 0})
+            : t("记录仅保存在当前会话")}
       </div>
     </aside>
   );
   const inspector = (
     <aside
       className={`pane inspector-pane ${swapped ? "on-left" : ""}`}
-      aria-label="版图检查器"
+      aria-label={t("版图检查器")}
     >
       <div className="pane-head">
-        <h2>检查器</h2>
+        <h2> {t("检查器")} </h2>
         <Button
           icon="close"
-          label="收起检查器"
+          label={t("收起检查器")}
           onClick={() => setRight(false)}
         />
       </div>
       <div className="pane-content inspector-content">
-        {selectedObject?.feature && <section className="object-inspection" aria-label="选中图形详情">
-          <h3>选中图形</h3>
-          <p className="object-name">{featureKind(selectedObject.feature.kind)}</p>
+        {selectedObject?.feature && <section className="object-inspection" aria-label={t("选中图形详情")}>
+          <h3> {t("选中图形")} </h3>
+          <p className="object-name">{t(featureKind(selectedObject.feature.kind))}</p>
           <dl>
-            <div><dt>来源单元</dt><dd>{selectedObject.feature.cell}</dd></div>
-            <div><dt>图层 / 类型</dt><dd>{selectedObject.layerId}</dd></div>
-            <div><dt>图形标识</dt><dd>{selectedObject.feature.id}</dd></div>
-            <div><dt>点击坐标</dt><dd>{selectedObject.point.slice(0, layout?.format === "gds" ? 2 : 3).map((v) => v.toFixed(3)).join(", ")} {layout?.unit}</dd></div>
-            <div><dt>平面范围</dt><dd>{selectedObject.feature.bounds.map((v) => v.toFixed(3)).join(", ")} {layout?.unit}</dd></div>
-            <div><dt>顶点</dt><dd>{selectedObject.feature.vertices.toLocaleString()}</dd></div>
-            {selectedObject.feature.area !== undefined && <div><dt>几何面积</dt><dd>{selectedObject.feature.area.toFixed(3)} {layout?.unit}²</dd></div>}
-            {selectedObject.feature.pathWidth !== undefined && <div><dt>路径宽度</dt><dd>{selectedObject.feature.pathWidth.toFixed(3)} {layout?.unit}</dd></div>}
-            {selectedObject.feature.pathLength !== undefined && <div><dt>路径长度</dt><dd>{selectedObject.feature.pathLength.toFixed(3)} {layout?.unit}</dd></div>}
-            {selectedObject.feature.byteOffset !== undefined && <div><dt>源记录偏移</dt><dd>{selectedObject.feature.byteOffset} 字节</dd></div>}
+            <div><dt> {t("来源单元")} </dt><dd>{selectedObject.feature.cell}</dd></div>
+            <div><dt> {t("图层 / 类型")} </dt><dd>{selectedObject.layerId}</dd></div>
+            <div><dt> {t("图形标识")} </dt><dd>{selectedObject.feature.id}</dd></div>
+            <div><dt> {t("点击坐标")} </dt><dd>{selectedObject.point.slice(0, layout?.format === "gds" ? 2 : 3).map((v) => v.toFixed(3)).join(", ")} {layout?.unit}</dd></div>
+            <div><dt> {t("平面范围")} </dt><dd>{selectedObject.feature.bounds.map((v) => v.toFixed(3)).join(", ")} {layout?.unit}</dd></div>
+            <div><dt> {t("顶点")} </dt><dd>{selectedObject.feature.vertices.toLocaleString()}</dd></div>
+            {selectedObject.feature.area !== undefined && <div><dt> {t("几何面积")} </dt><dd>{selectedObject.feature.area.toFixed(3)} {layout?.unit}²</dd></div>}
+            {selectedObject.feature.pathWidth !== undefined && <div><dt> {t("路径宽度")} </dt><dd>{selectedObject.feature.pathWidth.toFixed(3)} {layout?.unit}</dd></div>}
+            {selectedObject.feature.pathLength !== undefined && <div><dt> {t("路径长度")} </dt><dd>{selectedObject.feature.pathLength.toFixed(3)} {layout?.unit}</dd></div>}
+            {selectedObject.feature.byteOffset !== undefined && <div><dt> {t("源记录偏移")} </dt><dd>{selectedObject.feature.byteOffset}  {t("字节")} </dd></div>}
           </dl>
-          <details><summary>查看引用实例路径</summary><p className="instance-path">{selectedObject.feature.instance}</p></details>
-          <p className="muted">几何属性来自文件，电气连通性与工艺用途需要额外资料</p>
-          <button className="text-button" onClick={() => setSelectedObject(null)}>清除选择</button>
+          <details><summary> {t("查看引用实例路径")} </summary><p className="instance-path">{selectedObject.feature.instance}</p></details>
+          <p className="muted"> {t("几何属性来自文件，电气连通性与工艺用途需要额外资料")} </p>
+          <button className="text-button" onClick={() => setSelectedObject(null)}> {t("清除选择")} </button>
         </section>}
         <section>
-          <h3>{selectedLayer ? "选中图层" : "当前版图"}</h3>
+          <h3>{selectedLayer ? t("选中图层") : t("当前版图")}</h3>
           <p className="object-name">
-            {selectedLayer?.name ?? layout?.top ?? "尚未打开"}
+            {selectedLayer?.name ?? layout?.top ?? t("尚未打开")}
           </p>
           <dl>
             <div>
-              <dt>文件</dt>
+              <dt> {t("文件")} </dt>
               <dd title={layout?.name}>{layout?.name ?? "—"}</dd>
             </div>
             <div>
-              <dt>格式</dt>
+              <dt> {t("格式")} </dt>
               <dd>{layout?.format.toUpperCase() ?? "—"}</dd>
             </div>
             {selectedLayer && (
               <div>
-                <dt>{layout?.format === "gds" ? "多边形" : "三角形"}</dt>
+                <dt>{layout?.format === "gds" ? t("多边形") : t("三角形")}</dt>
                 <dd>{selectedLayer.polygons.toLocaleString()}</dd>
               </div>
             )}
@@ -876,23 +870,22 @@ export default function Workbench() {
                 setVisible([selectedLayer.id]);
               }}
             >
-              隔离当前图层
-            </button>
+               {t("隔离当前图层")} </button>
           )}
         </section>
         <section>
-          <h3>几何统计</h3>
+          <h3> {t("几何统计")} </h3>
           <dl>
             <div>
-              <dt>图层 / 材质</dt>
+              <dt> {t("图层 / 材质")} </dt>
               <dd>{layout?.layers.length.toLocaleString() ?? "—"}</dd>
             </div>
             <div>
-              <dt>单元 / 节点</dt>
+              <dt> {t("单元 / 节点")} </dt>
               <dd>{layout?.cells.length.toLocaleString() ?? "—"}</dd>
             </div>
             <div>
-              <dt>展开实例</dt>
+              <dt> {t("展开实例")} </dt>
               <dd>
                 {layout?.layers.length
                   ? layout.instances.toLocaleString()
@@ -900,7 +893,7 @@ export default function Workbench() {
               </dd>
             </div>
             <div>
-              <dt>三角形</dt>
+              <dt> {t("三角形")} </dt>
               <dd>
                 {layout?.layers.length
                   ? layout.triangles.toLocaleString()
@@ -908,7 +901,7 @@ export default function Workbench() {
               </dd>
             </div>
             <div>
-              <dt>平面宽度</dt>
+              <dt> {t("平面宽度")} </dt>
               <dd>
                 {layout?.layers.length
                   ? `${(layout.bounds[2] - layout.bounds[0]).toFixed(2)} ${layout.unit}`
@@ -916,7 +909,7 @@ export default function Workbench() {
               </dd>
             </div>
             <div>
-              <dt>平面高度</dt>
+              <dt> {t("平面高度")} </dt>
               <dd>
                 {layout?.layers.length
                   ? `${(layout.bounds[3] - layout.bounds[1]).toFixed(2)} ${layout.unit}`
@@ -926,9 +919,9 @@ export default function Workbench() {
           </dl>
         </section>
         <section>
-          <h3>图层展开</h3>
+          <h3> {t("图层展开")} </h3>
           <label className="range-label" htmlFor="explode">
-            层间距<span>{explode}</span>
+             {t("层间距")} <span>{explode}</span>
           </label>
           <input
             type="range"
@@ -940,10 +933,10 @@ export default function Workbench() {
             disabled={!layout}
             onChange={(e) => setExplode(Number(e.target.value))}
           />
-          <p className="muted">用于观察遮挡关系，不表示工艺尺寸</p>
+          <p className="muted"> {t("用于观察遮挡关系，不表示工艺尺寸")} </p>
         </section>
         <section>
-          <h3>版图比较</h3>
+          <h3> {t("版图比较")} </h3>
           <button
             className="text-button"
             disabled={!layout}
@@ -957,18 +950,17 @@ export default function Workbench() {
               setStatus("当前几何统计已设为比较基线");
             }}
           >
-            设为比较基线
-          </button>
+             {t("设为比较基线")} </button>
           {baseline && (
             <>
-              <p className="muted">基线：{baseline.name}</p>
+              <p className="muted"> {t("基线：")} {baseline.name}</p>
               <dl>
                 <div>
-                  <dt>图层变化</dt>
+                  <dt> {t("图层变化")} </dt>
                   <dd>{layout ? layout.layers.length - baseline.layers : 0}</dd>
                 </div>
                 <div>
-                  <dt>三角形变化</dt>
+                  <dt> {t("三角形变化")} </dt>
                   <dd>
                     {layout
                       ? (layout.triangles - baseline.triangles).toLocaleString()
@@ -976,21 +968,21 @@ export default function Workbench() {
                   </dd>
                 </div>
               </dl>
-              <p className="muted">仅比较数量，不等同于几何差异检查</p>
+              <p className="muted"> {t("仅比较数量，不等同于几何差异检查")} </p>
             </>
           )}
         </section>
         <section>
-          <h3>解析说明</h3>
-          {!!layout?.missingReferences?.length && <details className="missing-references"><summary>缺失引用目标（{layout.missingReferences.length} 项）</summary><ul>{layout.missingReferences.slice(0, 200).map((r) => <li key={`${r.source}/${r.target}`}><strong>{r.target}</strong><span>来源 {r.source} · {r.count} 次引用</span></li>)}</ul><p className="muted">目标定义未包含在当前文件中，完整显示需要重新导出包含依赖单元的版图库</p></details>}
+          <h3> {t("解析说明")} </h3>
+          {!!layout?.missingReferences?.length && <details className="missing-references"><summary> {t("缺失引用目标（")} {layout.missingReferences.length}  {t("项）")} </summary><ul>{layout.missingReferences.slice(0, 200).map((r) => <li key={`${r.source}/${r.target}`}><strong>{r.target}</strong><span> {t("来源")} {r.source} · {r.count}  {t("次引用")} </span></li>)}</ul><p className="muted"> {t("目标定义未包含在当前文件中，完整显示需要重新导出包含依赖单元的版图库")} </p></details>}
           {layout ? (
             layout.warnings.map((w) => (
               <p className="muted" key={w}>
-                {w}
+                {t(w)}
               </p>
             ))
           ) : (
-            <p className="muted">支持本地版图和自包含静态三维模型</p>
+            <p className="muted"> {t("支持本地版图和自包含静态三维模型")} </p>
           )}
         </section>
         <ExplanationPanel layout={layout} object={selectedObject?.feature} />
@@ -1002,15 +994,14 @@ export default function Workbench() {
         >
           <Icon name="chip" />
           <span>
-            AIALRA<span>工具与项目首页</span>
+            AIALRA<span> {t("工具与项目首页")} </span>
           </span>
           <Icon name="arrow" />
         </a>
       </div>
       <div className="pane-foot">
         <Icon name="shield" />
-        浏览器内解析 · 无文件上传
-      </div>
+         {t("浏览器内解析 · 无文件上传")} </div>
     </aside>
   );
   return (
@@ -1048,43 +1039,44 @@ export default function Workbench() {
       }}
     >
       <header className="topbar">
-        <a className="brand" href="/" aria-label="ICViewer 首页">
+        <div className="brand-group"><a className="brand" href="/" aria-label={t("GDS-3D-VIEWER 首页")}>
           <Icon name="chip" />
-          <strong>ICViewer</strong>
+          <strong>GDS-3D-VIEWER</strong>
           <span className="brand-divider" />
-          <span className="brand-caption">芯片版图预览器</span>
+          <span className="brand-caption"> {t("芯片版图预览器")} </span>
         </a>
+          <button className="text-button language-toggle" aria-label={t(locale === "zh" ? "切换为英文" : "切换为中文")} onClick={() => setLocale(locale === "zh" ? "en" : "zh")}>{locale === "zh" ? "EN" : "中文"}</button>
+        </div>
         <div className="top-actions">
-          <a className="icon-button source-link" aria-label="查看源码" title="查看源码 · GitHub" href="https://github.com/AIALRA-0/IC-Viewer" target="_blank" rel="noopener noreferrer"><Icon name="code" /></a>
+          <a className="icon-button source-link" aria-label={t("查看源码")} title={t("查看源码 · GitHub")} href="https://github.com/AIALRA-0/GDS-3D-VIEWER" target="_blank" rel="noopener noreferrer"><Icon name="code" /></a>
           <button
             ref={importButton}
             className="text-button primary"
             onClick={() => fileInput.current?.click()}
           >
             <Icon name="upload" />
-            <span>打开文件</span>
+            <span> {t("打开文件")} </span>
           </button>
           <button
             className="text-button demo-button"
             onClick={() => void demo()}
             disabled={busy}
           >
-            加载示例
-          </button>
+             {t("加载示例")} </button>
           <Button
             icon="download"
-            label="导出审阅记录"
+            label={t("导出审阅记录")}
             onClick={exportReview}
             disabled={!layout}
           />
           <Button
             icon={theme === "dark" ? "sun" : "moon"}
-            label={theme === "dark" ? "切换浅色主题" : "切换深色主题"}
+            label={theme === "dark" ? t("切换浅色主题") : t("切换深色主题")}
             onClick={() => setTheme((t) => (t === "dark" ? "light" : "dark"))}
           />
           <Button
             icon="info"
-            label="使用说明与隐私"
+            label={t("使用说明与隐私")}
             onClick={() => setHelp(true)}
           />
         </div>
@@ -1114,35 +1106,35 @@ export default function Workbench() {
         }}
       />
       <div className="work-area">
-        <nav className="activity-rail" aria-label="工作台面板">
+        <nav className="activity-rail" aria-label={t("工作台面板")}>
           <Button
             icon="layers"
-            label="图层"
+            label={t("图层")}
             pressed={panel === "layers" && left}
             onClick={() => showPanel("layers")}
           />
           <Button
             icon="tree"
-            label="单元"
+            label={t("单元")}
             pressed={panel === "cells" && left}
             onClick={() => showPanel("cells")}
           />
           <Button
             icon="note"
-            label="审阅记录"
+            label={t("审阅记录")}
             pressed={panel === "notes" && left}
             onClick={() => showPanel("notes")}
           />
           <Button
             icon="bookmark"
-            label="视角书签"
+            label={t("视角书签")}
             pressed={panel === "bookmarks" && left}
             onClick={() => showPanel("bookmarks")}
           />
           <div className="rail-spacer" />
           <Button
             icon="left"
-            label="显示或收起导航"
+            label={t("显示或收起导航")}
             pressed={left}
             onClick={() => {
               setLeft((v) => !v);
@@ -1151,7 +1143,7 @@ export default function Workbench() {
           />
           <Button
             icon="right"
-            label="显示或收起检查器"
+            label={t("显示或收起检查器")}
             pressed={right}
             onClick={() => {
               setRight((v) => !v);
@@ -1160,7 +1152,7 @@ export default function Workbench() {
           />
           <Button
             icon="swap"
-            label="交换左右侧栏"
+            label={t("交换左右侧栏")}
             onClick={() => setSwapped((v) => !v)}
             disabled={mobile}
           />
@@ -1171,7 +1163,7 @@ export default function Workbench() {
           {mobile && (left || right) && (
             <button
               className="drawer-backdrop"
-              aria-label="关闭侧栏"
+              aria-label={t("关闭侧栏")}
               onClick={() => {
                 setLeft(false);
                 setRight(false);
@@ -1183,7 +1175,7 @@ export default function Workbench() {
             <div
               className="splitter left-split"
               role="separator"
-              aria-label="调整左侧栏宽度"
+              aria-label={t("调整左侧栏宽度")}
               aria-orientation="vertical"
               aria-valuemin={220}
               aria-valuemax={400}
@@ -1200,15 +1192,15 @@ export default function Workbench() {
           )}
           <main className="pane main-pane">
             <div className="pane-head canvas-head">
-              <span className="filename" title={layout?.name ?? "版图预览"}>
+              <span className="filename" title={layout?.name ?? t("版图预览")}>
                 <Icon name="file" />
-                {layout?.name ?? "版图预览"}
+                {layout?.name ?? t("版图预览")}
               </span>
               <div className="canvas-tools">
                 {tools}
                 <Button
                   icon="camera"
-                  label="保存当前画面"
+                  label={t("保存当前画面")}
                   onClick={() => viewer.current?.screenshot()}
                   disabled={!layout}
                 />
@@ -1236,15 +1228,14 @@ export default function Workbench() {
                   <div className="empty-icon">
                     <Icon name="tree" />
                   </div>
-                  <h1>选择一个单元查看</h1>
-                  <p>{layout.incomplete && layout.missingReferences?.length ? "引用目标未包含在文件中，单元目录与缺失列表已读取" : "完整版图超出当前预览上限，单元目录已读取"}</p>
+                  <h1> {t("选择一个单元查看")} </h1>
+                  <p>{layout.incomplete && layout.missingReferences?.length ? t("引用目标未包含在文件中，单元目录与缺失列表已读取") : t("完整版图超出当前预览上限，单元目录已读取")}</p>
                   <button
                     className="text-button primary"
                     onClick={() => showPanel("cells")}
                   >
-                    打开单元目录
-                  </button>
-                  <p className="muted">筛选并选择较小单元，文件不会上传</p>
+                     {t("打开单元目录")} </button>
+                  <p className="muted"> {t("筛选并选择较小单元，文件不会上传")} </p>
                 </div>
               )}
               {!layout && !busy && (
@@ -1252,83 +1243,75 @@ export default function Workbench() {
                   <div className="empty-icon">
                     <Icon name="chip" />
                   </div>
-                  <h1>从版图，看见结构</h1>
-                  <p>打开本地文件，旋转、分层查看与记录观察</p>
+                  <h1> {t("从版图，看见结构")} </h1>
+                  <p> {t("打开本地文件，旋转、分层查看与记录观察")} </p>
                   <div className="empty-actions">
                     <button
                       className="text-button primary"
                       onClick={() => fileInput.current?.click()}
                     >
                       <Icon name="upload" />
-                      打开文件
-                    </button>
+                       {t("打开文件")} </button>
                     <button className="text-button" onClick={() => void demo()}>
-                      试用合成示例
-                      <Icon name="arrow" />
+                       {t("试用合成示例")} <Icon name="arrow" />
                     </button>
                   </div>
                   <p className="file-formats">
-                    GDS / GDS2 / GDSII · glTF / GLB · 最大 32 MB
-                  </p>
+                     {t("GDS / GDS2 / GDSII · glTF / GLB · 最大 32 MB")} </p>
                   <div className="privacy-caption">
                     <Icon name="shield" />
-                    文件在你的浏览器里解析，不上传服务器
-                  </div>
+                     {t("文件在你的浏览器里解析，不上传服务器")} </div>
                   <button
                     className="text-button quiet"
                     onClick={() => setHelp(true)}
                   >
-                    支持范围与使用说明
-                  </button>
+                     {t("支持范围与使用说明")} </button>
                 </div>
               )}
               {busy && (
                 <div className="loading-state" role="status">
                   <span className="spinner" />
-                  <strong>{status}</strong>
-                  <span>最多等待 45 秒，已有文件会保留</span>
+                  <strong>{t(status)}</strong>
+                  <span> {t("最多等待 45 秒，已有文件会保留")} </span>
                   <button className="text-button" onClick={cancel}>
-                    取消导入
-                  </button>
+                     {t("取消导入")} </button>
                 </div>
               )}
               {error && (
                 <div className="error-banner" role="alert">
-                  <span>{error}</span>
+                  <span>{t(error)}</span>
                   <Button
                     icon="close"
-                    label="关闭错误提示"
+                    label={t("关闭错误提示")}
                     onClick={() => setError("")}
                   />
                 </div>
               )}
               {layout && layout.layers.length > 0 && !busy && (
                 <div className="canvas-hint">
-                  拖动旋转 · 右键平移 · 滚轮缩放 · 悬停查看 · 点击固定详情
-                </div>
+                   {t("拖动旋转 · 右键平移 · 滚轮缩放 · 悬停查看 · 点击固定详情")} </div>
               )}
-              {layout?.incomplete && !busy && <div className="incomplete-banner" role="status">不完整预览 · {layout.missingReferences?.length ? "缺失单元定义，当前仅显示已有几何" : "完整几何尚未生成"}<button className="text-button quiet" onClick={() => { setRight(true); if (mobile) setLeft(false); }}>查看解析说明</button></div>}
+              {layout?.incomplete && !busy && <div className="incomplete-banner" role="status"> {t("不完整预览 ·")} {layout.missingReferences?.length ? t("缺失单元定义，当前仅显示已有几何") : t("完整几何尚未生成")}<button className="text-button quiet" onClick={() => { setRight(true); if (mobile) setLeft(false); }}> {t("查看解析说明")} </button></div>}
             </div>
             <div className="pane-foot main-foot">
               <span>
                 {layout
-                  ? `${layout.top} · ${layout.layers.length ? layout.triangles.toLocaleString() + " 个三角形" : "仅单元目录"}`
-                  : "拖入一个版图或模型文件即可开始"}
+                  ? `${layout.top} · ${layout.layers.length ? layout.triangles.toLocaleString() + " " + t("个三角形") : t("仅单元目录")}`
+                  : t("拖入一个版图或模型文件即可开始")}
               </span>
               <button
                 className="foot-action"
                 disabled={!layout}
                 onClick={() => reviewInput.current?.click()}
               >
-                导入审阅记录
-              </button>
+                 {t("导入审阅记录")} </button>
             </div>
           </main>
           {!mobile && (swapped ? left : right) && (
             <div
               className="splitter right-split"
               role="separator"
-              aria-label="调整右侧栏宽度"
+              aria-label={t("调整右侧栏宽度")}
               aria-orientation="vertical"
               aria-valuemin={220}
               aria-valuemax={400}
@@ -1347,79 +1330,65 @@ export default function Workbench() {
         </div>
       </div>
       <footer className="global-status">
-        <span role="status" title={status}>
-          {status}
+        <span role="status" title={t(status)}>
+          {t(status)}
         </span>
-        <span title={storage}>公开预览 · 无需密码 · {storage}</span>
+        <span title={t(storage)}> {t("公开预览 · 无需密码 ·")} {t(storage)}</span>
       </footer>
       {dragging && (
         <div className="drop-overlay">
           <Icon name="upload" />
-          <strong>松开以打开文件</strong>
-          <span>每次一个文件，最大 32 MB</span>
+          <strong> {t("松开以打开文件")} </strong>
+          <span> {t("每次一个文件，最大 32 MB")} </span>
         </div>
       )}
       {help && (
-        <Modal title="使用说明与隐私" onClose={() => setHelp(false)}>
-          <p>ICViewer 是用于教学、演示和早期版图观察的公开预览器</p>
-          <h3>开始查看</h3>
+        <Modal title={t("使用说明与隐私")} onClose={() => setHelp(false)}>
+          <p> {t("GDS-3D-VIEWER 是用于教学、演示和早期版图观察的公开预览器")} </p>
+          <h3> {t("开始查看")} </h3>
           <ol>
             <li>
-              打开本地 .gds、.gds2、.gdsii、.gltf 或 .glb 文件，也可以加载合成示例
-            </li>
+               {t("打开本地 .gds、.gds2、.gdsii、.gltf 或 .glb 文件，也可以加载合成示例")} </li>
             <li>
-              通过图层开关和单元列表选择显示内容，使用俯视、正视和三维视角观察
-            </li>
-            <li>把观察写入审阅记录，保存视角书签，再导出记录以便后续恢复</li>
+               {t("通过图层开关和单元列表选择显示内容，使用俯视、正视和三维视角观察")} </li>
+            <li> {t("把观察写入审阅记录，保存视角书签，再导出记录以便后续恢复")} </li>
           </ol>
-          <h3>文件与会话</h3>
+          <h3> {t("文件与会话")} </h3>
           <p>
-            解析任务在浏览器中独立运行，不上传你的版图、不共享会话。可选 AI 讲解由浏览器直连你确认的模型服务，只发送预览过的对象摘要；密钥仅留在当前页面，刷新即丢弃
-          </p>
+             {t("解析任务在浏览器中独立运行，不上传你的版图、不共享会话。可选 AI 讲解由浏览器直连你确认的模型服务，只发送预览过的对象摘要；密钥仅留在当前页面，刷新即丢弃")} </p>
           <p>
-            网页服务器仍会接收访问网页所需的普通请求，浏览器只保存明暗主题与侧栏偏好
-          </p>
+             {t("网页服务器仍会接收访问网页所需的普通请求，浏览器只保存明暗主题、侧栏和语言偏好")} </p>
           <p>
-            版图、审阅记录与书签只在本次会话中保留，刷新或关闭前请导出审阅记录并单独保留原始文件
-          </p>
-          <h3>支持范围</h3>
+             {t("版图、审阅记录与书签只在本次会话中保留，刷新或关闭前请导出审阅记录并单独保留原始文件")} </p>
+          <h3> {t("支持范围")} </h3>
           <p>
-            版图支持边界、方框、常规路径、单元引用和阵列引用，可独立打开不同顶层及子单元
-          </p>
+             {t("版图支持边界、方框、常规路径、单元引用和阵列引用，可独立打开不同顶层及子单元")} </p>
           <p>
-            圆端路径、绝对宽度路径、绝对缩放或角度需在原版图工具中先转为普通边界，文字标签不渲染
-          </p>
+             {t("圆端路径、绝对宽度路径、绝对缩放或角度需在原版图工具中先转为普通边界，文字标签不渲染")} </p>
           <p>
-            三维模型只支持自包含、无纹理、无压缩扩展的静态三角形网格，外部缓冲区与纹理均拒绝加载
-          </p>
+             {t("三维模型只支持自包含、无纹理、无压缩扩展的静态三角形网格，外部缓冲区与纹理均拒绝加载")} </p>
           <p>
-            最大 32 MB、150,000 个展开实例、300,000 个多边形、2,000,000
-            个三角形，解析超过 45 秒自动终止
-          </p>
-          <h3>观察边界</h3>
+             {t("最大 32 MB、150,000 个展开实例、300,000 个多边形、2,000,000 个三角形，解析超过 45 秒自动终止")} </p>
+          <h3> {t("观察边界")} </h3>
           <p>
-            版图层高度用于展示，不代表工艺厚度；数量比较不等同于几何差异检查，结果不能代替版图规则检查或流片签核
-          </p>
+             {t("版图层高度用于展示，不代表工艺厚度；数量比较不等同于几何差异检查，结果不能代替版图规则检查或流片签核")} </p>
           <p>
             <a
-              href="https://github.com/AIALRA-0/IC-Viewer"
+              href="https://github.com/AIALRA-0/GDS-3D-VIEWER"
               target="_blank"
               rel="noreferrer"
             >
-              查看项目源码
-            </a>{" "}
+               {t("查看项目源码")} </a>{" "}
             ·{" "}
             <a
               href="https://github.com/AIALRA-0/GDS-GLTF-3D-Viewer"
               target="_blank"
               rel="noreferrer"
             >
-              查看原始转换器
-            </a>{" "}
+               {t("查看原始转换器")} </a>{" "}
             ·{" "}
             <a href="https://aialra.online" target="_blank" rel="noreferrer">
-              AIALRA 工具首页
-            </a>
+               {t("AIALRA 工具首页")} </a>
           </p>
         </Modal>
       )}

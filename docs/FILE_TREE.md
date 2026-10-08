@@ -24,7 +24,7 @@ repo/
 ├─ scripts/
 │  ├─ deploy.sh
 │  ├─ smoke.sh
-│  └─ nginx/icviewer.conf
+│  └─ nginx/gds-3d-viewer.conf
 ├─ docs/
 ├─ .github/
 │  └─ workflows/

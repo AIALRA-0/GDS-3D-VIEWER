@@ -2,7 +2,7 @@
 
 ## Canonical Source
 
-ICViewer treats `GDS` as the source of truth for geometry conversion and visualization.
+GDS-3D-VIEWER treats `GDS` as the source of truth for geometry conversion and visualization.
 
 ## Optional Sidecars
 

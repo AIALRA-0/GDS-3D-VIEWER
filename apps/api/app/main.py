@@ -18,7 +18,7 @@ ASSET_ROOT = REPO_ROOT / "apps" / "api" / "data"
 
 ensure_storage()
 
-app = FastAPI(title="ICViewer API", version="0.1.0")
+app = FastAPI(title="GDS-3D-VIEWER API", version="0.1.0")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],

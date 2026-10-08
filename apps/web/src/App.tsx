@@ -35,7 +35,7 @@ interface ViewerShellApi {
 
 declare global {
   interface Window {
-    icviewerViewerShell?: ViewerShellApi;
+    gds3dViewerShell?: ViewerShellApi;
   }
 }
 
@@ -57,7 +57,7 @@ const EMPTY_OPERATOR: OperatorResult = {
 
 const TEXT = {
   en: {
-    brand: "ICViewer",
+    brand: "GDS-3D-VIEWER",
     load: "Load",
     viewer: "View",
     ai: "AI",
@@ -91,7 +91,7 @@ const TEXT = {
     errors: "Error",
   },
   zh: {
-    brand: "ICViewer",
+    brand: "GDS-3D-VIEWER",
     load: "加载",
     viewer: "视图",
     ai: "AI",
@@ -153,7 +153,7 @@ export default function App() {
     if (typeof window === "undefined") {
       return "en";
     }
-    return window.localStorage.getItem("icviewer-language") === "zh" ? "zh" : "en";
+    return window.localStorage.getItem("gds-3d-viewer-language") === "zh" ? "zh" : "en";
   });
   const [busyState, setBusyState] = useState<BusyState>("idle");
   const [drawer, setDrawer] = useState<DrawerPanel>("none");
@@ -176,7 +176,7 @@ export default function App() {
   const copy = TEXT[language];
 
   useEffect(() => {
-    window.localStorage.setItem("icviewer-language", language);
+    window.localStorage.setItem("gds-3d-viewer-language", language);
   }, [language]);
 
   useEffect(() => {
@@ -190,13 +190,13 @@ export default function App() {
       if (event.origin !== window.location.origin || !event.data || typeof event.data !== "object") {
         return;
       }
-      if (event.data.type === "icviewer-selection" && event.data.selection) {
+      if (event.data.type === "gds-3d-viewer-selection" && event.data.selection) {
         setViewerSelection({
           title: cleanViewerText(String(event.data.selection.title ?? "")),
           info: cleanViewerText(String(event.data.selection.info ?? "")),
         });
       }
-      if (event.data.type === "icviewer-ready") {
+      if (event.data.type === "gds-3d-viewer-ready") {
         setViewerReady(Boolean(event.data.ready));
       }
     }
@@ -262,15 +262,15 @@ export default function App() {
   }
 
   function connectViewerShell() {
-    const frameWindow = iframeRef.current?.contentWindow as (Window & { icviewerViewerShell?: ViewerShellApi }) | null;
+    const frameWindow = iframeRef.current?.contentWindow as (Window & { gds3dViewerShell?: ViewerShellApi }) | null;
     if (!frameWindow) {
       viewerShellRef.current = null;
       return;
     }
 
     const attach = () => {
-      if (frameWindow.icviewerViewerShell) {
-        viewerShellRef.current = frameWindow.icviewerViewerShell;
+      if (frameWindow.gds3dViewerShell) {
+        viewerShellRef.current = frameWindow.gds3dViewerShell;
         viewerShellRef.current.setControlsOpen(drawer === "viewer");
         const selection = viewerShellRef.current.getSelection();
         setViewerSelection({
@@ -478,7 +478,7 @@ export default function App() {
             ref={iframeRef}
             className="viewer-frame"
             src={viewerUrl}
-            title="ICViewer core"
+            title="GDS-3D-VIEWER core"
             onLoad={connectViewerShell}
           />
         ) : (

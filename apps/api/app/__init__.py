@@ -1,1 +1,1 @@
-"""ICViewer backend package."""
+"""GDS-3D-VIEWER backend package."""

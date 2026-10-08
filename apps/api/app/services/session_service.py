@@ -299,7 +299,7 @@ def inspect_gds_file(gds_path: Path, technology: str, source_files: list[str]) -
         source="upload",
         format="gds",
         technology=technology,
-        description=f"Imported from {gds_path.name} for ICViewer review.",
+        description=f"Imported from {gds_path.name} for GDS-3D-VIEWER review.",
         tags=["layout", technology, "uploaded"],
         sourceFiles=source_files,
         layers=layers,
@@ -620,9 +620,9 @@ def ensure_detail_asset(session_id: str) -> SessionResponseModel:
 def export_session(session: SessionResponseModel) -> tuple[str, bytes]:
     payload = deepcopy(session.model_dump(mode="json"))
     payload["exportMetadata"] = {
-        "formatVersion": "icviewer-session-v1",
+        "formatVersion": "gds-3d-viewer-session-v1",
         "exportedAt": _iso_now(),
-        "exportedBy": "ICViewer",
+        "exportedBy": "GDS-3D-VIEWER",
         "sourceSessionId": session.sessionId,
     }
     raw = json.dumps(payload, indent=2).encode("utf-8")

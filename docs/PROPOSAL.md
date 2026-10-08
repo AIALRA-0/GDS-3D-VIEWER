@@ -1,8 +1,8 @@
-# ICViewer Proposal
+# GDS-3D-VIEWER Proposal
 
 ## One-Line Pitch
 
-ICViewer is an AI-native 3D IC layout review cockpit that combines geometry visualization, engineering metadata, explainable summaries, and review workflows in a deployable web application.
+GDS-3D-VIEWER is an AI-native 3D IC layout review cockpit that combines geometry visualization, engineering metadata, explainable summaries, and review workflows in a deployable web application.
 
 ## Problem
 

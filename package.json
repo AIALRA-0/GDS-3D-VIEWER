@@ -1,17 +1,17 @@
 {
-  "name": "icviewer",
+  "name": "gds-3d-viewer",
   "private": true,
   "version": "0.1.0",
   "workspaces": [
     "apps/web"
   ],
   "scripts": {
-    "build:web": "npm run build --workspace @icviewer/web",
-    "build:legacy": "npm run build --workspace @icviewer/web -- --mode legacy",
-    "test:public": "npm run test:public --workspace @icviewer/web",
-    "dev:web": "npm run dev --workspace @icviewer/web",
-    "preview:web": "npm run preview --workspace @icviewer/web",
-    "test:e2e": "npm run test:e2e --workspace @icviewer/web"
+    "build:web": "npm run build --workspace @gds-3d-viewer/web",
+    "build:legacy": "npm run build --workspace @gds-3d-viewer/web -- --mode legacy",
+    "test:public": "npm run test:public --workspace @gds-3d-viewer/web",
+    "dev:web": "npm run dev --workspace @gds-3d-viewer/web",
+    "preview:web": "npm run preview --workspace @gds-3d-viewer/web",
+    "test:e2e": "npm run test:e2e --workspace @gds-3d-viewer/web"
   },
   "devDependencies": {
     "@types/three": "^0.183.1"

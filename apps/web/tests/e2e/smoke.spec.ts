@@ -12,10 +12,10 @@ test("fullscreen cockpit runs the backend-backed workflow", async ({ page }) => 
 
   await page.getByTestId("upload-input").setInputFiles(path.join(fixtureRoot, "example/example.gds"));
 
-  await expect(page.locator("iframe[title='ICViewer core']")).toBeVisible({ timeout: 90000 });
+  await expect(page.locator("iframe[title='GDS-3D-VIEWER core']")).toBeVisible({ timeout: 90000 });
   await expect(page.locator(".brand-block")).toContainText("tt_um_hh", { timeout: 90000 });
 
-  const frame = page.frameLocator("iframe[title='ICViewer core']");
+  const frame = page.frameLocator("iframe[title='GDS-3D-VIEWER core']");
   await expect(frame.locator("#instanceClassTitle")).toContainText("tt_um_hh", { timeout: 90000 });
 
   await page.getByTestId("viewer-drawer-button").evaluate((node) => (node as HTMLButtonElement).click());

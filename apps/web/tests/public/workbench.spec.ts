@@ -174,7 +174,7 @@ test("external resources, truncated files, huge files and invalid review are ref
       name: "bad.review.json",
       mimeType: "application/json",
       buffer: Buffer.from(
-        '{"format":"icviewer-review","version":1,"file":"other.gltf"}',
+        '{"format":"gds-3d-viewer-review","version":1,"file":"other.gltf"}',
       ),
     });
   await expect(page.getByRole("alert")).toContainText("不匹配");

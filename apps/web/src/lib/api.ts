@@ -78,7 +78,7 @@ export async function ensureDetailedSession(sessionId: string): Promise<SessionP
 
 export async function createSessionFromFiles(files: File[]): Promise<SessionPayload> {
   const imported = await readImportedSession(
-    pickFile(files, (file) => /session\.json$/i.test(file.name) || /icviewer/i.test(file.name))
+    pickFile(files, (file) => /session\.json$/i.test(file.name) || /gds-3d-viewer|icviewer/i.test(file.name))
   );
   if (imported) {
     return imported;

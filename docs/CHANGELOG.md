@@ -2,7 +2,7 @@
 
 ## 2026-04-12
 
-- initialized the ICViewer monorepo structure
+- initialized the GDS-3D-VIEWER monorepo structure
 - added hackathon proposal, milestones, compatibility, deployment, and testing docs
 - prepared a shared agent workflow for tracked frontend and backend edits
 - implemented a FastAPI backend with sample, upload, explain, command, diff, and static asset endpoints

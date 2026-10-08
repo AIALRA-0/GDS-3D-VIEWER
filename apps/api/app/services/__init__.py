@@ -1,1 +1,1 @@
-"""Service package for ICViewer API."""
+"""Service package for GDS-3D-VIEWER API."""

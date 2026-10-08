@@ -1,6 +1,6 @@
 # Browser explanation harness
 
-Version: `icviewer-explain-v1`. Sources: [explanation.ts](../apps/web/src/public/explanation.ts) and [ExplanationPanel.tsx](../apps/web/src/public/ExplanationPanel.tsx).
+Version: `gds-3d-viewer-explain-v1`. Sources: [explanation.ts](../apps/web/src/public/explanation.ts) and [ExplanationPanel.tsx](../apps/web/src/public/ExplanationPanel.tsx).
 
 ## Data flow and keys
 
@@ -18,19 +18,19 @@ Requests use `Authorization: Bearer <current-page-key>`, JSON content type, no c
 
 ## Summary and fixed framework
 
-- `harness`, `target`, `format`, `unit`
+- `harness`, `language` (`zh` or `en`), `target`, `format`, `unit`
 - `cell`: name, direct geometry count and reference count when available
 - `geometry`, for a selected object: identifier, kind, instance path, layer/datatype, bounds, vertex count, area and PATH width/length when available
 - `incomplete`, up to 32 missing references associated with the source cell, and explicit unknown process/connectivity/timing facts
 
 Source filenames/bytes, complete vertex arrays, screenshots, bookmarks, review notes and credentials are excluded. Names, instance paths and dimensions can contain sensitive design information; visitors must inspect the actual outgoing preview. Changing the object, file, endpoint or model resets consent.
 
-The fixed prompt requests five Chinese sections: known facts, geometry and hierarchy, possible uses marked as inference, unknowns, and suggested observations. JSON strings are untrusted data, not instructions. The model must distinguish geometric PATHs from electrically identified wires, acknowledge incomplete previews, and avoid inventing nets, logical functions, process meanings, physical thickness, timing or rule checks. No code, links or tool calls are requested.
+The fixed prompt requests five Markdown sections in the selected interface language (Chinese by default): known facts, geometry and hierarchy, possible uses marked as inference, unknowns, and suggested observations. JSON strings are untrusted data, not instructions. The model must distinguish geometric PATHs from electrically identified wires, acknowledge incomplete previews, and avoid inventing nets, logical functions, process meanings, physical thickness, timing or rule checks. No code, links or tool calls are requested. Changing language cancels pending requests and resets consent while retaining completed text.
 
 ## Lifecycle and evidence
 
-AbortController, a 60-second deadline and generation identifiers prevent cancelled or outdated results from replacing the current explanation. Provider errors show generic HTTP status messages without echoing response bodies; connection failures do not expose raw exceptions. Results render as plain text, and occurrences of the current key are redacted.
+AbortController, a 60-second deadline and generation identifiers prevent cancelled or outdated results from replacing the current explanation. Provider errors show generic HTTP status messages without echoing response bodies; connection failures do not expose raw exceptions. Results render through react-markdown and remark-gfm: headings, lists, emphasis, blockquotes, tables and fenced code are supported. Raw HTML is skipped, images are excluded and links render as inert text; no response-generated resource requests occur. Occurrences of the current key are redacted before rendering. Generate/cancel buttons wrap with a gap in narrow panels.
 
 The static origin still rejects mutations and legacy API routes. Its connection policy permits HTTPS providers and explicit HTTP loopback addresses while retaining script, Worker and embedding restrictions.
 
-Tests use a synthetic PATH and intercepted provider responses, never a real key or paid model call. They verify consent, direct destination, bounded summary, no persistence/export, response masking, literal HTML text, own-origin refusal, hidden error bodies and stale cancellation. They establish the client contract, not provider CORS support or explanation quality.
+Tests use a synthetic PATH and intercepted provider responses, never a real key or paid model call. They verify consent, direct destination, bounded summary, no persistence/export, response masking, inactive HTML/resources, Markdown structures, narrow controls, language switching, own-origin refusal, hidden error bodies and stale cancellation. They establish the client contract, not provider CORS support or explanation quality.

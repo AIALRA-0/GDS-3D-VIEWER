@@ -31,7 +31,7 @@
     document.body.classList.toggle("model-ready", !visible);
     window.parent?.postMessage(
       {
-        type: "icviewer-ready",
+        type: "gds-3d-viewer-ready",
         ready: !visible,
       },
       window.location.origin,
@@ -50,7 +50,7 @@
   function notifySelection() {
     window.parent?.postMessage(
       {
-        type: "icviewer-selection",
+        type: "gds-3d-viewer-selection",
         selection: selectionSnapshot(),
       },
       window.location.origin,
@@ -156,7 +156,7 @@
     return true;
   }
 
-  window.icviewerViewerShell = {
+  window.gds3dViewerShell = {
     setControlsOpen,
     toggleControls() {
       setControlsOpen(!document.body.classList.contains("controls-open"));
@@ -173,7 +173,7 @@
       return;
     }
     const payload = event.data;
-    if (payload.type === "icviewer-set-controls-open") {
+    if (payload.type === "gds-3d-viewer-set-controls-open") {
       setControlsOpen(payload.open);
     }
   });

@@ -1,1 +1,1 @@
-"""Route package for ICViewer API."""
+"""Route package for GDS-3D-VIEWER API."""

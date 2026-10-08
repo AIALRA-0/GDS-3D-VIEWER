@@ -2,9 +2,9 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-DEPLOY_ROOT="${DEPLOY_ROOT:-/opt/icviewer}"
-SERVICE_NAME="${SERVICE_NAME:-icviewer}"
-SITE_NAME="${SITE_NAME:-icviewer.example.com}"
+DEPLOY_ROOT="${DEPLOY_ROOT:-/opt/gds-3d-viewer}"
+SERVICE_NAME="${SERVICE_NAME:-gds-3d-viewer}"
+SITE_NAME="${SITE_NAME:-gds-3d-viewer.example.com}"
 SITE_AVAILABLE="/etc/nginx/sites-available/${SITE_NAME}"
 SITE_ENABLED="/etc/nginx/sites-enabled/${SITE_NAME}"
 SYSTEMD_TARGET="/etc/systemd/system/${SERVICE_NAME}.service"
@@ -38,7 +38,7 @@ echo "[4/8] Building frontend"
 npm run build:web
 
 echo "[5/8] Installing systemd service"
-install -m 0644 "${DEPLOY_ROOT}/scripts/systemd/icviewer.service" "${SYSTEMD_TARGET}"
+install -m 0644 "${DEPLOY_ROOT}/scripts/systemd/gds-3d-viewer.service" "${SYSTEMD_TARGET}"
 systemctl daemon-reload
 systemctl enable "${SERVICE_NAME}" >/dev/null 2>&1 || true
 systemctl restart "${SERVICE_NAME}"
@@ -56,7 +56,7 @@ echo "[7/8] Installing Nginx site"
 if [ -f "${SITE_AVAILABLE}" ]; then
   cp "${SITE_AVAILABLE}" "${SITE_AVAILABLE}.bak.${BACKUP_SUFFIX}"
 fi
-install -m 0644 "${DEPLOY_ROOT}/scripts/nginx/icviewer.conf" "${SITE_AVAILABLE}"
+install -m 0644 "${DEPLOY_ROOT}/scripts/nginx/gds-3d-viewer.conf" "${SITE_AVAILABLE}"
 ln -sfn "${SITE_AVAILABLE}" "${SITE_ENABLED}"
 nginx -t
 systemctl reload nginx

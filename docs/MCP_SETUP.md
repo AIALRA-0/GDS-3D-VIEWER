@@ -24,7 +24,7 @@ Use this to give agents scoped file access to the repository root instead of the
 
 Recommended package:
 
-- `npx -y @modelcontextprotocol/server-filesystem /path/to/IC-Viewer`
+- `npx -y @modelcontextprotocol/server-filesystem /path/to/GDS-3D-VIEWER`
 
 ### GitHub MCP
 

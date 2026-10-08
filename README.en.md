@@ -1,15 +1,15 @@
 <div align="center">
 
-<h1>ICViewer</h1>
+<h1>GDS-3D-VIEWER</h1>
 
 <p><strong>Open chip layouts in your browser and inspect layers, cells and individual geometry</strong></p>
 
 <p>No login · Browser-local files · Hover and click inspection · Optional object explanations</p>
 
 <p>
-  <a href="https://icviewer.aialra.online">Open live preview</a> ·
-  <a href="https://github.com/AIALRA-0/IC-Viewer">Source code</a> ·
-  <a href="https://github.com/AIALRA-0/IC-Viewer/archive/refs/heads/main.zip">Download source</a> ·
+  <a href="https://gds3d.aialra.online">Open live preview</a> ·
+  <a href="https://github.com/AIALRA-0/GDS-3D-VIEWER">Source code</a> ·
+  <a href="https://github.com/AIALRA-0/GDS-3D-VIEWER/archive/refs/heads/main.zip">Download source</a> ·
   <a href="README.md">简体中文</a>
 </p>
 
@@ -21,7 +21,7 @@ Figure 1 The complete workbench running the original synthetic demonstration
 
 ## 1 First successful preview
 
-1. Open the [live preview](https://icviewer.aialra.online) and click “加载示例” to try the synthetic layout
+1. Open the [live preview](https://gds3d.aialra.online) and click “加载示例” to try the synthetic layout
 2. Click “打开文件” or drag in a local `.gds`, `.gds2`, `.gdsii`, `.gltf` or `.glb` file; suffix matching is case-insensitive
 3. Choose layers or cells, hover for a quick tooltip, and click geometry to pin details in the inspector
 4. Adjust views and layer separation, write review notes, and export them for later restoration
@@ -99,11 +99,32 @@ Figure 9 Collapsible panels preserve the preview on a 390 pixel viewport
 
 </div>
 
+<div align="center">
+
+![English interface with the same layout and controls; the header button switches back to Chinese](docs/assets/readme/public-english.png)
+
+Figure 10 English interface with the same layout and controls; the header button switches back to Chinese
+
+</div>
+
+<div align="center">
+
+![Markdown headings, emphasis, tables and lists rendered from an intercepted demonstration response, without a real model call](docs/assets/readme/ai-markdown.png)
+
+Figure 11 Formatted Markdown from an intercepted synthetic-summary demonstration, without a real model call; the key has been cleared
+
+</div>
+
 ## 3 Object explanations and keys
 
-The optional AI panel explains the current cell or clicked geometry using the fixed `icviewer-explain-v1` harness
+The interface defaults to Chinese. The header's `EN` / `中文` button switches interface labels and the language of future AI explanations; only the language preference is saved
+Switching languages preserves the loaded layout, layer selection and notes. Cell names and completed explanations retain their original text
+
+The optional AI panel explains the current cell or clicked geometry using the fixed `gds-3d-viewer-explain-v1` harness
 It requests five sections: known facts, geometry and hierarchy, possible uses, unknowns, and suggested observations
 The prompt distinguishes geometric PATHs from electrically identified wires and requires uncertainty when evidence is missing
+Markdown headings, emphasis, lists, quotes, tables and code blocks are formatted. Model HTML, images and clickable external links are disabled
+Generate/cancel controls wrap in narrow sidebars. Changing language cancels pending requests and resets consent
 
 - Keys live only in current-page memory, use a masked input, and are discarded on refresh, page departure or explicit clearing
 - Keys never enter browser storage, review exports or the website server; the browser authenticates directly to the user-selected provider
@@ -173,11 +194,11 @@ Table 2 Source and documentation routes
 | --- | --- |
 | [`apps/web/src/public/`](apps/web/src/public/) | Browser parsing, picking, harness and redesigned UI |
 | [`apps/web/tests/public/`](apps/web/tests/public/) | Public parser and real-browser regressions |
-| [`scripts/nginx/icviewer-public.conf`](scripts/nginx/icviewer-public.conf) | Dedicated static host and request isolation |
+| [`scripts/nginx/gds-3d-viewer-public.conf`](scripts/nginx/gds-3d-viewer-public.conf) | Dedicated static host and request isolation |
 | [Public preview](docs/PUBLIC-PREVIEW.md) | Formats, boundaries and deployment recovery |
 | [Explanation harness](docs/AI-HARNESS.md) | Fixed framework and ephemeral key contract |
 | [Compatibility specification](docs/COMPATIBILITY_SPEC.md) | Engineering context for the original local API workflow |
-| [Issues](https://github.com/AIALRA-0/IC-Viewer/issues) | Reproductions and suggestions using publishable synthetic data |
+| [Issues](https://github.com/AIALRA-0/GDS-3D-VIEWER/issues) | Reproductions and suggestions using publishable synthetic data |
 
 </div>
 

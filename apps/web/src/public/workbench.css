@@ -117,6 +117,8 @@ button svg {
   padding: 0 24px;
   border-bottom: 1px solid var(--line);
 }
+.brand-group { display: flex; align-items: center; gap: 14px; min-width: 0; }
+.language-toggle { flex-shrink: 0; min-width: 42px; }
 .brand {
   display: flex;
   gap: 12px;
@@ -1145,3 +1147,32 @@ input[type="range"] {
 .missing-references li span { display:block; color:var(--muted); }
 .incomplete-banner { position:absolute; top:12px; left:12px; right:12px; z-index:3; display:flex; align-items:center; justify-content:space-between; gap:12px; padding:8px 12px; border:1px solid var(--warning); border-radius:6px; background:var(--raised); color:var(--warning); font-size:12px; }
 @media(max-width:600px) { .incomplete-banner { align-items:flex-start; flex-direction:column; gap:4px; } }
+
+.explanation-panel { min-width: 0; }
+.explanation-actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin: 14px 0; }
+.explanation-actions .text-button { flex: 0 1 auto; max-width: 100%; white-space: normal; min-height: 40px; }
+.explanation-result { margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--line); min-width: 0; }
+.explanation-result > .muted { margin-bottom: 14px; }
+.ai-spinner { width: 14px; height: 14px; border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: spin 1s linear infinite; flex-shrink: 0; }
+.markdown-content { font-size: 13px; line-height: 1.85; overflow-wrap: anywhere; min-width: 0; }
+.markdown-content p { margin: 0 0 12px; }
+.markdown-content h1, .markdown-content h2, .markdown-content h3, .markdown-content h4, .markdown-content h5, .markdown-content h6 { font-size: 14px; line-height: 1.6; margin: 20px 0 10px; font-weight: 600; }
+.markdown-content > :first-child { margin-top: 0; }
+.markdown-content ul, .markdown-content ol { padding-left: 22px; margin: 10px 0 16px; }
+.markdown-content li { margin: 6px 0; }
+.markdown-content li > p { margin-bottom: 6px; }
+.markdown-content code { font-size: 12px; padding: 2px 5px; border-radius: 4px; background: var(--hover); }
+.markdown-content pre { padding: 12px; margin: 14px 0; border: 1px solid var(--line); border-radius: 6px; background: var(--canvas); overflow-x: auto; white-space: pre; max-width: 100%; font-family: ui-monospace, Consolas, monospace; }
+.markdown-content pre code { background: none; padding: 0; }
+.markdown-content blockquote { margin: 14px 0; padding: 4px 12px; border-left: 3px solid var(--line); color: var(--secondary); }
+.markdown-content hr { border: 0; border-top: 1px solid var(--line); margin: 18px 0; }
+.markdown-table { max-width: 100%; overflow-x: auto; margin: 14px 0; }
+.markdown-table table { border-collapse: collapse; font-size: 12px; }
+.markdown-table th, .markdown-table td { padding: 7px 10px; border: 1px solid var(--line); text-align: left; white-space: normal; }
+@media (prefers-reduced-motion: reduce) { .ai-spinner { animation: none; } }
+@media (max-width: 600px) {
+  .workbench { grid-template-rows: auto minmax(0, 1fr) 28px; }
+  .topbar { flex-wrap: wrap; gap: 6px; padding: 8px 12px; }
+  .brand-group { width: 100%; justify-content: space-between; }
+  .top-actions { width: 100%; justify-content: flex-end; flex-wrap: wrap; }
+}
