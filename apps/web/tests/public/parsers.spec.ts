@@ -96,6 +96,25 @@ test("GDS units, rotated reflected references and array pitches have known bound
   a.bounds.forEach((n, i) => expect(n).toBeCloseTo([0, 0, 20, 25][i]));
   expect(a.instances).toBe(7);
   expect(a.layers[0].polygons).toBe(6);
+  expect(a.layers[0].features).toHaveLength(6);
+  expect(a.layers[0].features![0].cell).toBe("CHILD");
+  expect(a.layers[0].features![0].area).toBeCloseTo(50);
+  expect(a.layers[0].features![1].firstTriangle).toBe(a.layers[0].features![0].triangles);
+  expect(new Set(a.layers[0].features!.map((f) => f.instance)).size).toBe(6);
+  expect(r.layers[0].features![0].bounds).toEqual([100, 200, 105, 210]);
+});
+test("missing cells retain real geometry and report incomplete preview", () => {
+  const missing = [rec(10, 0), rec(18, 6, Buffer.from("MISSING_GATE")), points(20, 30), rec(17, 0)];
+  const data = file([cell("DEMO"), polygon, ...missing, rec(7, 0)]);
+  const parsed = parseGds(data, "synthetic.gds2");
+  expect(parsed.incomplete).toBe(true);
+  expect(parsed.missingReferences).toEqual([{ source: "DEMO", target: "MISSING_GATE", count: 1 }]);
+  expect(parsed.layers[0].polygons).toBe(1);
+  expect(parsed.warnings.join(" ")).toContain("不完整预览");
+  const metadata = parseGds(file([cell("EMPTY"), ...missing, rec(7, 0)]), "empty.gds2");
+  expect(metadata.layers).toEqual([]);
+  expect(metadata.cells[0].name).toBe("EMPTY");
+  expect(metadata.incomplete).toBe(true);
 });
 test("cyclic GDS references and excessive arrays are refused", () => {
   const data = file([

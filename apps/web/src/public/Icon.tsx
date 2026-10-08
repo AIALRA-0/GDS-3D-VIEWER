@@ -20,6 +20,8 @@ const paths: Record<string, string> = {
   reset: "M3 10a9 9 0 1 1 2 8M3 4v6h6",
   swap: "M4 7h16m-4-4 4 4-4 4M20 17H4m4-4-4 4 4 4",
   cube: "m12 2 9 5v10l-9 5-9-5V7zM3 7l9 5 9-5M12 12v10",
+  code: "m8 5-6 7 6 7m8-14 6 7-6 7M14 3l-4 18",
+  explain: "M4 3h16v14H9l-5 4zM8 7h8M8 11h5",
 };
 export function Icon({ name }: { name: string }) {
   return (

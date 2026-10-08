@@ -6,9 +6,11 @@ import type {
 } from "react";
 import { Icon } from "./Icon";
 import { LIMITS } from "./types";
-import type { Layout } from "./types";
+import type { Layout, PickInfo } from "./types";
 import { Viewer } from "./Viewer";
+import { featureKind } from "./Viewer";
 import type { CameraPose, ViewerHandle } from "./Viewer";
+import { ExplanationPanel } from "./ExplanationPanel";
 import "./workbench.css";
 import tokens from "./tokens.json";
 type Panel = "layers" | "cells" | "notes" | "bookmarks";
@@ -89,6 +91,7 @@ function Modal({
   );
 }
 export default function Workbench() {
+  const [selectedObject, setSelectedObject] = useState<PickInfo | null>(null);
   const [layout, setLayout] = useState<Layout | null>(null),
     [visible, setVisible] = useState<string[]>([]),
     [selected, setSelected] = useState<string | null>(null);
@@ -287,6 +290,7 @@ export default function Workbench() {
       setLayout(result);
       setVisible(result.layers.map((l) => l.id));
       setSelected(null);
+      setSelectedObject(null);
       setExplode(0);
       setSearch("");
       if (!top) {
@@ -298,8 +302,10 @@ export default function Workbench() {
       setBusy(false);
       setStatus(
         result.layers.length
-          ? `${file.name} · ${result.layers.length} 个图层 · 本地解析完成`
-          : "已读取单元目录，请选择较小单元",
+          ? `${file.name} · ${result.layers.length} 个图层 · ${result.incomplete ? "不完整预览，缺失引用已列出" : "本地解析完成"}`
+          : result.incomplete && result.missingReferences?.length
+            ? "已读取单元目录，缺失引用已列出"
+            : "已读取单元目录，请选择较小单元",
       );
       if (!result.layers.length) {
         setPanel("cells");
@@ -655,7 +661,7 @@ export default function Workbench() {
                   <button
                     className="layer-name"
                     title={layer.name}
-                    onClick={() => setSelected(layer.id)}
+                    onClick={() => { setSelected(layer.id); setSelectedObject(null); }}
                   >
                     {layer.name}
                     <small>
@@ -670,6 +676,7 @@ export default function Workbench() {
                     onClick={() => {
                       setVisible([layer.id]);
                       setSelected(layer.id);
+                      setSelectedObject(null);
                     }}
                   >
                     <Icon name="fit" />
@@ -822,6 +829,25 @@ export default function Workbench() {
         />
       </div>
       <div className="pane-content inspector-content">
+        {selectedObject?.feature && <section className="object-inspection" aria-label="选中图形详情">
+          <h3>选中图形</h3>
+          <p className="object-name">{featureKind(selectedObject.feature.kind)}</p>
+          <dl>
+            <div><dt>来源单元</dt><dd>{selectedObject.feature.cell}</dd></div>
+            <div><dt>图层 / 类型</dt><dd>{selectedObject.layerId}</dd></div>
+            <div><dt>图形标识</dt><dd>{selectedObject.feature.id}</dd></div>
+            <div><dt>点击坐标</dt><dd>{selectedObject.point.slice(0, layout?.format === "gds" ? 2 : 3).map((v) => v.toFixed(3)).join(", ")} {layout?.unit}</dd></div>
+            <div><dt>平面范围</dt><dd>{selectedObject.feature.bounds.map((v) => v.toFixed(3)).join(", ")} {layout?.unit}</dd></div>
+            <div><dt>顶点</dt><dd>{selectedObject.feature.vertices.toLocaleString()}</dd></div>
+            {selectedObject.feature.area !== undefined && <div><dt>几何面积</dt><dd>{selectedObject.feature.area.toFixed(3)} {layout?.unit}²</dd></div>}
+            {selectedObject.feature.pathWidth !== undefined && <div><dt>路径宽度</dt><dd>{selectedObject.feature.pathWidth.toFixed(3)} {layout?.unit}</dd></div>}
+            {selectedObject.feature.pathLength !== undefined && <div><dt>路径长度</dt><dd>{selectedObject.feature.pathLength.toFixed(3)} {layout?.unit}</dd></div>}
+            {selectedObject.feature.byteOffset !== undefined && <div><dt>源记录偏移</dt><dd>{selectedObject.feature.byteOffset} 字节</dd></div>}
+          </dl>
+          <details><summary>查看引用实例路径</summary><p className="instance-path">{selectedObject.feature.instance}</p></details>
+          <p className="muted">几何属性来自文件，电气连通性与工艺用途需要额外资料</p>
+          <button className="text-button" onClick={() => setSelectedObject(null)}>清除选择</button>
+        </section>}
         <section>
           <h3>{selectedLayer ? "选中图层" : "当前版图"}</h3>
           <p className="object-name">
@@ -956,6 +982,7 @@ export default function Workbench() {
         </section>
         <section>
           <h3>解析说明</h3>
+          {!!layout?.missingReferences?.length && <details className="missing-references"><summary>缺失引用目标（{layout.missingReferences.length} 项）</summary><ul>{layout.missingReferences.slice(0, 200).map((r) => <li key={`${r.source}/${r.target}`}><strong>{r.target}</strong><span>来源 {r.source} · {r.count} 次引用</span></li>)}</ul><p className="muted">目标定义未包含在当前文件中，完整显示需要重新导出包含依赖单元的版图库</p></details>}
           {layout ? (
             layout.warnings.map((w) => (
               <p className="muted" key={w}>
@@ -966,6 +993,7 @@ export default function Workbench() {
             <p className="muted">支持本地版图和自包含静态三维模型</p>
           )}
         </section>
+        <ExplanationPanel layout={layout} object={selectedObject?.feature} />
         <a
           className="portal-link"
           href="https://aialra.online"
@@ -1027,6 +1055,7 @@ export default function Workbench() {
           <span className="brand-caption">芯片版图预览器</span>
         </a>
         <div className="top-actions">
+          <a className="icon-button source-link" aria-label="查看源码" title="查看源码 · GitHub" href="https://github.com/AIALRA-0/IC-Viewer" target="_blank" rel="noopener noreferrer"><Icon name="code" /></a>
           <button
             ref={importButton}
             className="text-button primary"
@@ -1192,6 +1221,8 @@ export default function Workbench() {
                 visible={visible}
                 explode={explode}
                 theme={theme}
+                selectedObject={selectedObject}
+                onPick={setSelectedObject}
                 onSelect={(id) => {
                   setSelected(id);
                   if (mobile) {
@@ -1206,7 +1237,7 @@ export default function Workbench() {
                     <Icon name="tree" />
                   </div>
                   <h1>选择一个单元查看</h1>
-                  <p>完整版图超出当前预览上限，单元目录已读取</p>
+                  <p>{layout.incomplete && layout.missingReferences?.length ? "引用目标未包含在文件中，单元目录与缺失列表已读取" : "完整版图超出当前预览上限，单元目录已读取"}</p>
                   <button
                     className="text-button primary"
                     onClick={() => showPanel("cells")}
@@ -1273,9 +1304,10 @@ export default function Workbench() {
               )}
               {layout && layout.layers.length > 0 && !busy && (
                 <div className="canvas-hint">
-                  拖动旋转 · 右键平移 · 滚轮缩放 · 点击选择图层
+                  拖动旋转 · 右键平移 · 滚轮缩放 · 悬停查看 · 点击固定详情
                 </div>
               )}
+              {layout?.incomplete && !busy && <div className="incomplete-banner" role="status">不完整预览 · {layout.missingReferences?.length ? "缺失单元定义，当前仅显示已有几何" : "完整几何尚未生成"}<button className="text-button quiet" onClick={() => { setRight(true); if (mobile) setLeft(false); }}>查看解析说明</button></div>}
             </div>
             <div className="pane-foot main-foot">
               <span>
@@ -1342,7 +1374,7 @@ export default function Workbench() {
           </ol>
           <h3>文件与会话</h3>
           <p>
-            解析任务在浏览器中独立运行，不上传你的版图、不共享会话、不调用远程人工智能服务
+            解析任务在浏览器中独立运行，不上传你的版图、不共享会话。可选 AI 讲解由浏览器直连你确认的模型服务，只发送预览过的对象摘要；密钥仅留在当前页面，刷新即丢弃
           </p>
           <p>
             网页服务器仍会接收访问网页所需的普通请求，浏览器只保存明暗主题与侧栏偏好

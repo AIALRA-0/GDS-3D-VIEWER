@@ -1,350 +1,197 @@
 <div align="center">
 
-![ICViewer 项目横幅](docs/assets/readme/icviewer-hero.svg)
-
-图 1 项目入口横幅
-
 <h1>ICViewer</h1>
 
-<p><strong>面向芯片版图教学、演示和早期评审的可解释三维集成电路审阅工作台</strong></p>
+<p><strong>在浏览器里打开芯片版图，看清图层、单元和每一处几何</strong></p>
+
+<p>无需登录 · 文件留在浏览器 · 悬停与点击详情 · 可选对象讲解</p>
 
 <p>
-  <a href="README.en.md">English</a> ·
-  <a href="#quick-start-cn">快速开始</a> ·
-  <a href="#verification-cn">验证证据</a> ·
-  <a href="docs/COMPATIBILITY_SPEC.md">兼容规范</a> ·
-  <a href="docs/DEPLOYMENT.md">部署模板</a>
+  <a href="https://icviewer.aialra.online">打开在线预览</a> ·
+  <a href="https://github.com/AIALRA-0/IC-Viewer">查看源码</a> ·
+  <a href="https://github.com/AIALRA-0/IC-Viewer/archive/refs/heads/main.zip">下载源码</a> ·
+  <a href="README.en.md">English</a>
 </p>
 
-<p>
-  <a href="https://github.com/AIALRA-0/IC-Viewer/actions/workflows/ci.yml"><img alt="CI status" src="https://github.com/AIALRA-0/IC-Viewer/actions/workflows/ci.yml/badge.svg"></a>
-  <img alt="Backend tests 9 passed" src="https://img.shields.io/badge/backend_tests-9_passed-22c55e">
-  <img alt="Browser test 1 passed" src="https://img.shields.io/badge/browser_test-1_passed-22c55e">
-  <img alt="Version 0.1.0" src="https://img.shields.io/badge/version-0.1.0-2563eb">
-  <img alt="License not specified" src="https://img.shields.io/badge/license-not_specified-64748b">
-</p>
+![深色工作台的合成示例、图层导航和几何统计](docs/assets/readme/public-dark.png)
+
+图 1 合成示例的完整工作台，图层、几何与统计来自实际浏览器运行
 
 </div>
 
-> [!TIP]
-> 2026-10-07 公开预览已上线：[打开 ICViewer](https://icviewer.aialra.online)
-> 新界面参考 AIALRA-TEMPLATE，支持浏览器内解析 GDS 和自包含 glTF/GLB，无需密码，版图文件不上传
-> [公开版使用与部署说明](docs/PUBLIC-PREVIEW.md) · [本轮验证记录](docs/VERIFICATION-PUBLIC.md)
-> 下文保留原有本地后端工作流的说明与历史验证记录，该工作流不接入公开站点
+## 1 第一次打开
 
-> [!IMPORTANT]
-> ICViewer 已完成 GDS 上传、三维转换、版图交互、工程元数据、解释、操作建议、差异比较、记录、书签和会话导出闭环
-> 当前代码面向黑客松演示、教学和早期评审，尚未具备身份认证、多租户隔离和生产级恶意文件防护
+- 第一步，访问 [在线预览](https://icviewer.aialra.online)，点击“加载示例”查看合成版图
+- 第二步，点击“打开文件”或拖入本地文件，支持 `.gds`、`.gds2`、`.gdsii`、`.gltf` 和 `.glb`，后缀不区分大小写
+- 第三步，切换图层或选择单元，把鼠标停在几何上查看提示，点击后在检查器中固定详细信息
+- 第四步，调整三维、俯视和层间距，把观察写入审阅记录，导出记录供以后恢复
 
-本文全部数值来自 2026-08-24 对源代码、固定样例、后端测试、真实浏览器端到端测试、前端生产构建和依赖审计的复核记录
+文件在当前浏览器内解析，打开和查看不需要账号或密钥
+刷新后需重新打开源文件；导出的审阅记录保存观察和视角，不包含源版图
 
-## 1 项目概览
+## 2 产品展示
 
-传统网页 GDS 查看器通常停留在几何渲染
-ICViewer 把三维版图放在中央工作区，并把层级、层信息、边界框、多边形统计、评审标记、解释结果和操作建议组织在同一个审阅界面中
-
-GDS 是几何事实源
-`manifest.json`、`metrics.json`、`markers.json`、DEF 和 LEF 作为可选旁路文件补充工艺、指标、标记和工具来源，不要求浏览器理解商业电子设计自动化数据库
+全部图片使用仓库自制的合成示例，不包含用户版图或访问密钥
+界面参考 AIALRA-TEMPLATE 的设计参数重新实现，模板本体保持不变
+图片来源、尺寸和复现方式见 [素材说明](docs/assets/readme/PROVENANCE.md)
 
 <div align="center">
 
-表 1.1 项目定位
+![浅色主题保留相同的工作区结构，适合明亮环境](docs/assets/readme/public-light.png)
 
-| 维度 | 当前实现 | 证据 |
+图 2 浅色主题保留相同的工作区结构，适合明亮环境
+
+</div>
+
+<div align="center">
+
+![悬停提示对应鼠标命中的图形，显示单元、图层和坐标](docs/assets/readme/geometry-hover.png)
+
+图 3 悬停提示对应鼠标命中的图形，显示单元、图层和坐标
+
+</div>
+
+<div align="center">
+
+![点击固定并高亮命中的图形，右侧显示来源、尺寸和实例路径；路径对象还提供宽度与长度](docs/assets/readme/geometry-inspection.png)
+
+图 4 点击固定并高亮命中的图形，右侧显示来源、尺寸和实例路径；路径对象还提供宽度与长度
+
+</div>
+
+<div align="center">
+
+![选择较小单元单独观察，大设计达到展开预算时仍可浏览单元目录](docs/assets/readme/cell-browser.png)
+
+图 5 选择较小单元单独观察，大设计达到展开预算时仍可浏览单元目录
+
+</div>
+
+<div align="center">
+
+![分层展示帮助观察遮挡关系，显示高度不代表真实工艺厚度](docs/assets/readme/exploded-layers.png)
+
+图 6 分层展示帮助观察遮挡关系，显示高度不代表真实工艺厚度
+
+</div>
+
+<div align="center">
+
+![记录观察、保存视角书签，并导出可恢复的审阅文件](docs/assets/readme/review-records.png)
+
+图 7 记录观察、保存视角书签，并导出可恢复的审阅文件
+
+</div>
+
+<div align="center">
+
+![先核对服务地址与对象摘要，再明确同意发送；截图密钥为空，没有调用真实模型](docs/assets/readme/ai-harness.png)
+
+图 8 先核对服务地址与对象摘要，再明确同意发送；截图密钥为空，没有调用真实模型
+
+</div>
+
+<div align="center">
+
+<img src="docs/assets/readme/mobile-preview.png" width="390" alt="390 像素窄屏采用可收起侧栏，保留中央预览和常用操作">
+
+图 9 390 像素窄屏采用可收起侧栏，保留中央预览和常用操作
+
+</div>
+
+## 3 对象讲解与密钥
+
+- AI 人工智能（Artificial Intelligence）：这里用于把所选对象的结构化事实转成文字说明；浏览器把用户确认的摘要交给其指定的模型服务，再显示返回的文字；只有主动配置并确认发送才会请求服务，几何查看本身不需要模型；讲解中的推测需要独立核对，不能作为电气连接或工艺规则的证明
+
+“AI 讲解”支持当前单元以及点击选中的几何，使用固定框架 `icviewer-explain-v1`
+框架依次说明已知事实、几何与层级、可能用途、无法确认和建议观察
+它明确区分路径形状与有连接资料的电气网络，缺少资料时要求说明未知
+
+- 密钥仅保存在当前页面内存，输入框掩码显示，刷新、离开页面或点击“清除密钥”即丢弃
+- 密钥不进入本地存储、审阅导出或网站服务器；浏览器直接使用密钥向用户选定的模型服务认证
+- 确认后只发送可预览的单元或几何摘要，可能包含名称、实例路径和尺寸，不发送源文件或完整顶点数据
+- 模型服务需要允许浏览器跨域请求；网络或服务失败会显示错误，网站不会转发密钥代为请求
+
+模型协议、摘要字段、取消行为和固定提示词见 [讲解接口说明](docs/AI-HARNESS.md)
+
+## 4 支持范围与实际限制
+
+<div align="center">
+
+表 1 公开预览能力与边界
+
+| 项目 | 当前行为 | 需要注意 |
 | --- | --- | --- |
-| 产品形态 | React、TypeScript 和 Three.js 浏览器工作台 | `apps/web/` |
-| 后端 | FastAPI 会话、转换、解释、命令、差异和导出接口 | `apps/api/` |
-| 几何输入 | GDS 文件 | `fixtures/example/example.gds` |
-| 工程上下文 | 清单、指标、标记、DEF、LEF 和工艺预设 | `packages/shared/`、`fixtures/compat/` |
-| 人工智能 | DeepSeek 兼容接口，可在无密钥时使用确定性本地规则 | `apps/api/app/services/ai_service.py` |
-| 当前版本 | `0.1.0` | `package.json`、FastAPI 应用元数据 |
-| 项目阶段 | 黑客松原型和可复现演示 | `docs/PROPOSAL.md`、`docs/MILESTONES.md` |
+| 版图文件 | 边界、框、路径、单元引用、阵列和常见变换 | 未提供工艺资料时图层按编号展示 |
+| 缺失单元 | 保留已存在的几何，显示“不完整预览”和缺失目标清单 | 完整显示需要包含依赖单元的重新导出文件 |
+| 三维模型 | 自包含、未压缩的静态三角形模型 | 拒绝外部资源地址与图片，动画不播放 |
+| 悬停与选择 | 单元、实例、图形类型、图层、坐标和几何尺寸 | 这些事实不能推导真实网络名称或电气连通性 |
+| 图层操作 | 显示、隐藏、隔离、层间距及常用视角 | 展示高度不是实际厚度 |
+| 审阅 | 记录、书签、视角和图层状态导出与恢复 | 原始文件需要另行保留 |
+| 比较 | 图层数量及三角形数量变化 | 不执行几何差异或制造规则检查 |
+| 解析预算 | 单文件 32 MB，解析最多 45 秒 | 超预算设计进入单元目录，不假装已显示全部几何 |
 
 </div>
 
-## 2 界面预览
+缺失引用不等于文件后缀有误：文件可能引用外部标准单元库而没有包含其定义
+检查器会列出目标名称与引用来源，预览器不会编造缺失单元的形状
+详细解析限制见 [公开版说明](docs/PUBLIC-PREVIEW.md)
 
-下图来自本地运行的真实前后端
-浏览器上传仓库固定 GDS 后，后端完成会话创建和三维资源生成，界面显示版图、层开关和单元层级控制
+## 5 本地运行
 
-<div align="center">
+公开版只需要 Node.js，持续集成使用版本 22
+在仓库根目录执行以下命令：
 
-![ICViewer 加载固定 GDS 后的三维审阅界面](docs/assets/readme/icviewer-cockpit.png)
-
-图 2.1 本地端到端运行截图
-
-</div>
-
-截图只包含仓库固定样例和本地界面，不包含部署域名、账号、用户标识或真实芯片设计
-
-## 3 系统结构
-
-<div align="center">
-
-```mermaid
-%% 浏览器把 GDS 和可选旁路文件交给 API，再取得三维资源和结构化审阅会话
-flowchart TD
-    A[GDS 几何文件] --> D[FastAPI 会话入口]
-    B[清单 指标 标记] --> D
-    C[可选 DEF LEF] --> D
-    D --> E[GDS 解析和 glTF 生成]
-    D --> F[元数据归一化和模式校验]
-    E --> G[会话资源目录]
-    F --> H[结构化会话]
-    G --> I[React 审阅工作台]
-    H --> I
-    I --> J[Three.js 三维查看器]
-    I --> K[解释 操作 差异 记录]
-    K --> L[会话 JSON 导出]
+```sh
+# 按锁文件安装依赖
+npm ci
+# 启动浏览器解析工作台，终端会显示本机访问地址
+npm run dev:web
+# 检查类型并生成可发布的静态站点
+npm run build:web
 ```
 
-图 3.1 数据进入、转换、审阅和导出流程
+源码主入口是 [`Workbench.tsx`](apps/web/src/public/Workbench.tsx)，公开部署只使用 `apps/web/dist`
+原有 Python 后端工作流另见 [本地开发说明](docs/LOCAL-WORKFLOW.md)，其服务不接入公开站点
 
-</div>
+## 6 验证与协作
 
-<div align="center">
+当前公开版的 15 项回归覆盖缺失单元、变换与阵列、悬停和点击信息、密钥生命周期、摘要直连、取消、外部资源拒绝、超限文件、审阅恢复及移动布局
+生产构建与原有界面构建均已通过；测试范围及最新发布验证见 [验证记录](docs/VERIFICATION-PUBLIC.md)
 
-表 3.1 组件职责
-
-| 组件 | 职责 | 关键路径 |
-| --- | --- | --- |
-| 网页外壳 | 上传、语言切换、状态、抽屉和导出 | `apps/web/src/App.tsx` |
-| 三维查看器 | 轨道旋转、平移、缩放、聚焦、分层和单元选择 | `apps/web/public/reference-viewer/` |
-| 会话服务 | 文件保存、GDS 解析、详细资源生成和会话读取 | `apps/api/app/services/session_service.py` |
-| 解释服务 | 设计摘要和自然语言操作建议，本地规则可回退 | `apps/api/app/services/ai_service.py` |
-| 差异服务 | 比较两份清单并生成结构化差异 | `apps/api/app/services/diff_service.py` |
-| 共享契约 | 清单模式、预设和前端类型 | `packages/shared/` |
-
-</div>
-
-## 4 已交付能力
-
-<div align="center">
-
-表 4.1 功能矩阵
-
-| 范围 | 能力 | 当前状态 |
-| --- | --- | --- |
-| 输入 | 单独 GDS 或带清单、指标、标记、DEF 和 LEF 的文件组 | 已实现 |
-| 查看 | 左键旋转、右键平移、滚轮指针缩放、双击聚焦 | 已实现 |
-| 筛选 | 图层开关、填充单元、顶层几何和实例控制 | 已实现 |
-| 上下文 | 层级、边界框、单元数、实例数、多边形数和面积 | 已实现 |
-| 评审 | 标记、记录、书签和选择状态 | 已实现 |
-| 解释 | 远程兼容接口或确定性本地摘要 | 已实现 |
-| 操作器 | 把自然语言请求转换为受限查看器动作 | 已实现 |
-| 差异 | 比较两份版图清单的指标和标记 | 已实现 |
-| 会话 | 导出会话 JSON，并通过上传流程重新载入 | 已实现并有测试 |
-| 性能模式 | 简化大型版图渲染 | 里程碑仍标记为待完成 |
-
-</div>
-
-## 5 兼容模型
-
-ICViewer 不尝试替代 OpenROAD、OpenLane 或 Virtuoso 的原生数据库
-它使用 GDS 承载几何，再用旁路文件承载能够公开交换的工程上下文
-
-<div align="center">
-
-表 5.1 输入兼容性
-
-| 来源 | 必需输入 | 可选输入 | 边界 |
-| --- | --- | --- | --- |
-| 通用 GDS 流程 | GDS | 清单、指标和标记 | 未提供工艺映射时使用预设或解析结果 |
-| OpenROAD 或 OpenLane | 流片输出 GDS | DEF、LEF、指标 JSON 和清单 | 不读取工具内部数据库 |
-| Virtuoso | 导出或流片 GDS | 描述工艺和层名称的清单 | OpenAccess 原生状态不在当前范围 |
-| 已导出会话 | 会话 JSON | 无 | 用于恢复审阅状态，不替代原始 GDS 归档 |
-
-</div>
-
-更完整的输入约定见 [`docs/COMPATIBILITY_SPEC.md`](docs/COMPATIBILITY_SPEC.md)
-清单字段以 [`packages/shared/manifest.schema.json`](packages/shared/manifest.schema.json) 为准
-
-## 6 接口
-
-<div align="center">
-
-表 6.1 后端接口
-
-| 方法 | 路径 | 用途 |
-| --- | --- | --- |
-| GET | `/health` | 轻量健康检查 |
-| GET | `/api/samples` | 列出内置样例 |
-| GET | `/api/samples/default` | 取得默认样例会话 |
-| GET | `/api/samples/{sample_id}` | 取得指定样例会话 |
-| POST | `/api/sessions` | 上传 GDS 文件组并创建会话 |
-| GET | `/api/sessions/{session_id}` | 读取已创建会话 |
-| POST | `/api/sessions/{session_id}/detail` | 按需生成大型版图详细资源 |
-| POST | `/api/explain` | 生成设计解释 |
-| POST | `/api/command` | 生成受限查看器动作 |
-| POST | `/api/diff` | 比较两份清单 |
-| POST | `/api/export` | 导出完整会话 JSON |
-
-</div>
-
-当前接口没有身份认证和租户隔离
-只应绑定到本机或受保护网络，不能直接暴露为公开多用户服务
-
-## 7 环境要求
-
-<div align="center">
-
-表 7.1 已验证环境
-
-| 范围 | 仓库约束或本次环境 | 用途 |
-| --- | --- | --- |
-| Node.js | CI 使用 22，本次本地构建使用 24.13.0 | 前端依赖、构建和浏览器测试 |
-| npm | 本次使用 11.5.2 | 工作区依赖管理 |
-| Python | CI 使用 3.11，本次本地测试使用 3.12.7 | FastAPI、GDS 转换和测试 |
-| 浏览器 | Chromium | Playwright 端到端验证 |
-| 操作系统 | CI 为 Ubuntu，本次复核为 Windows | 项目具有跨平台开发路径 |
-
-</div>
-
-Python 依赖包含 `gdstk`、`gdspy`、`triangle`、`pygltflib` 和 NumPy
-前端依赖包含 React、Three.js、Vite、TypeScript 和 Playwright
-
-<a id="quick-start-cn"></a>
-
-## 8 快速开始
-
-### 8.1 后端
-
-```bash
-python3 -m venv .venv # 在仓库根目录创建隔离的 Python 环境
-source .venv/bin/activate # 在 POSIX 终端激活环境
-python -m pip install -r apps/api/requirements.txt # 安装锁定版本的后端和测试依赖
-cd apps/api # 进入 FastAPI 应用目录
-uvicorn app.main:app --reload --host 127.0.0.1 --port 34000 # 仅在本机启动开发接口
+```sh
+# 安装真实浏览器测试所需的浏览器
+npx playwright install chromium --with-deps
+# 执行公开版解析与交互回归
+npm run test:public
+# 单独检查原有本地工作流的生产构建
+npm run build:legacy
 ```
 
-Windows PowerShell 使用 `.\.venv\Scripts\Activate.ps1` 激活同一环境
-
-### 8.2 前端
-
-在另一个终端回到仓库根目录
-
-```bash
-npm ci # 按锁文件安装前端依赖
-npm run dev:web -- --mode legacy --host 127.0.0.1 --port 4173 # 启动原有本地后端工作流的界面
-```
-
-浏览器访问 `http://127.0.0.1:4173/legacy.html`
-选择 `fixtures/example/example.gds` 可以复现图 2.1
-
-### 8.3 可选解释接口
-
-没有密钥时，解释和操作器会使用确定性本地规则
-接入兼容接口时只在本机环境中设置密钥，不要写入仓库、终端截图或问题报告
-
-```bash
-export DEEPSEEK_API_KEY="<your-api-key>" # 注入本机会话密钥，禁止提交真实值
-export DEEPSEEK_MODEL="<compatible-model>" # 指定兼容模型名称
-export DEEPSEEK_BASE_URL="https://api-provider.example" # 使用运营者授权的兼容接口地址
-```
-
-## 9 操作要点
-
 <div align="center">
 
-表 9.1 常用交互
+表 2 源码与文档入口
 
-| 操作 | 结果 |
+| 入口 | 内容 |
 | --- | --- |
-| 左键拖动 | 围绕当前目标旋转 |
-| 右键拖动 | 平移视图 |
-| 滚轮 | 以指针位置为中心缩放 |
-| 双击几何 | 聚焦选中对象 |
-| View | 打开原生查看器控制面板 |
-| AI | 打开解释和操作器面板 |
-| Data | 查看指标、层级、文件和警告 |
-| Notes | 添加评审记录 |
-| Export | 下载当前会话 JSON |
+| [`apps/web/src/public/`](apps/web/src/public/) | 浏览器解析、几何选择、讲解框架与新界面 |
+| [`apps/web/tests/public/`](apps/web/tests/public/) | 公开版解析和真实浏览器回归 |
+| [`scripts/nginx/icviewer-public.conf`](scripts/nginx/icviewer-public.conf) | 独立静态站点与请求隔离配置 |
+| [公开版说明](docs/PUBLIC-PREVIEW.md) | 文件支持、安全边界与部署恢复 |
+| [讲解接口说明](docs/AI-HARNESS.md) | 固定框架和页面密钥约定 |
+| [兼容规范](docs/COMPATIBILITY_SPEC.md) | 原有本地后端工作流的工程上下文 |
+| [问题反馈](https://github.com/AIALRA-0/IC-Viewer/issues) | 缺陷复现与功能建议，请使用有权公开的合成数据 |
 
 </div>
 
-## 10 验证证据
+本仓库维护工作台与公开预览；[GDS-GLTF-3D-Viewer](https://github.com/AIALRA-0/GDS-GLTF-3D-Viewer) 是关联的原有查看器项目
+修改共享契约前遵循 [`AGENTS.md`](AGENTS.md) 的协作规则
 
-<a id="verification-cn"></a>
+## 7 发布与权利
 
-<div align="center">
+公开入口由 Cloudflare 代理，源站仅提供静态文件，不暴露上传接口、原有后端或共享会话
+主页正常访问仍会请求站点服务；可选讲解会向用户确认的模型服务发送摘要
+入口也已加入 [AIALRA 工具首页](https://aialra.online)，工作台顶部的独立源码图标链接到本仓库
 
-表 10.1 2026-08-24 本地复核结果
-
-| 门禁 | 命令 | 结果 |
-| --- | --- | --- |
-| 后端测试 | `.venv` 中运行 `pytest` | 9 项通过，耗时 16.89 秒 |
-| 前端构建 | `npm run build:web` | TypeScript 和 Vite 构建通过 |
-| 浏览器闭环 | `npm run test:e2e` | 1 项通过，耗时约 1.5 分钟 |
-| 浏览器路径 | 上传固定 GDS、生成详细资源、打开控制、记录、导出 | 全流程通过 |
-| 依赖审计 | `npm audit` | 5 项告警，其中 3 项高危、2 项低危 |
-
-</div>
-
-```bash
-.venv/bin/python -m pytest apps/api/tests -q # 从仓库根目录运行 9 项后端测试
-npm run build:web # 执行 TypeScript 检查和前端生产构建
-npm run test:e2e --workspace @icviewer/web # 在前后端运行时执行真实浏览器闭环
-```
-
-浏览器测试在当前机器耗时约 90 秒，而测试文件的超时上限是 120 秒
-较慢的持续集成运行器可能在功能完成前触发超时，动态状态以页面顶部的 CI 徽章为准
-
-## 11 仓库导航
-
-<div align="center">
-
-表 11.1 目录结构
-
-| 路径 | 内容 |
-| --- | --- |
-| `apps/api/` | FastAPI 应用、服务、模式和 9 项测试 |
-| `apps/web/` | React 工作台、原生查看器外壳和 Playwright 测试 |
-| `packages/shared/` | 清单模式、TypeScript 类型和工艺预设 |
-| `fixtures/example/` | 固定 GDS 和示例清单 |
-| `fixtures/compat/` | OpenROAD 风格 DEF、LEF、指标、标记和清单 |
-| `scripts/` | 冒烟、构建和可配置部署模板 |
-| `docs/` | 提案、里程碑、测试、兼容、部署和协作记录 |
-| `.github/workflows/ci.yml` | 前端构建、后端测试和浏览器测试 |
-| `AGENTS.md` | 共享路径锁和跨角色协作规则 |
-
-</div>
-
-## 12 隐私安全边界
-
-- 仓库已经把历史生产域名、部署根目录和内部仓库路径替换为中性示例
-- 上传内容和生成资源写入 `apps/api/data/`，该目录已被 Git 忽略
-- 对外分享的截图、导出会话和日志只能包含有权公开的芯片数据
-- 密钥只通过环境变量注入，不应进入清单、会话 JSON、截图或日志
-- 当前 FastAPI 跨域配置允许所有来源，生产部署需要收紧到明确来源
-- 当前系统没有登录、权限和多租户隔离，不能承载互不信任的公开用户
-- 示例 systemd 单元使用 `User=root`，生产运营者需要改为受限服务账号并重新设置文件权限
-- Nginx、证书和部署脚本是模板，必须替换示例域名并经过独立安全审核
-
-## 13 已知边界
-
-- 当前转换管线验证了仓库固定 GDS，不代表兼容所有工艺和所有 GDS 生成器
-- 大型版图可以延迟生成详细资源，但性能模式和简化渲染仍在待办列表
-- 人工智能解释是辅助信息，不能代替版图规则检查、时序签核或流片审查
-- 无密钥回退能够保持演示可用，但输出来自规则而不是远程模型
-- 2026-08-24 的历史审计有 3 项高危和 2 项低危告警，本轮兼容升级后审计为 0，构建和公开版浏览器回归已通过，详见本轮验证记录
-- 浏览器测试接近当前超时上限，持续集成结果可能受运行器速度影响
-- 仓库没有声明开源许可证
-
-## 14 贡献指南
-
-- 第一步，在 `docs/agent-locks.md` 登记共享路径锁
-
-- 第二步，按照 `AGENTS.md` 记录跨前端和后端边界的契约变化
-
-- 第三步，使用固定或合成版图添加失败测试
-
-- 第四步，运行后端测试、前端构建和浏览器闭环
-
-- 第五步，同步更新双语 README、兼容规范、里程碑和变更记录
-
-- 第六步，提交前扫描域名、账号、密钥、内部路径和芯片设计身份信息
-
-## 15 许可证
-
-仓库当前没有 `LICENSE` 文件，也没有声明开源许可证
-在权利人补充许可证之前，默认著作权规则适用，公开可见不等同于获得复制、修改或再分发授权
+仓库尚未声明项目开源许可证，公开可见不等于获得任意再分发授权
+随公开构建提供的第三方声明见 [`NOTICE.txt`](apps/web/public-static/NOTICE.txt)

@@ -24,3 +24,7 @@
 ## Public preview contract (2026-10-07)
 
 The public entry parses GDS and self-contained glTF/GLB in a disposable browser Worker. No backend endpoint, cloud session, remote AI, or legacy third-party viewer bundle is deployed. The original React/FastAPI workflow remains available through the local legacy build and legacy.html. Public review files store notes, bookmarks and camera state; they do not contain the source geometry. Large GDS files can open a cell directory without expanding the entire design.
+
+## Object inspection and explanation contract (2026-10-07)
+
+Public geometry retains bounded source metadata and per-layer triangle ranges for object picking. Missing cell definitions are reported explicitly while existing geometry remains viewable; incomplete geometry is never marked complete. AI is optional browser-to-provider communication after preview and consent, using an in-memory visitor credential and the fixed `icviewer-explain-v1` context. No layout-file upload or server-side AI proxy is added. `scripts/nginx/icviewer-public.conf` therefore permits browser HTTPS model connections and loopback HTTP while retaining static-only routes and method restrictions. This frontend change requires that deployment-header update. README files document the current public product and keep the original API workflow in separate documentation.

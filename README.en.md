@@ -1,350 +1,194 @@
 <div align="center">
 
-![ICViewer project banner](docs/assets/readme/icviewer-hero.svg)
-
-Figure 1 Project hero banner
-
 <h1>ICViewer</h1>
 
-<p><strong>An explainable 3D integrated-circuit layout review cockpit for education, demos, and early engineering review</strong></p>
+<p><strong>Open chip layouts in your browser and inspect layers, cells and individual geometry</strong></p>
+
+<p>No login · Browser-local files · Hover and click inspection · Optional object explanations</p>
 
 <p>
-  <a href="README.md">中文</a> ·
-  <a href="#quick-start-en">Quick start</a> ·
-  <a href="#verification-en">Verification</a> ·
-  <a href="docs/COMPATIBILITY_SPEC.md">Compatibility</a> ·
-  <a href="docs/DEPLOYMENT.md">Deployment template</a>
+  <a href="https://icviewer.aialra.online">Open live preview</a> ·
+  <a href="https://github.com/AIALRA-0/IC-Viewer">Source code</a> ·
+  <a href="https://github.com/AIALRA-0/IC-Viewer/archive/refs/heads/main.zip">Download source</a> ·
+  <a href="README.md">简体中文</a>
 </p>
 
-<p>
-  <a href="https://github.com/AIALRA-0/IC-Viewer/actions/workflows/ci.yml"><img alt="CI status" src="https://github.com/AIALRA-0/IC-Viewer/actions/workflows/ci.yml/badge.svg"></a>
-  <img alt="Backend tests 9 passed" src="https://img.shields.io/badge/backend_tests-9_passed-22c55e">
-  <img alt="Browser test 1 passed" src="https://img.shields.io/badge/browser_test-1_passed-22c55e">
-  <img alt="Version 0.1.0" src="https://img.shields.io/badge/version-0.1.0-2563eb">
-  <img alt="License not specified" src="https://img.shields.io/badge/license-not_specified-64748b">
-</p>
+![Dark workbench with synthetic geometry, layers and statistics](docs/assets/readme/public-dark.png)
+
+Figure 1 The complete workbench running the original synthetic demonstration
 
 </div>
 
-> [!TIP]
-> Public preview deployed on 2026-10-07: [Open ICViewer](https://icviewer.aialra.online)
-> The redesigned interface follows AIALRA-TEMPLATE and parses GDS and self-contained glTF/GLB in the browser, with no password or layout-file upload
-> [Public usage and deployment](docs/PUBLIC-PREVIEW.md) · [Current verification](docs/VERIFICATION-PUBLIC.md)
-> The remaining sections retain the original local backend workflow and its historical verification; that workflow is not connected to the public site
+## 1 First successful preview
 
-> [!IMPORTANT]
-> ICViewer closes the loop from GDS upload and 3D conversion to interaction, engineering metadata, explanation, operator suggestions, diffing, notes, bookmarks, and session export
-> The code is a reproducible hackathon, teaching, and early-review prototype without authentication, tenant isolation, or production-grade hostile-file defenses
+1. Open the [live preview](https://icviewer.aialra.online) and click “加载示例” to try the synthetic layout
+2. Click “打开文件” or drag in a local `.gds`, `.gds2`, `.gdsii`, `.gltf` or `.glb` file; suffix matching is case-insensitive
+3. Choose layers or cells, hover for a quick tooltip, and click geometry to pin details in the inspector
+4. Adjust views and layer separation, write review notes, and export them for later restoration
 
-This status was verified on 2026-08-24 against the source, bundled fixtures, 9 backend tests, 1 real-browser end-to-end test, the production frontend build, and the dependency audit
+Opening files requires no account or model key. Parsing happens in the current browser
+After refresh, reopen the source file; review exports contain observations and view state rather than the source layout
 
-## 1 Project overview
+## 2 Product showcase
 
-Many browser GDS viewers stop at geometry rendering
-ICViewer places the 3D layout at the center and organizes hierarchy, layers, bounding boxes, polygon statistics, review markers, explanations, and operator actions around a single review workspace
-
-GDS remains the geometry source of truth
-Optional `manifest.json`, `metrics.json`, `markers.json`, DEF, and LEF files add technology, metrics, markers, and tool provenance without requiring the browser to understand a proprietary EDA database
+Every image uses the repository's original synthetic sample, without visitor designs or model credentials
+The interface follows copied parameters from AIALRA-TEMPLATE; the template itself remains untouched
+See [asset provenance](docs/assets/readme/PROVENANCE.md) for dimensions and reproduction
 
 <div align="center">
 
-Table 1.1 Project positioning
+![Light theme preserves the same workspace structure](docs/assets/readme/public-light.png)
 
-| Dimension | Current implementation | Evidence |
+Figure 2 Light theme preserves the same workspace structure
+
+</div>
+
+<div align="center">
+
+![The hover tooltip reports the actual hit cell, layer and coordinates](docs/assets/readme/geometry-hover.png)
+
+Figure 3 The hover tooltip reports the actual hit cell, layer and coordinates
+
+</div>
+
+<div align="center">
+
+![Clicking pins and highlights a primitive with source, dimensions and instance path; PATHs also report width and length](docs/assets/readme/geometry-inspection.png)
+
+Figure 4 Clicking pins and highlights a primitive with source, dimensions and instance path; PATHs also report width and length
+
+</div>
+
+<div align="center">
+
+![Inspect smaller cells independently, including designs exceeding the full expansion budget](docs/assets/readme/cell-browser.png)
+
+Figure 5 Inspect smaller cells independently, including designs exceeding the full expansion budget
+
+</div>
+
+<div align="center">
+
+![Separated layers reveal occlusion; display heights are not physical thicknesses](docs/assets/readme/exploded-layers.png)
+
+Figure 6 Separated layers reveal occlusion; display heights are not physical thicknesses
+
+</div>
+
+<div align="center">
+
+![Record observations, save camera bookmarks and export restorable reviews](docs/assets/readme/review-records.png)
+
+Figure 7 Record observations, save camera bookmarks and export restorable reviews
+
+</div>
+
+<div align="center">
+
+![Verify the provider and summary before consenting; the key is empty and no real model is called](docs/assets/readme/ai-harness.png)
+
+Figure 8 Verify the provider and summary before consenting; the key is empty and no real model is called
+
+</div>
+
+<div align="center">
+
+<img src="docs/assets/readme/mobile-preview.png" width="390" alt="Collapsible panels preserve the preview on a 390 pixel viewport">
+
+Figure 9 Collapsible panels preserve the preview on a 390 pixel viewport
+
+</div>
+
+## 3 Object explanations and keys
+
+The optional AI panel explains the current cell or clicked geometry using the fixed `icviewer-explain-v1` harness
+It requests five sections: known facts, geometry and hierarchy, possible uses, unknowns, and suggested observations
+The prompt distinguishes geometric PATHs from electrically identified wires and requires uncertainty when evidence is missing
+
+- Keys live only in current-page memory, use a masked input, and are discarded on refresh, page departure or explicit clearing
+- Keys never enter browser storage, review exports or the website server; the browser authenticates directly to the user-selected provider
+- Only the confirmed summary is sent; names, instance paths and dimensions can be included, while source files and full vertex arrays are excluded
+- The provider must permit browser cross-origin requests; failures appear locally and the website never proxies credentials
+
+AI output and inferred uses need independent review. See [the harness contract](docs/AI-HARNESS.md) for protocol, fields, cancellation and the fixed prompt
+
+## 4 Capabilities and limits
+
+<div align="center">
+
+Table 1 Public preview capabilities and boundaries
+
+| Surface | Current behavior | Boundary |
 | --- | --- | --- |
-| Product | React, TypeScript, and Three.js browser cockpit | `apps/web/` |
-| Backend | FastAPI sessions, conversion, explanation, commands, diff, and export | `apps/api/` |
-| Geometry input | GDS file | `fixtures/example/example.gds` |
-| Engineering context | Manifest, metrics, markers, DEF, LEF, and technology presets | `packages/shared/`, `fixtures/compat/` |
-| AI behavior | DeepSeek-compatible endpoint with deterministic local fallback | `apps/api/app/services/ai_service.py` |
-| Current version | `0.1.0` | `package.json`, FastAPI metadata |
-| Project phase | Hackathon prototype and reproducible demo | `docs/PROPOSAL.md`, `docs/MILESTONES.md` |
+| Layouts | Boundaries, boxes, paths, references, arrays and common transforms | Numeric layers when process metadata is unavailable |
+| Missing cells | Existing geometry, incomplete banner and missing-target list | Full rendering needs an export containing dependency cells |
+| 3D models | Self-contained, uncompressed static triangle meshes | External resources and images refused; animation not played |
+| Hover/selection | Cell, instance, kind, layer, coordinates and dimensions | Does not establish net names or electrical connectivity |
+| Layer controls | Visibility, isolation, separation and camera views | Display heights are illustrative |
+| Reviews | Notes, bookmarks, camera and layer state export/restore | Retain source files separately |
+| Comparison | Layer-count and triangle-count changes | No geometric XOR or manufacturing checks |
+| Parsing | 32 MB per file, 45-second limit | Over-budget designs open their cell directory |
 
 </div>
 
-## 2 Interface preview
+A missing reference is not a suffix error: a file can reference external standard-cell definitions without embedding them
+The inspector reports targets and referring cells; missing shapes are never fabricated
+See [public preview details](docs/PUBLIC-PREVIEW.md) for exact limits
 
-The screenshot below comes from a real local frontend and backend run
-The browser uploaded the bundled GDS, the backend created a session and generated 3D assets, and the UI displayed the layout, layers, and instance controls
+## 5 Run locally
 
-<div align="center">
+The public app needs Node.js; CI uses version 22. Run from the repository root:
 
-![ICViewer cockpit after loading the bundled GDS fixture](docs/assets/readme/icviewer-cockpit.png)
-
-Figure 2.1 Local end-to-end screenshot
-
-</div>
-
-The screenshot contains only repository fixtures and local UI state, with no deployment domain, account, user identifier, or proprietary chip data
-
-## 3 Architecture
-
-<div align="center">
-
-```mermaid
-%% The API converts geometry and context into a structured review session consumed by the browser
-flowchart TD
-    A[GDS geometry] --> D[FastAPI session endpoint]
-    B[Manifest metrics markers] --> D
-    C[Optional DEF LEF] --> D
-    D --> E[GDS parsing and glTF generation]
-    D --> F[Metadata normalization and schema checks]
-    E --> G[Session asset directory]
-    F --> H[Structured session]
-    G --> I[React review cockpit]
-    H --> I
-    I --> J[Three.js 3D viewer]
-    I --> K[Explain operator diff notes]
-    K --> L[Session JSON export]
+```sh
+# Install from the lockfile
+npm ci
+# Start the browser-local workbench; the terminal prints its local URL
+npm run dev:web
+# Check types and build static files
+npm run build:web
 ```
 
-Figure 3.1 Ingestion, conversion, review, and export flow
+The main entry is [`Workbench.tsx`](apps/web/src/public/Workbench.tsx); deploy only `apps/web/dist`
+The original Python-backed workflow is documented in [local development](docs/LOCAL-WORKFLOW.md) and excluded from the public site
 
-</div>
+## 6 Verification and contributions
 
-<div align="center">
+The 15 public regressions cover missing cells, transforms/arrays, hover/click facts, key lifetime, direct summaries, cancellation, resource rejection, oversized files, review restoration and mobile layouts
+Public and legacy production builds pass. See [verification evidence](docs/VERIFICATION-PUBLIC.md) for scope and release checks
 
-Table 3.1 Component responsibilities
-
-| Component | Responsibility | Key path |
-| --- | --- | --- |
-| Web shell | Upload, language, status, drawers, and export | `apps/web/src/App.tsx` |
-| 3D viewer | Orbit, pan, zoom, focus, layers, and instance selection | `apps/web/public/reference-viewer/` |
-| Session service | Storage, GDS parsing, detail generation, and session reads | `apps/api/app/services/session_service.py` |
-| Explanation service | Design summaries and operator suggestions with local fallback | `apps/api/app/services/ai_service.py` |
-| Diff service | Structured comparison between two manifests | `apps/api/app/services/diff_service.py` |
-| Shared contract | Manifest schema, presets, and frontend types | `packages/shared/` |
-
-</div>
-
-## 4 Delivered capabilities
-
-<div align="center">
-
-Table 4.1 Feature matrix
-
-| Area | Capability | Status |
-| --- | --- | --- |
-| Input | GDS alone or a bundle with manifest, metrics, markers, DEF, and LEF | Implemented |
-| Viewer | Left-drag orbit, right-drag pan, cursor zoom, and double-click focus | Implemented |
-| Filtering | Layers, filler cells, top geometry, and instance controls | Implemented |
-| Context | Hierarchy, bounding box, cells, instances, polygons, and area | Implemented |
-| Review | Markers, notes, bookmarks, and selection state | Implemented |
-| Explain | Remote compatible endpoint or deterministic local summary | Implemented |
-| Operator | Natural language to constrained viewer actions | Implemented |
-| Diff | Compare metrics and markers from two manifests | Implemented |
-| Session | Export JSON and re-import through the upload flow | Implemented and tested |
-| Performance mode | Simplified rendering for large layouts | Still open in milestones |
-
-</div>
-
-## 5 Compatibility model
-
-ICViewer does not replace the native databases used by OpenROAD, OpenLane, or Virtuoso
-It carries geometry through GDS and adds portable engineering context through sidecars
-
-<div align="center">
-
-Table 5.1 Input compatibility
-
-| Source | Required input | Optional input | Boundary |
-| --- | --- | --- | --- |
-| Generic GDS flow | GDS | Manifest, metrics, markers | Presets or parsed results provide missing layer context |
-| OpenROAD or OpenLane | Streamed-out GDS | DEF, LEF, metrics JSON, manifest | Tool-internal databases are not read |
-| Virtuoso | Exported or streamed GDS | Technology and layer-name manifest | Native OpenAccess state is out of scope |
-| Exported session | Session JSON | None | Restores review state but does not replace GDS archival |
-
-</div>
-
-See [`docs/COMPATIBILITY_SPEC.md`](docs/COMPATIBILITY_SPEC.md) for the input contract
-[`packages/shared/manifest.schema.json`](packages/shared/manifest.schema.json) is the field-level source of truth
-
-## 6 API
-
-<div align="center">
-
-Table 6.1 Backend endpoints
-
-| Method | Path | Purpose |
-| --- | --- | --- |
-| GET | `/health` | Lightweight health check |
-| GET | `/api/samples` | List bundled samples |
-| GET | `/api/samples/default` | Load the default sample session |
-| GET | `/api/samples/{sample_id}` | Load a selected sample session |
-| POST | `/api/sessions` | Upload a GDS bundle and create a session |
-| GET | `/api/sessions/{session_id}` | Read an existing session |
-| POST | `/api/sessions/{session_id}/detail` | Generate detailed assets on demand |
-| POST | `/api/explain` | Generate a layout explanation |
-| POST | `/api/command` | Generate constrained viewer actions |
-| POST | `/api/diff` | Compare two manifests |
-| POST | `/api/export` | Export a complete session JSON |
-
-</div>
-
-The API has no authentication or tenant isolation
-Bind it to localhost or a protected network rather than exposing it directly as a public multi-user service
-
-## 7 Requirements
-
-<div align="center">
-
-Table 7.1 Verified environments
-
-| Area | Repository constraint or verification environment | Purpose |
-| --- | --- | --- |
-| Node.js | CI uses 22; local build used 24.13.0 | Dependencies, build, browser tests |
-| npm | Local verification used 11.5.2 | Workspace dependency management |
-| Python | CI uses 3.11; local tests used 3.12.7 | FastAPI, GDS conversion, tests |
-| Browser | Chromium | Playwright end-to-end verification |
-| Operating system | Ubuntu in CI; Windows for this audit | Cross-platform development path |
-
-</div>
-
-Python dependencies include `gdstk`, `gdspy`, `triangle`, `pygltflib`, and NumPy
-Frontend dependencies include React, Three.js, Vite, TypeScript, and Playwright
-
-<a id="quick-start-en"></a>
-
-## 8 Quick start
-
-### 8.1 Backend
-
-```bash
-python3 -m venv .venv # Create an isolated Python environment at the repository root
-source .venv/bin/activate # Activate the environment in a POSIX shell
-python -m pip install -r apps/api/requirements.txt # Install pinned backend and test dependencies
-cd apps/api # Enter the FastAPI application directory
-uvicorn app.main:app --reload --host 127.0.0.1 --port 34000 # Start the development API on localhost only
+```sh
+# Install the real browser used by regression tests
+npx playwright install chromium --with-deps
+# Run public parser and browser regressions
+npm run test:public
+# Build the separate original local workflow
+npm run build:legacy
 ```
 
-On Windows PowerShell, activate the same environment with `.\.venv\Scripts\Activate.ps1`
-
-### 8.2 Frontend
-
-Return to the repository root in a second terminal
-
-```bash
-npm ci # Install frontend dependencies from the lock file
-npm run dev:web -- --mode legacy --host 127.0.0.1 --port 4173 # Start the original local backend interface
-```
-
-Open `http://127.0.0.1:4173/legacy.html`
-Select `fixtures/example/example.gds` to reproduce Figure 2.1
-
-### 8.3 Optional explanation endpoint
-
-Without credentials, explain and operator actions use deterministic local rules
-Keep any compatible API credential in the local environment rather than the repository, screenshots, or issue reports
-
-```bash
-export DEEPSEEK_API_KEY="<your-api-key>" # Inject a local session secret and never commit its real value
-export DEEPSEEK_MODEL="<compatible-model>" # Select the compatible model name
-export DEEPSEEK_BASE_URL="https://api-provider.example" # Use an operator-authorized compatible endpoint
-```
-
-## 9 Interaction guide
-
 <div align="center">
 
-Table 9.1 Common interactions
+Table 2 Source and documentation routes
 
-| Action | Result |
+| Route | Content |
 | --- | --- |
-| Left drag | Orbit around the target |
-| Right drag | Pan the view |
-| Mouse wheel | Zoom toward the pointer |
-| Double click | Focus selected geometry |
-| View | Open the native viewer controls |
-| AI | Open explanation and operator panels |
-| Data | Inspect metrics, hierarchy, files, and warnings |
-| Notes | Add review notes |
-| Export | Download the current session JSON |
+| [`apps/web/src/public/`](apps/web/src/public/) | Browser parsing, picking, harness and redesigned UI |
+| [`apps/web/tests/public/`](apps/web/tests/public/) | Public parser and real-browser regressions |
+| [`scripts/nginx/icviewer-public.conf`](scripts/nginx/icviewer-public.conf) | Dedicated static host and request isolation |
+| [Public preview](docs/PUBLIC-PREVIEW.md) | Formats, boundaries and deployment recovery |
+| [Explanation harness](docs/AI-HARNESS.md) | Fixed framework and ephemeral key contract |
+| [Compatibility specification](docs/COMPATIBILITY_SPEC.md) | Engineering context for the original local API workflow |
+| [Issues](https://github.com/AIALRA-0/IC-Viewer/issues) | Reproductions and suggestions using publishable synthetic data |
 
 </div>
 
-<a id="verification-en"></a>
+This repository maintains the workbench and public preview; [GDS-GLTF-3D-Viewer](https://github.com/AIALRA-0/GDS-GLTF-3D-Viewer) is the related original viewer
+Follow [`AGENTS.md`](AGENTS.md) before changing shared contracts
 
-## 10 Verification
+## 7 Publication and rights
 
-<div align="center">
+Cloudflare proxies the public entry. The origin serves static files only, without an upload API, legacy backend or shared sessions
+Normal website requests still reach the site; optional explanations send confirmed summaries to the selected model provider
+The viewer is listed on the [AIALRA portal](https://aialra.online), and its separate toolbar source icon opens this repository
 
-Table 10.1 Local verification on 2026-08-24
-
-| Gate | Command | Result |
-| --- | --- | --- |
-| Backend tests | `pytest` in `.venv` | 9 passed in 16.89 seconds |
-| Frontend build | `npm run build:web` | TypeScript and Vite build passed |
-| Browser loop | `npm run test:e2e` | 1 passed in about 1.5 minutes |
-| Browser path | Upload fixture, generate detail, open controls, add note, export | Full path passed |
-| Dependency audit | `npm audit` | 5 advisories: 3 high and 2 low |
-
-</div>
-
-```bash
-.venv/bin/python -m pytest apps/api/tests -q # Run all 9 backend tests from the repository root
-npm run build:web # Run TypeScript checks and the production frontend build
-npm run test:e2e --workspace @icviewer/web # Run the real-browser loop while both services are available
-```
-
-The browser test took about 90 seconds locally while its test-level timeout is 120 seconds
-Slower CI runners may time out before the workflow completes, so use the dynamic CI badge at the top as the current remote result
-
-## 11 Repository map
-
-<div align="center">
-
-Table 11.1 Directory structure
-
-| Path | Content |
-| --- | --- |
-| `apps/api/` | FastAPI app, services, schemas, and 9 tests |
-| `apps/web/` | React cockpit, native viewer shell, and Playwright test |
-| `packages/shared/` | Manifest schema, TypeScript types, and technology presets |
-| `fixtures/example/` | Bundled GDS and example manifest |
-| `fixtures/compat/` | OpenROAD-style DEF, LEF, metrics, markers, and manifest |
-| `scripts/` | Smoke, build, and configurable deployment templates |
-| `docs/` | Proposal, milestones, tests, compatibility, deployment, and coordination |
-| `.github/workflows/ci.yml` | Frontend build, backend tests, and browser test |
-| `AGENTS.md` | Shared-path locking and cross-owner coordination rules |
-
-</div>
-
-## 12 Privacy and security
-
-- Historical production domains, deployment roots, and internal repository paths have been replaced with neutral examples
-- Uploaded content and generated assets go to ignored `apps/api/data/`
-- Before sharing screenshots, exported sessions, or logs, verify that the chip data is authorized for publication
-- Inject credentials only through environment variables and keep them out of manifests, session JSON, screenshots, and logs
-- The current FastAPI CORS policy allows every origin and should be restricted for production
-- There is no login, authorization, or tenant isolation for mutually untrusted users
-- The example systemd unit uses `User=root`; production operators should switch to a restricted service account and update ownership
-- Nginx, certificates, and deployment scripts are templates that require operator-specific values and an independent security review
-
-## 13 Known limitations
-
-- The conversion path is verified against bundled GDS fixtures rather than every process and generator
-- Detailed assets can be deferred for large layouts, but performance mode and simplified rendering remain open
-- AI explanations are supporting information, not a substitute for DRC, timing signoff, or tapeout review
-- Local-rule fallback keeps the demo available but is not a remote-model response
-- The historical 2026-08-24 audit reported 3 high and 2 low frontend-toolchain advisories; compatible upgrades now report 0, and builds plus public browser regression pass; see the current verification record
-- The browser test is close to its current timeout and may vary with runner performance
-- The repository declares no open-source license
-
-## 14 Contributing
-
-- First, acquire the shared-path lock in `docs/agent-locks.md`
-
-- Second, record frontend and backend contract changes according to `AGENTS.md`
-
-- Third, add a failing test using a bundled or synthetic layout
-
-- Fourth, run backend tests, the frontend build, and the browser loop
-
-- Fifth, update both READMEs, compatibility notes, milestones, and the changelog
-
-- Sixth, scan for domains, accounts, credentials, internal paths, and chip-design identity data
-
-## 15 License
-
-The repository has no `LICENSE` file and declares no open-source license
-Default copyright rules apply until the rights holder adds one, and public visibility does not grant permission to copy, modify, or redistribute the project
+No project open-source license has been declared; public visibility alone does not grant unrestricted redistribution
+The build retains [third-party notices](apps/web/public-static/NOTICE.txt)

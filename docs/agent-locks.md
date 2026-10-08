@@ -6,6 +6,7 @@
 | packages/shared/manifest.schema.json | backend | add canonical manifest schema and presets | 2026-04-12 18:09 UTC | 2026-04-12 18:40 UTC | released |
 | README.md | documentation | publish a bilingual, evidence-backed, privacy-safe project landing page | 2026-08-25 00:30 UTC | 2026-08-25 01:30 UTC | released |
 | package.json; .github/workflows/ci.yml; docs/coordination.md; README.md; README.en.md | main | public static preview build, regression routing and public entry documentation | 2026-10-07 America/Los_Angeles | current turn | released |
+| README.md; README.en.md; docs/coordination.md | main | geometry inspection, private local AI harness and complete product showcase | 2026-10-07 America/Los_Angeles | current turn | released |
 
 - Frontend shared contract now covers scene state, notes, explain, operator, diff payloads, and optional backend transport fields.
 - Backend released the manifest schema lock after adding presets and layer provenance fields required by the API.
@@ -13,3 +14,4 @@
 
 
 - Public preview build and regression routes are released; the legacy local API entry remains separately testable and is excluded from public deployment
+- Geometry inspection, missing-definition previews and the browser-direct ephemeral-key harness are released; both READMEs now describe the current public product with synthetic-only visual evidence

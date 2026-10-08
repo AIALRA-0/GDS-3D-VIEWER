@@ -1,9 +1,32 @@
+export interface GeometryFeature {
+  id: string;
+  kind: "boundary" | "path" | "box" | "mesh";
+  cell: string;
+  instance: string;
+  layer: string;
+  datatype?: number;
+  firstTriangle: number;
+  triangles: number;
+  vertices: number;
+  bounds: [number, number, number, number];
+  area?: number;
+  pathWidth?: number;
+  pathLength?: number;
+  byteOffset?: number;
+}
+export interface PickInfo {
+  layerId: string;
+  feature?: GeometryFeature;
+  point: [number, number, number];
+  screen: [number, number];
+}
 export interface LayerMesh {
   id: string;
   name: string;
   color: string;
   positions: Float32Array;
   polygons: number;
+  features?: GeometryFeature[];
 }
 export interface CellInfo {
   name: string;
@@ -22,6 +45,8 @@ export interface Layout {
   instances: number;
   triangles: number;
   warnings: string[];
+  missingReferences?: { source: string; target: string; count: number }[];
+  incomplete?: boolean;
 }
 export const LIMITS = {
   fileBytes: 32 * 1024 * 1024,

@@ -1,6 +1,6 @@
 import { Matrix4, Quaternion, Vector3, Color } from "three";
 import { LIMITS } from "./types";
-import type { Layout } from "./types";
+import type { Layout, GeometryFeature } from "./types";
 
 interface Accessor {
   bufferView: number;
@@ -212,6 +212,7 @@ export function parseGltf(input: ArrayBuffer, filename: string): Layout {
       color: string;
       positions: number[];
       polygons: number;
+      features: GeometryFeature[];
     }
   >();
   let instances = 0,
@@ -223,7 +224,7 @@ export function parseGltf(input: ArrayBuffer, filename: string): Layout {
     -Infinity,
     -Infinity,
   ];
-  const visit = (id: number, parent: Matrix4, stack: Set<number>) => {
+  const visit = (id: number, parent: Matrix4, stack: Set<number>, instance: string) => {
     check(
       integer(id, doc.nodes.length) &&
         stack.size < LIMITS.depth &&
@@ -258,7 +259,7 @@ export function parseGltf(input: ArrayBuffer, filename: string): Layout {
       check(integer(node.mesh, doc.meshes.length), "模型网格索引错误");
       const mesh = doc.meshes[node.mesh];
       check(Array.isArray(mesh.primitives), "网格结构无效");
-      for (const primitive of mesh.primitives) {
+      for (const [primitiveIndex, primitive] of mesh.primitives.entries()) {
         check(
           (primitive.mode ?? 4) === 4 && !primitive.extensions,
           "只支持普通三角形网格",
@@ -295,10 +296,13 @@ export function parseGltf(input: ArrayBuffer, filename: string): Layout {
             color: `#${new Color().setRGB(factor[0], factor[1], factor[2]).getHexString()}`,
             positions: [],
             polygons: 0,
+            features: [],
           };
           groups.set(key, group);
         }
         group.polygons += indices.length / 3;
+        const firstTriangle = group.positions.length / 9;
+        const objectBounds: [number, number, number, number] = [Infinity, Infinity, -Infinity, -Infinity];
         for (const index of indices) {
           check(integer(index, positions.length / 3), "三角形索引越界");
           point.fromArray(positions, index * 3).applyMatrix4(matrix);
@@ -309,18 +313,23 @@ export function parseGltf(input: ArrayBuffer, filename: string): Layout {
             "变换后的模型坐标超过限制",
           );
           group.positions.push(point.x, point.y, point.z);
+          objectBounds[0] = Math.min(objectBounds[0], point.x);
+          objectBounds[1] = Math.min(objectBounds[1], point.z);
+          objectBounds[2] = Math.max(objectBounds[2], point.x);
+          objectBounds[3] = Math.max(objectBounds[3], point.z);
           bounds[0] = Math.min(bounds[0], point.x);
           bounds[1] = Math.min(bounds[1], point.z);
           bounds[2] = Math.max(bounds[2], point.x);
           bounds[3] = Math.max(bounds[3], point.z);
         }
+        group.features.push({ id: `${instance}/primitive-${primitiveIndex}`, kind: "mesh", cell: (node.name ?? `Node ${id}`).slice(0, 256), instance, layer: group.id, firstTriangle, triangles: indices.length / 3, vertices: positions.length / 3, bounds: objectBounds });
       }
     }
     check(!node.children || Array.isArray(node.children), "子节点结构错误");
     for (const child of node.children ?? [])
-      visit(child, matrix, new Set(stack).add(id));
+      visit(child, matrix, new Set(stack).add(id), `${instance}/node-${child}`);
   };
-  for (const id of scene.nodes) visit(id, new Matrix4(), new Set());
+  for (const id of scene.nodes) visit(id, new Matrix4(), new Set(), `node-${id}`);
   check(groups.size && triangles, "模型没有可显示的三角形");
   return {
     name: filename,

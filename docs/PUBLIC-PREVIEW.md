@@ -18,16 +18,19 @@ The synthetic sample is authored by `scripts/generate-browser-demo.py`. It conta
 ## Public boundary
 
 - Binary GDS layout inputs accept `.gds`, `.gds2` and `.gdsii` suffixes, case-insensitively, through both file selection and drag-and-drop
-- File bytes remain in the visitor's browser. No upload endpoint, remote AI credential, shared database, or remote session exists in the public bundle
+- File bytes remain in the visitor's browser. No upload endpoint, bundled AI credential, shared database or remote session exists
+- Optional explanations use a fixed harness and the visitor's current-page key, never browser storage or the website server. After summary preview and consent, the browser directly authenticates to the chosen model provider. The provider receives that key and bounded summary, not source bytes; see [AI-HARNESS.md](AI-HARNESS.md)
 - Each import uses a disposable Worker. Replacing or cancelling an import invalidates old results and stops the old task; parsing stops after 45 seconds
 - Limits: 32 MB input, 1,000,000 GDS records, 20,000 cells, 150,000 expanded instances, 300,000 polygons, 2,000,000 triangles, hierarchy depth 64
 - A GDS design that exceeds expansion limits opens its cell directory; selecting a smaller cell performs a new bounded parse. No truncated geometry is presented as the full design
+- Missing reference targets retain existing geometry and display an explicit incomplete banner plus source/target/count details. Missing-only cells return their directory without fabricated shapes. Full rendering requires an export containing the dependency definitions
+- Hover and clicks identify actual primitive triangle ranges, source cells, instance paths and coordinates. PATH geometry reports width/length; geometry alone does not establish electrical wire identity or connectivity
 - GDS supports boundaries, boxes, flush/square/custom-extension paths, reflection, rotation, magnification and arrays. Round-ended paths, absolute path width, absolute reference transformations and NODE elements require conversion in a layout tool. Text labels are omitted with a warning
 - glTF/GLB supports static, uncompressed triangle meshes with embedded binary buffers. External buffer URLs, images, required extensions, sparse accessors, invalid indices, recursive nodes and invalid coordinates are refused. Animation is not played
 - Layer heights are illustrative. Layer separation and quantitative comparisons are visual aids, not physical process data, geometry XOR, design-rule checking or sign-off
 - Preferences contain only theme, panel widths and panel placement. Source files, notes and camera bookmarks are in memory. Review export contains annotations and view state; retain the source geometry separately
 - Ordinary requests to fetch the website still reach the CDN/origin. No analytics script or file upload request is included
-- The origin denies non-GET/HEAD requests, dotfiles, API paths, legacy routes and directory listings. Security headers constrain scripts and connections to this origin, prohibit embedding, and isolate the page from other browsing contexts
+- The origin denies non-GET/HEAD requests, dotfiles, API paths, legacy routes and directory listings. Scripts and Workers remain same-origin; connections allow HTTPS model providers and explicit HTTP loopback addresses. Embedding is prohibited and browsing contexts are isolated
 
 ## Preserve the local API workflow
 
@@ -37,7 +40,7 @@ npm run dev:web -- --mode legacy
 npm run build:legacy
 ```
 
-The local workflow still supports the existing bundle inputs, backend explanation, command and export APIs. The public preview provides local observations and quantitative comparison only; it does not expose those backend services. `dist-local` and the legacy viewer assets must never be deployed as the public site.
+The local workflow still supports the existing bundle inputs, backend explanation, command and export APIs. The public preview adds browser-direct optional explanations without exposing those backend services. `dist-local` and the legacy viewer assets must never be deployed as the public site.
 
 ## Deploy and recover
 

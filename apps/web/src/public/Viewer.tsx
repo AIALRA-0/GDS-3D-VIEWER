@@ -7,7 +7,18 @@ import {
 } from "react";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
-import type { Layout } from "./types";
+import type { Layout, PickInfo, GeometryFeature } from "./types";
+export function featureAtTriangle(features: GeometryFeature[], triangle: number) {
+  let low = 0, high = features.length - 1;
+  while (low <= high) {
+    const mid = (low + high) >>> 1, feature = features[mid];
+    if (triangle < feature.firstTriangle) high = mid - 1;
+    else if (triangle >= feature.firstTriangle + feature.triangles) low = mid + 1;
+    else return feature;
+  }
+  return undefined;
+}
+export const featureKind = (kind?: string) => ({ boundary: "边界多边形", path: "路径几何", box: "框", mesh: "模型网格" }[kind ?? ""] ?? "图层几何");
 export interface CameraPose {
   position: number[];
   target: number[];
@@ -24,9 +35,11 @@ interface Props {
   explode: number;
   theme: string;
   onSelect: (id: string) => void;
+  onPick?: (pick: PickInfo | null) => void;
+  selectedObject?: PickInfo | null;
 }
 export const Viewer = forwardRef<ViewerHandle, Props>(function Viewer(
-  { layout, visible, explode, theme, onSelect },
+  { layout, visible, explode, theme, onSelect, onPick, selectedObject },
   ref,
 ) {
   const host = useRef<HTMLDivElement>(null),
@@ -41,6 +54,9 @@ export const Viewer = forwardRef<ViewerHandle, Props>(function Viewer(
     } | null>(null);
   const select = useRef(onSelect);
   select.current = onSelect;
+  const pick = useRef(onPick);
+  pick.current = onPick;
+  const [hover, setHover] = useState<PickInfo | null>(null);
   const [error, setError] = useState("");
   useImperativeHandle(
     ref,
@@ -103,6 +119,7 @@ export const Viewer = forwardRef<ViewerHandle, Props>(function Viewer(
     const container = host.current;
     if (!container || !layout || !layout.layers.length) return;
     setError("");
+    setHover(null);
     let renderer: THREE.WebGLRenderer;
     try {
       renderer = new THREE.WebGLRenderer({
@@ -208,8 +225,38 @@ export const Viewer = forwardRef<ViewerHandle, Props>(function Viewer(
     const pointer = new THREE.Vector2(),
       caster = new THREE.Raycaster();
     let down = [0, 0];
+    let hoverTimer: ReturnType<typeof setTimeout> | undefined;
+    const hitTest = (e: PointerEvent): PickInfo | null => {
+      const rect = renderer.domElement.getBoundingClientRect();
+      pointer.set(((e.clientX - rect.left) / rect.width) * 2 - 1, (-(e.clientY - rect.top) / rect.height) * 2 + 1);
+      caster.setFromCamera(pointer, camera);
+      const hit = caster.intersectObjects(meshes.filter((m) => m.visible), false)[0];
+      if (!hit) return null;
+      const mesh = hit.object as THREE.Mesh;
+      const layer = layout.layers.find((l) => l.id === mesh.userData.layerId)!;
+      const local = mesh.worldToLocal(hit.point.clone());
+      const yScale = layout.format === "gds" ? Math.min(0.18, 2.5 / layout.layers.length) : scale;
+      return {
+        layerId: layer.id,
+        feature: featureAtTriangle(layer.features ?? [], hit.faceIndex ?? -1),
+        point: layout.format === "gds"
+          ? [local.x / scale + centerX, -(local.z / scale + centerZ), local.y / yScale]
+          : [local.x / scale + centerX, local.y / yScale, local.z / scale + centerZ],
+        screen: [e.clientX - rect.left, e.clientY - rect.top],
+      };
+    };
+    const pointerMove = (e: PointerEvent) => {
+      if (hoverTimer) clearTimeout(hoverTimer);
+      if (e.buttons) { setHover(null); return; }
+      hoverTimer = setTimeout(() => setHover(hitTest(e)), 80);
+    };
+    const pointerLeave = () => {
+      if (hoverTimer) clearTimeout(hoverTimer);
+      setHover(null);
+    };
     const pointerDown = (e: PointerEvent) => {
       down = [e.clientX, e.clientY];
+      pointerLeave();
     };
     const pointerUp = (e: PointerEvent) => {
       if (
@@ -217,17 +264,9 @@ export const Viewer = forwardRef<ViewerHandle, Props>(function Viewer(
         Math.hypot(e.clientX - down[0], e.clientY - down[1]) > 5
       )
         return;
-      const rect = renderer.domElement.getBoundingClientRect();
-      pointer.set(
-        ((e.clientX - rect.left) / rect.width) * 2 - 1,
-        (-(e.clientY - rect.top) / rect.height) * 2 + 1,
-      );
-      caster.setFromCamera(pointer, camera);
-      const hit = caster.intersectObjects(
-        meshes.filter((m) => m.visible),
-        false,
-      )[0];
-      if (hit) select.current(hit.object.userData.layerId);
+      const result = hitTest(e);
+      pick.current?.(result);
+      if (result) select.current(result.layerId);
     };
     const lost = (e: Event) => {
       e.preventDefault();
@@ -235,6 +274,8 @@ export const Viewer = forwardRef<ViewerHandle, Props>(function Viewer(
     };
     renderer.domElement.addEventListener("pointerdown", pointerDown);
     renderer.domElement.addEventListener("pointerup", pointerUp);
+    renderer.domElement.addEventListener("pointermove", pointerMove);
+    renderer.domElement.addEventListener("pointerleave", pointerLeave);
     renderer.domElement.addEventListener("webglcontextlost", lost);
     runtime.current = { renderer, scene, camera, controls, meshes, size, draw };
     resize();
@@ -242,6 +283,9 @@ export const Viewer = forwardRef<ViewerHandle, Props>(function Viewer(
       runtime.current = null;
       renderer.domElement.removeEventListener("pointerdown", pointerDown);
       renderer.domElement.removeEventListener("pointerup", pointerUp);
+      renderer.domElement.removeEventListener("pointermove", pointerMove);
+      renderer.domElement.removeEventListener("pointerleave", pointerLeave);
+      if (hoverTimer) clearTimeout(hoverTimer);
       renderer.domElement.removeEventListener("webglcontextlost", lost);
       observer.disconnect();
       controls.dispose();
@@ -273,8 +317,31 @@ export const Viewer = forwardRef<ViewerHandle, Props>(function Viewer(
     });
     r.draw();
   }, [visible, explode, layout]);
+  useEffect(() => {
+    setHover(null);
+    const r = runtime.current, feature = selectedObject?.feature;
+    if (!r || !feature) return;
+    const mesh = r.meshes.find((m) => m.userData.layerId === selectedObject.layerId);
+    if (!mesh) return;
+    const points = mesh.geometry.getAttribute("position").array.slice(feature.firstTriangle * 9, (feature.firstTriangle + feature.triangles) * 9);
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute("position", new THREE.BufferAttribute(points, 3));
+    const material = new THREE.MeshBasicMaterial({ color: 0xffc66d, wireframe: true, transparent: true, opacity: 0.7, depthTest: false });
+    const outline = new THREE.Mesh(geometry, material);
+    outline.renderOrder = 2;
+    mesh.add(outline);
+    r.draw();
+    return () => { mesh.remove(outline); geometry.dispose(); material.dispose(); if (runtime.current === r) r.draw(); };
+  }, [selectedObject, layout]);
   return (
     <div className="viewer-host" ref={host} data-testid="viewer-canvas">
+      {hover && <div className="geometry-tooltip" role="tooltip" style={{ left: Math.min(hover.screen[0] + 14, Math.max(8, (host.current?.clientWidth ?? 300) - 262)), top: Math.min(hover.screen[1] + 14, Math.max(8, (host.current?.clientHeight ?? 300) - 150)) }}>
+        <strong>{featureKind(hover.feature?.kind)}</strong>
+        <span>{hover.feature?.cell ?? "模型"} · {hover.layerId}</span>
+        <span>X {hover.point[0].toFixed(3)} · Y {hover.point[1].toFixed(3)} {layout?.unit}</span>
+        {hover.feature?.pathWidth !== undefined && <span>路径宽度 {hover.feature.pathWidth.toFixed(3)} {layout?.unit}</span>}
+        <small>点击固定到检查器</small>
+      </div>}
       {error && (
         <div className="canvas-error" role="alert">
           {error}

@@ -1,6 +1,6 @@
 import { ShapeUtils, Vector2 } from "three";
 import { LIMITS } from "./types";
-import type { Layout, LayerMesh } from "./types";
+import type { Layout, LayerMesh, GeometryFeature } from "./types";
 
 type Point = [number, number];
 type Matrix = [number, number, number, number, number, number];
@@ -20,6 +20,7 @@ interface Element {
   cols: number;
   rows: number;
   absolute: boolean;
+  byteOffset: number;
 }
 interface Cell {
   name: string;
@@ -53,6 +54,7 @@ export const newElement = (kind: number): Element => ({
   cols: 1,
   rows: 1,
   absolute: false,
+  byteOffset: 0,
 });
 function real8(view: DataView, offset: number): number {
   const byte = view.getUint8(offset);
@@ -173,6 +175,7 @@ export function parseGds(
     } else if ([8, 9, 10, 11, 45].includes(type)) {
       if (!cell || element) throw new Error("元素结构错误");
       element = newElement(type);
+      element.byteOffset = pos;
     } else if (type === 12) {
       warnings.add("文字标签未渲染");
       element = newElement(type);
@@ -251,6 +254,12 @@ export function parseGds(
   const referenced = new Set(
     [...cells.values()].flatMap((c) => c.refs.map((r) => r.name)),
   );
+  const missingReferences = [...cells.values()].flatMap((c) => {
+    const missing = new Map<string, number>();
+    for (const r of c.refs) if (!cells.has(r.name)) missing.set(r.name, (missing.get(r.name) ?? 0) + r.cols * r.rows);
+    return [...missing].map(([target, count]) => ({ source: c.name, target, count }));
+  });
+  const missingVisited = new Set<string>();
   const tops = [...cells.keys()].filter((n) => !referenced.has(n));
   if (!tops.length) throw new Error("单元引用存在循环，找不到顶层单元");
   const top = selectedTop ?? tops[0];
@@ -263,6 +272,7 @@ export function parseGds(
       color: string;
       positions: number[];
       polygons: number;
+      features: GeometryFeature[];
     }
   >();
   let instances = 0,
@@ -274,15 +284,15 @@ export function parseGds(
     -Infinity,
     -Infinity,
   ];
-  const visit = (name: string, matrix: Matrix, stack: Set<string>) => {
+  const visit = (name: string, matrix: Matrix, stack: Set<string>, instance: string) => {
     if (stack.size >= LIMITS.depth || stack.has(name))
       throw new Error("单元引用循环或层级过深");
     if (++instances > LIMITS.instances)
       throw new PreviewLimitError("展开实例超过 150,000 个，请选择较小单元");
     const current = cells.get(name);
-    if (!current) throw new Error("单元引用的目标不存在");
+    if (!current) { missingVisited.add(name); return; }
     const chain = new Set(stack).add(name);
-    for (const e of current.polygons) {
+    for (const [elementIndex, e] of current.polygons.entries()) {
       if (++polygons > LIMITS.polygons)
         throw new PreviewLimitError("多边形超过 300,000 个，请选择较小单元");
       if (e.kind === 9 && (e.pathType === 1 || ![0, 2, 4].includes(e.pathType)))
@@ -332,10 +342,35 @@ export function parseGds(
           color: COLORS[groups.size % COLORS.length],
           positions: [],
           polygons: 0,
+          features: [],
         };
         groups.set(id, group);
       }
       group.polygons++;
+      const objectBounds: [number, number, number, number] = [Infinity, Infinity, -Infinity, -Infinity];
+      let twiceArea = 0;
+      for (let i = 0; i < world.length; i++) {
+        const a = world[i], b = world[(i + 1) % world.length];
+        objectBounds[0] = Math.min(objectBounds[0], a.x);
+        objectBounds[1] = Math.min(objectBounds[1], a.y);
+        objectBounds[2] = Math.max(objectBounds[2], a.x);
+        objectBounds[3] = Math.max(objectBounds[3], a.y);
+        twiceArea += a.x * b.y - b.x * a.y;
+      }
+      const magnification = Math.hypot(matrix[0], matrix[1]);
+      group.features.push({
+        id: `${instance}/element-${elementIndex + 1}`,
+        kind: e.kind === 9 ? "path" : e.kind === 45 ? "box" : "boundary",
+        cell: name, instance, layer: id, datatype: e.datatype,
+        firstTriangle: group.positions.length / 9,
+        triangles: faces.length * 2 + points.length * 2,
+        vertices: world.length, bounds: objectBounds, area: Math.abs(twiceArea) / 2,
+        byteOffset: e.byteOffset,
+        ...(e.kind === 9 ? {
+          pathWidth: Math.abs(e.width) * unit * magnification,
+          pathLength: e.xy.reduce((sum, p, i, a) => sum + (i ? Math.hypot(p[0] - a[i - 1][0], p[1] - a[i - 1][1]) : 0), 0) * unit * magnification,
+        } : {}),
+      });
       for (const p of world) {
         bounds[0] = Math.min(bounds[0], p.x);
         bounds[1] = Math.min(bounds[1], p.y);
@@ -361,7 +396,7 @@ export function parseGds(
         put(a, z + 0.3);
       }
     }
-    for (const r of current.refs) {
+    for (const [referenceIndex, r] of current.refs.entries()) {
       if (r.absolute)
         throw new Error("暂不支持引用的绝对角度或绝对缩放，请先展开版图");
       if (r.xy.length !== (r.kind === 11 ? 3 : 1))
@@ -388,12 +423,13 @@ export function parseGds(
             r.name,
             multiply(matrix, [c, s, -s * reflect, c * reflect, x, y]),
             chain,
+            `${instance}/ref-${referenceIndex + 1}[${col},${row}]:${r.name}`,
           );
         }
     }
   };
   try {
-    visit(top, [1, 0, 0, 1, 0, 0], new Set());
+    visit(top, [1, 0, 0, 1, 0, 0], new Set(), top);
   } catch (error) {
     if (selectedTop || !(error instanceof PreviewLimitError)) throw error;
     return {
@@ -415,9 +451,12 @@ export function parseGds(
         error.message,
         "已读取单元目录，完整几何未生成，请选择较小单元",
       ],
+      missingReferences,
+      incomplete: true,
     };
   }
-  if (!groups.size) throw new Error("所选单元没有可渲染的几何");
+  if (!groups.size && !missingVisited.size) throw new Error("所选单元没有可渲染的几何");
+  if (missingVisited.size) warnings.add(`不完整预览：当前展开缺少 ${missingVisited.size} 种引用目标，只显示文件中实际存在的几何；完整器件形状需要配套单元库`);
   if (tops.length > 1) warnings.add("文件含多个顶层单元，可在单元面板中选择");
   warnings.add("层高度按显示顺序排列，仅用于分层观察，不代表真实工艺厚度");
   const layers: LayerMesh[] = [...groups.values()].map((g) => ({
@@ -435,10 +474,12 @@ export function parseGds(
     })),
     tops,
     top,
-    bounds,
+    bounds: groups.size ? bounds : [0, 0, 0, 0],
     unit: "µm",
     instances,
     triangles,
     warnings: [...warnings],
+    missingReferences,
+    incomplete: missingVisited.size > 0,
   };
 }
