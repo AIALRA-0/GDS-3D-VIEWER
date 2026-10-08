@@ -39,7 +39,10 @@ test("full repeated layout supports 2D picking, selected-instance highlight and 
   const transfers: string[] = []; page.on("request", r => { if (r.method() !== "GET") transfers.push(r.url()); });
   await page.goto("/");
   await page.getByTestId("public-file-input").setInputFiles({ name: "synthetic-repeated.gds", buffer: repeatedFixture(), mimeType: "application/octet-stream" });
-  await expect(page.locator(".global-status")).toContainText("本地解析完成");
+  // Initial software-GPU rendering can outlast the default five-second assertion
+  // on CI. Match the existing import budget; keep the whole-test timeout and all
+  // full-layout, pixel, picking and no-upload assertions unchanged.
+  await expect(page.locator(".global-status")).toContainText("本地解析完成", { timeout: 45_000 });
   await expect(page.locator(".incomplete-banner")).toHaveCount(0);
   await expect(page.locator(".inspector-pane")).toContainText("4,800");
   await page.getByRole("button", { name: "二维", exact: true }).click();
