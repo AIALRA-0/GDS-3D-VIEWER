@@ -1,0 +1,75 @@
+apps/web/tests/public/palettes-controls.spec.ts
+  s_07756e806a3fa5::t_57c5ce647e7edd 1-136
+apps/web/src/public/translations.en.ts
+  s_07756e806a3fa5::t_34cef1c8aaf5fa 404-449
+apps/web/src/public/ExplanationPanel.tsx
+  s_07756e806a3fa5::t_d4b0aa4efcf4ac 6,70,81-82
+apps/web/src/public/workbench.css
+  s_07756e806a3fa5::t_d4b0aa4efcf4ac 1238
+  s_07756e806a3fa5::t_4559200c6c4491 1201-1237,1239-1241
+apps/web/src/public/IconButton.tsx
+  s_07756e806a3fa5::t_87e1984fe69dfc 28
+  s_07756e806a3fa5::t_3e71ac47428ed6 29,33
+  s_07756e806a3fa5::t_4b1bf4b63262ed 1-27,30-32,34-35
+apps/web/src/public/Workbench.tsx
+  s_07756e806a3fa5::t_34cef1c8aaf5fa 2,9-11,40,59,62,67,77-84,94-95,131-136,195,294,362,378,400,484-485,487,515-520,602-606,649-653,668-669,707-708,760,767,780,795,864,891,895,899,903,970-975,979,990,1081-1083,1086-1088,1240,1301,1318,1326,1364-1375,1393,1404
+apps/web/src/public/Icon.tsx
+  s_07756e806a3fa5::t_e46f0ec276ec72 2-16
+apps/web/tests/public/instancing.spec.ts
+  s_07756e806a3fa5::t_4559200c6c4491 47-57
+apps/web/src/public/Viewer.tsx
+  s_07756e806a3fa5::t_d4b0aa4efcf4ac 26-27,445
+  s_07756e806a3fa5::t_f16615094689da 24-25,28-31,66,71,87-89,235,237,248-249,270,392,434-440,443,446
+apps/web/src/public/palettes.ts
+  s_07756e806a3fa5::t_f70d4f7c0378be 5
+  s_07756e806a3fa5::t_4b1bf4b63262ed 1-4,6-30
+apps/web/src/public/PalettePanel.tsx
+  s_07756e806a3fa5::t_f16615094689da 6-7,30
+  s_07756e806a3fa5::t_e46f0ec276ec72 1-5,8-29,31-73
+README.en.md
+  s_07756e806a3fa5::t_0bba034829375e 32,38-42,138-153
+README.md
+  s_07756e806a3fa5::t_b3e84b4756e124 33,39-43,139-154
+apps/web/tests/public/inspection.spec.ts
+  s_07756e806a3fa5::t_1413263bae5656 102
+apps/web/tests/public/language-markdown.spec.ts
+  s_07756e806a3fa5::t_89522c1aa0f482 29-30
+apps/web/tests/public/source-layers.spec.ts
+  s_07756e806a3fa5::t_2a17115fe1969e 19,41
+apps/web/tests/public/viewer-tools.spec.ts
+  s_07756e806a3fa5::t_c761eb6f595553 7
+apps/web/tests/public/workbench.spec.ts
+  s_07756e806a3fa5::t_2504c3839a3273 72,90
+docs/INTERFACE-DESIGN.md
+  s_07756e806a3fa5::t_e7053d537bee8c 1-7
+docs/NETWORK-TROUBLESHOOTING.md
+  s_07756e806a3fa5::t_e94b444d5503be 22-29
+docs/PUBLIC-PREVIEW.md
+  s_07756e806a3fa5::t_e86b37bc361120 33,35
+docs/VERIFICATION-PUBLIC.md
+  s_07756e806a3fa5::t_9b4461b16ae982 9,13,17,21-23,49-55
+docs/agent-locks.md
+  s_07756e806a3fa5::t_e5978bcec68e47 5
+docs/assets/readme/PROVENANCE.md
+  s_07756e806a3fa5::t_df5685bca80f89 3,18-19,27-28
+docs/coordination.md
+  s_07756e806a3fa5::t_cb5b40766972af 48-51
+docs/security/publication-risk-notes.md
+  s_07756e806a3fa5::t_6b2399b3b258d2 21-22
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "f31c3a7cd58b08a75b17c78e16ad9b4c8151295b",
+  "prompts": {},
+  "sessions": {
+    "s_07756e806a3fa5": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a11a40-20dc-7732-a5b7-49adf5fb1016",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "AIALRA-0 <aialra@163.com>"
+    }
+  }
+}
