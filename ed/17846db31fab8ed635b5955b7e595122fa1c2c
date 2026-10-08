@@ -1,0 +1,82 @@
+docs/agent-locks.md
+  s_07756e806a3fa5::t_c7306a997aea5f 5,32-33
+README.md
+  s_07756e806a3fa5::t_c7306a997aea5f 34
+  s_07756e806a3fa5::t_30c48d047e8939 33,37,40,42,44,46,146,148,154,246
+docs/VERIFICATION-PUBLIC.md
+  s_07756e806a3fa5::t_c7306a997aea5f 9,13,21,26-27,64-67
+apps/web/src/public/Viewer.tsx
+  s_07756e806a3fa5::t_fd62e1cf73911b 119,220
+  s_07756e806a3fa5::t_65acefb52a9bf4 480
+  s_07756e806a3fa5::t_f21eb90e7e83ae 375
+  s_07756e806a3fa5::t_f9c81510161fc9 51,117-118,145,158,168,219,243,258,348,374,376-379,389,478
+  s_07756e806a3fa5::t_30c48d047e8939 479,481
+apps/web/src/public/types.ts
+  s_07756e806a3fa5::t_f9c81510161fc9 57-58
+apps/web/src/public/Workbench.tsx
+  s_07756e806a3fa5::t_f9c81510161fc9 447,532,683,743,1346,1415
+apps/web/tests/public/language-markdown.spec.ts
+  s_07756e806a3fa5::t_30c48d047e8939 22
+apps/web/src/public/PalettePanel.tsx
+  s_07756e806a3fa5::t_7fa1da68f3de84 6,14-33,54-56,58-59,65,99
+  s_07756e806a3fa5::t_6a7cb557a487d0 70-71,73-74
+apps/web/tests/public/ui-refinements.spec.ts
+  s_07756e806a3fa5::t_fd62e1cf73911b 1-2,4-29,31-74,81-84,87-93,95-109,112-113,120-121
+  s_07756e806a3fa5::t_8a7b60b4b9c77a 110-111
+  s_07756e806a3fa5::t_d4dc630a491174 3,30
+  s_07756e806a3fa5::t_6a7cb557a487d0 94
+  s_07756e806a3fa5::t_6700abfb20fcb2 75-80,85-86,114-119
+apps/web/src/public/workbench.css
+  s_07756e806a3fa5::t_5a63b72c139c2b 1279
+  s_07756e806a3fa5::t_5a4ca8b61513a5 1240-1254,1278,1280,1312-1313,1324
+apps/web/src/public/gds.ts
+  s_07756e806a3fa5::t_f9c81510161fc9 282-294,455,551,612
+  s_07756e806a3fa5::t_30c48d047e8939 296
+apps/web/src/public/palettes.ts
+  s_07756e806a3fa5::t_7fa1da68f3de84 10-14,36-51
+apps/web/src/public/SelectField.tsx
+  s_07756e806a3fa5::t_5a4ca8b61513a5 36,44
+  s_07756e806a3fa5::t_3dc3cc3f0def35 1-2,5-35,37-43,45
+README.en.md
+  s_07756e806a3fa5::t_0170120d066606 32,36,39,41,43,45,145,153,245
+apps/web/src/public/ExplanationPanel.tsx
+  s_07756e806a3fa5::t_6d2bc44548279e 74-77
+apps/web/src/public/translations.en.ts
+  s_07756e806a3fa5::t_088a6870288353 494-511
+apps/web/tests/public/cell-instances-ui.spec.ts
+  s_07756e806a3fa5::t_8614d69919539e 5-6,91,120,123
+apps/web/tests/public/inspection.spec.ts
+  s_07756e806a3fa5::t_094d0cf80edd0b 81
+apps/web/tests/public/instance-fixture.ts
+  s_07756e806a3fa5::t_a5651c38ba0692 1-20
+apps/web/tests/public/palettes-controls.spec.ts
+  s_07756e806a3fa5::t_53f21940c1a19f 4,48,70
+apps/web/tests/public/viewer-tools.spec.ts
+  s_07756e806a3fa5::t_b28d15a9e7a71d 45,48
+docs/GDS-RECORDS.md
+  s_07756e806a3fa5::t_b35bb7f2a04487 23
+docs/PUBLIC-PREVIEW.md
+  s_07756e806a3fa5::t_2b1df90eec94b2 34-35,56-57
+docs/assets/readme/PROVENANCE.md
+  s_07756e806a3fa5::t_364fbe9ca44c96 18-19,34-35
+docs/coordination.md
+  s_07756e806a3fa5::t_9054dcec7a4f84 56-57
+docs/security/publication-risk-notes.md
+  s_07756e806a3fa5::t_ca5146125997a8 28-29
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "ed17846db31fab8ed635b5955b7e595122fa1c2c",
+  "prompts": {},
+  "sessions": {
+    "s_07756e806a3fa5": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a11a40-20dc-7732-a5b7-49adf5fb1016",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "AIALRA-0 <aialra@163.com>"
+    }
+  }
+}
