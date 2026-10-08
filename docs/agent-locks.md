@@ -2,6 +2,7 @@
 
 | path | owner | purpose | start | eta | status |
 |------|-------|---------|-------|-----|--------|
+| README.md; README.en.md; docs/coordination.md | main | unified toolbar, inspector tabs, layer aliases and GDS source metadata | 2026-10-07 America/Los_Angeles | current turn | released |
 | packages/shared/types.ts | frontend | add shared scene contracts for cockpit MVP | 2026-04-12 18:35 UTC | 2026-04-12 18:50 UTC | released |
 | packages/shared/manifest.schema.json | backend | add canonical manifest schema and presets | 2026-04-12 18:09 UTC | 2026-04-12 18:40 UTC | released |
 | README.md | documentation | publish a bilingual, evidence-backed, privacy-safe project landing page | 2026-08-25 00:30 UTC | 2026-08-25 01:30 UTC | released |
@@ -17,3 +18,4 @@
 - Public preview build and regression routes are released; the legacy local API entry remains separately testable and is excluded from public deployment
 - Geometry inspection, missing-definition previews and the browser-direct ephemeral-key harness are released; both READMEs now describe the current public product with synthetic-only visual evidence
 - GDS-3D-VIEWER identity, Chinese-default language switching and safe Markdown explanations are released; old review imports remain compatible and public documentation includes eleven synthetic-only product screenshots
+- Unified toolbar, inspector subtabs and source metadata are released; layer IDs/geometry stay unchanged, names are explicit session data, and old name-free review imports remain compatible

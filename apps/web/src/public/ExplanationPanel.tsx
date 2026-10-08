@@ -5,7 +5,7 @@ import { explanationContext, requestExplanation, HARNESS_VERSION } from "./expla
 import { Icon } from "./Icon";
 import { Markdown } from "./Markdown";
 
-export function ExplanationPanel({ layout, object }: { layout: Layout | null; object?: GeometryFeature }) {
+export function ExplanationPanel({ layout, object, layerNames }: { layout: Layout | null; object?: GeometryFeature; layerNames: Record<string, string> }) {
   const { t, locale } = useI18n();
   const [endpoint, setEndpoint] = useState("https://api.deepseek.com/chat/completions");
   const [model, setModel] = useState("deepseek-flash");
@@ -18,12 +18,12 @@ export function ExplanationPanel({ layout, object }: { layout: Layout | null; ob
   const controller = useRef<AbortController | null>(null);
   const generation = useRef(0);
   const keyInput = useRef<HTMLInputElement>(null);
-  const context = layout ? explanationContext(layout, geometry ? object : undefined, locale) : null;
+  const context = layout ? explanationContext(layout, geometry ? object : undefined, locale, layerNames) : null;
   useEffect(() => {
     generation.current++;
     controller.current?.abort();
     setBusy(false); setConsent(false); setResult(""); setError("");
-  }, [layout, object?.id, endpoint, model, geometry]);
+  }, [layout, object?.id, endpoint, model, geometry, layerNames]);
   useEffect(() => {
     generation.current++;
     controller.current?.abort();

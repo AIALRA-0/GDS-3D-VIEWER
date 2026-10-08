@@ -74,6 +74,7 @@ test("local geometry, layer visibility, review export and restore; no file netwo
   await boxes.first().uncheck();
   await expect(boxes.first()).not.toBeChecked();
   await page.getByRole("button", { name: "俯视", exact: true }).click();
+  await page.getByRole("tab", { name: "显示", exact: true }).click();
   await page.getByLabel("层间距").fill("3");
   await page.getByRole("button", { name: "审阅记录", exact: true }).click();
   await page

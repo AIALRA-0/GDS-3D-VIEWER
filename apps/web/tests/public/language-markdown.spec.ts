@@ -18,7 +18,8 @@ test("Chinese default and English switch preserve geometry, notes and legacy rev
   await expect(page.locator(".main-foot")).toContainText("AIALRA_DEMO");
   expect(await canvas!.evaluate((element) => element.isConnected)).toBe(true);
   await expect(page.getByRole("heading", { name: "Geometry statistics" })).toBeVisible();
-  await expect(page.getByText("Layer heights follow display order for inspection and do not represent process thickness", { exact: true })).toHaveCount(1);
+  await page.getByRole("tab", { name: "Source data", exact: true }).click();
+  await expect(page.getByText("Layer heights follow display order for inspection and do not represent process thickness", { exact: true })).toBeVisible();
   await page.getByRole("button", { name: "Layers", exact: true }).click();
   await expect(page.locator(".layer-row input").first()).not.toBeChecked();
   await page.getByRole("button", { name: "Help and privacy" }).click();
@@ -45,6 +46,7 @@ test("narrow AI controls do not overlap and Markdown is formatted without active
   await page.getByRole("button", { name: "试用合成示例" }).click();
   await expect(page.locator(".viewer-host canvas")).toBeVisible();
   await page.getByRole("button", { name: "切换为英文" }).click();
+  await page.getByRole("tab", { name: "AI", exact: true }).click();
   const panel = page.getByRole("region", { name: "AI explanation", exact: true });
   await panel.getByText("Configure this session", { exact: true }).click();
   const endpoint = "https://models.example.invalid/v1/chat/completions";

@@ -32,3 +32,6 @@ Public geometry retains bounded source metadata and per-layer triangle ranges fo
 ## GDS-3D-VIEWER identity and language contract (2026-10-07)
 
 The owner requested a complete product rename to GDS-3D-VIEWER and a Chinese-default Chinese/English public UI. Naming updates necessarily include package/workflow callers, local backend titles, deployment names and documentation across ownership paths; functionality and published third-party rights are retained. Previously exported review files remain importable. Markdown explanations render as safe React elements without executing HTML or fetching remote images; generation/cancellation use a dedicated wrapping action row. Language switching applies to interface text and the fixed explanation prompt without retaining credentials or changing source geometry.
+
+
+- Public frontend contract: unified icon toolbar orders sample then language and help then GitHub; inspector tabs preserve mounted AI state, source metadata retains local text/reference coordinates and bounded properties, layer aliases remain separate from geometry and travel only in review exports. Old reviews without names remain valid. No backend or template edits.

@@ -38,9 +38,10 @@ interface Props {
   onSelect: (id: string) => void;
   onPick?: (pick: PickInfo | null) => void;
   selectedObject?: PickInfo | null;
+  layerNames?: Record<string, string>;
 }
 export const Viewer = forwardRef<ViewerHandle, Props>(function Viewer(
-  { layout, visible, explode, theme, onSelect, onPick, selectedObject },
+  { layout, visible, explode, theme, onSelect, onPick, selectedObject, layerNames },
   ref,
 ) {
   const { t } = useI18n();
@@ -340,6 +341,7 @@ export const Viewer = forwardRef<ViewerHandle, Props>(function Viewer(
       {hover && <div className="geometry-tooltip" role="tooltip" style={{ left: Math.min(hover.screen[0] + 14, Math.max(8, (host.current?.clientWidth ?? 300) - 262)), top: Math.min(hover.screen[1] + 14, Math.max(8, (host.current?.clientHeight ?? 300) - 150)) }}>
         <strong>{t(featureKind(hover.feature?.kind))}</strong>
         <span>{hover.feature?.cell ?? t("模型")} · {hover.layerId}</span>
+        {layerNames?.[hover.layerId] && <span>{layerNames[hover.layerId]}</span>}
         <span>X {hover.point[0].toFixed(3)} · Y {hover.point[1].toFixed(3)} {layout?.unit}</span>
         {hover.feature?.pathWidth !== undefined && <span> {t("路径宽度")} {hover.feature.pathWidth.toFixed(3)} {layout?.unit}</span>}
         <small> {t("点击固定到检查器")} </small>

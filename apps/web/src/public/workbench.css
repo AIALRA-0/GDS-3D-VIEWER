@@ -1176,3 +1176,18 @@ input[type="range"] {
   .brand-group { width: 100%; justify-content: space-between; }
   .top-actions { width: 100%; justify-content: flex-end; flex-wrap: wrap; }
 }
+[hidden] { display: none !important; }
+.top-actions .language-toggle { width: 36px; min-width: 36px; font-size: 12px; font-weight: 600; }
+.top-actions .toolbar-button { color: var(--secondary); }
+.inspector-tabs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); flex: none; border-bottom: 1px solid var(--line); padding: 4px 8px 0; gap: 2px; }
+.inspector-tabs button { padding: 10px 2px; min-width: 0; font-size: 12px; color: var(--secondary); border-bottom: 2px solid transparent; }
+.inspector-tabs button:hover { color: var(--text); background: var(--hover); }
+.inspector-tabs button[aria-selected=true] { color: var(--text); border-bottom-color: var(--text); }
+.layer-rename { margin: 12px 0; }
+.layer-rename label, .source-filter { display: flex; flex-direction: column; gap: 8px; margin: 12px 0; font-size: 12px; }
+.group-actions { flex-wrap: wrap; }
+.source-record { padding: 10px 0; border-bottom: 1px solid var(--line); overflow-wrap: anywhere; font-size: 12px; }
+.source-record summary { cursor: pointer; }
+.source-record dl { margin-top: 12px; }
+.record-count { display: flex; justify-content: space-between; gap: 12px; padding: 5px 0; font-size: 12px; }
+@media(max-width:600px) { .top-actions { flex-wrap: nowrap; justify-content: flex-start; gap: 6px; } .top-actions .icon-button { width: 36px; } }

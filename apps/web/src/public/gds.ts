@@ -21,11 +21,16 @@ interface Element {
   rows: number;
   absolute: boolean;
   byteOffset: number;
+  text: string;
+  presentation: number;
+  properties: { attribute: number; value: string }[];
+  attribute?: number;
 }
 interface Cell {
   name: string;
   polygons: Element[];
   refs: Element[];
+  labels: Element[];
 }
 class PreviewLimitError extends Error {}
 const COLORS = [
@@ -55,6 +60,9 @@ export const newElement = (kind: number): Element => ({
   rows: 1,
   absolute: false,
   byteOffset: 0,
+  text: "",
+  presentation: 0,
+  properties: [],
 });
 function real8(view: DataView, offset: number): number {
   const byte = view.getUint8(offset);
@@ -138,6 +146,9 @@ export function parseGds(
     records = 0,
     finished = false;
   const warnings = new Set<string>();
+  let version: number | undefined, library: string | undefined, userUnitMeters = 1e-6;
+  const recordCounts = new Map<number, number>();
+  const handled = new Set([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 22, 23, 25, 26, 27, 28, 33, 43, 44, 45, 46, 48, 49]);
   for (let pos = 0; pos < buffer.byteLength;) {
     if (++records > LIMITS.records) throw new Error("记录数量超过安全限制");
     if (pos + 4 > buffer.byteLength) throw new Error("文件记录被截断");
@@ -145,24 +156,30 @@ export function parseGds(
       type = view.getUint8(pos + 2),
       data = pos + 4,
       size = length - 4;
+    recordCounts.set(type, (recordCounts.get(type) ?? 0) + 1);
     if (length < 4 || length % 2 || pos + length > buffer.byteLength)
       throw new Error("无效或截断的文件记录");
     const need = (n: number) => {
       if (size < n) throw new Error("记录字段被截断");
     };
-    const string = () =>
+    const string = (limit = 256) =>
       decoder
         .decode(new Uint8Array(buffer, data, size))
         .replace(/\0+$/g, "")
-        .slice(0, 256);
-    if (type === 3) {
+        .slice(0, limit);
+    if (type === 0) { need(2); version = view.getUint16(data); }
+    else if (type === 2) library = string();
+    else if (type === 3) {
       need(16);
       unit = real8(view, data + 8) * 1e6;
+      const databasePerUser = real8(view, data);
+      userUnitMeters = unit / 1e6 / databasePerUser;
+      if (!Number.isFinite(userUnitMeters) || databasePerUser <= 0) throw new Error("无效的版图单位");
       if (!Number.isFinite(unit) || unit <= 0 || unit > 1e6)
         throw new Error("无效的版图单位");
     } else if (type === 5) {
       if (cell) throw new Error("单元记录嵌套错误");
-      cell = { name: "", polygons: [], refs: [] };
+      cell = { name: "", polygons: [], refs: [], labels: [] };
     } else if (type === 6) {
       if (!cell) throw new Error("单元名称出现在单元之外");
       cell.name = string();
@@ -172,19 +189,17 @@ export function parseGds(
       cells.set(cell.name, cell);
       cell = null;
       if (cells.size > LIMITS.cells) throw new Error("单元数量超过限制");
-    } else if ([8, 9, 10, 11, 45].includes(type)) {
+    } else if ([8, 9, 10, 11, 12, 45].includes(type)) {
       if (!cell || element) throw new Error("元素结构错误");
       element = newElement(type);
       element.byteOffset = pos;
-    } else if (type === 12) {
-      warnings.add("文字标签未渲染");
-      element = newElement(type);
     } else if (type === 21) {
       throw new Error("暂不支持 NODE 元素，请先转换为边界多边形");
     } else if (type === 17) {
       if (!cell || !element) throw new Error("元素结束记录错误");
       if ([8, 9, 45].includes(element.kind)) cell.polygons.push(element);
       if ([10, 11].includes(element.kind)) cell.refs.push(element);
+      if (element.kind === 12) cell.labels.push(element);
       element = null;
     } else if (type === 4) {
       finished = true;
@@ -195,7 +210,7 @@ export function parseGds(
       if (type === 13) {
         need(2);
         element.layer = view.getUint16(data);
-      } else if (type === 14 || type === 46) {
+      } else if (type === 14 || type === 46 || type === 22) {
         need(2);
         element.datatype = view.getUint16(data);
       } else if (type === 15) {
@@ -208,7 +223,16 @@ export function parseGds(
             view.getInt32(data + i),
             view.getInt32(data + i + 4),
           ]);
-      } else if (type === 18) element.name = string();
+      } else if (type === 25) element.text = string(4096);
+      else if (type === 23) { need(2); element.presentation = view.getUint16(data); }
+      else if (type === 43) { need(2); element.attribute = view.getUint16(data); }
+      else if (type === 44) {
+        if (element.attribute === undefined) throw new Error("元素属性缺少编号");
+        if (element.properties.length >= 128) throw new Error("元素属性数量超过限制");
+        element.properties.push({ attribute: element.attribute, value: string(4096) });
+        element.attribute = undefined;
+      }
+      else if (type === 18) element.name = string();
       else if (type === 19) {
         need(4);
         element.cols = view.getUint16(data);
@@ -251,6 +275,25 @@ export function parseGds(
     pos += length;
   }
   if (!finished || !cells.size) throw new Error("文件没有完整的版图库");
+  const gds: NonNullable<Layout["gds"]> = {
+    version, library, databaseUnitMeters: unit / 1e6, userUnitMeters,
+    records: [...recordCounts].map(([type, count]) => ({ type, count, handled: handled.has(type) })),
+    labels: [], references: [],
+  };
+  // Source metadata is collected once per record, never multiplied by the hierarchy.
+  for (const c of cells.values()) {
+    for (const e of c.labels) {
+      if (e.xy.length !== 1) throw new Error("文字坐标记录错误");
+      if (gds.labels.length >= 50000) throw new Error("文字标签数量超过限制");
+      gds.labels.push({ cell: c.name, layer: `${e.layer}/${e.datatype}`, text: e.text, xy: [e.xy[0][0] * unit, e.xy[0][1] * unit], angle: e.angle, magnification: e.mag, reflect: e.reflect, presentation: e.presentation, properties: e.properties });
+    }
+    for (const e of c.refs) {
+      if (gds.references.length >= LIMITS.instances) throw new Error("引用记录数量超过限制");
+      gds.references.push({ cell: c.name, target: e.name, kind: e.kind === 11 ? "AREF" : "SREF", xy: e.xy.map(([x, y]) => [x * unit, y * unit]), columns: e.cols, rows: e.rows, angle: e.angle, magnification: e.mag, reflect: e.reflect, absolute: e.absolute, properties: e.properties });
+    }
+  }
+  if (gds.labels.length) warnings.add("文字标签可在源数据中查看，未叠加到三维画布");
+  if (gds.records.some((r) => !r.handled)) warnings.add("部分记录仅统计而未解释，可在源数据中查看记录类型");
   const referenced = new Set(
     [...cells.values()].flatMap((c) => c.refs.map((r) => r.name)),
   );
@@ -366,6 +409,7 @@ export function parseGds(
         triangles: faces.length * 2 + points.length * 2,
         vertices: world.length, bounds: objectBounds, area: Math.abs(twiceArea) / 2,
         byteOffset: e.byteOffset,
+        ...(e.properties.length ? { properties: e.properties } : {}),
         ...(e.kind === 9 ? {
           pathWidth: Math.abs(e.width) * unit * magnification,
           pathLength: e.xy.reduce((sum, p, i, a) => sum + (i ? Math.hypot(p[0] - a[i - 1][0], p[1] - a[i - 1][1]) : 0), 0) * unit * magnification,
@@ -453,9 +497,10 @@ export function parseGds(
       ],
       missingReferences,
       incomplete: true,
+      gds,
     };
   }
-  if (!groups.size && !missingVisited.size) throw new Error("所选单元没有可渲染的几何");
+  if (!groups.size && !missingVisited.size && !cells.get(top)?.labels.length) throw new Error("所选单元没有可渲染的几何");
   if (missingVisited.size) warnings.add(`不完整预览：当前展开缺少 ${missingVisited.size} 种引用目标，只显示文件中实际存在的几何；完整器件形状需要配套单元库`);
   if (tops.length > 1) warnings.add("文件含多个顶层单元，可在单元面板中选择");
   warnings.add("层高度按显示顺序排列，仅用于分层观察，不代表真实工艺厚度");
@@ -481,5 +526,6 @@ export function parseGds(
     warnings: [...warnings],
     missingReferences,
     incomplete: missingVisited.size > 0,
+    gds,
   };
 }

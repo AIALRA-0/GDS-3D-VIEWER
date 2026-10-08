@@ -2,7 +2,7 @@ import type { GeometryFeature, Layout } from "./types";
 import { translate, type Locale } from "./i18n";
 
 export const HARNESS_VERSION = "gds-3d-viewer-explain-v1";
-export function explanationContext(layout: Layout, object?: GeometryFeature, language: Locale = "zh") {
+export function explanationContext(layout: Layout, object?: GeometryFeature, language: Locale = "zh", layerNames: Record<string, string> = {}) {
   const cellName = object?.cell ?? layout.top;
   const cell = layout.cells.find((c) => c.name === cellName);
   return {
@@ -15,6 +15,7 @@ export function explanationContext(layout: Layout, object?: GeometryFeature, lan
     ...(object ? { geometry: {
       id: object.id, kind: object.kind, instance: object.instance,
       layer: object.layer, datatype: object.datatype, bounds: object.bounds,
+      ...(layerNames[object.layer] ? { userProvidedLayerName: layerNames[object.layer] } : {}),
       vertices: object.vertices, area: object.area,
       pathWidth: object.pathWidth, pathLength: object.pathLength,
     } } : {}),

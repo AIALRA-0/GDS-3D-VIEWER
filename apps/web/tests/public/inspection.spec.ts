@@ -58,6 +58,7 @@ test("missing reference preview retains wire, hover and exact click facts", asyn
   await page.mouse.move(0, 0);
   await expect(page.getByRole("tooltip")).toHaveCount(0);
   await expect(page.locator(".object-inspection")).toContainText("WIRE_DEMO");
+  await page.getByRole("tab", { name: "源数据", exact: true }).click();
   await page.locator(".missing-references summary").click();
   await expect(page.locator(".missing-references")).toContainText("ABSENT_CELL");
   await expect(page.getByRole("link", { name: "查看源码" })).toHaveAttribute("href", "https://github.com/AIALRA-0/GDS-3D-VIEWER");
@@ -65,6 +66,7 @@ test("missing reference preview retains wire, hover and exact click facts", asyn
 });
 test("AI requires consent, sends bounded facts directly, masks responses and drops key on refresh", async ({ page }) => {
   const hit = await load(page); await page.mouse.click(hit.x, hit.y);
+  await page.getByRole("tab", { name: "AI", exact: true }).click();
   const panel = page.getByRole("region", { name: "AI 讲解", exact: true });
   await panel.getByText("配置本次会话", { exact: true }).click();
   const endpoint = "https://models.example.invalid/v1/chat/completions";
@@ -101,12 +103,14 @@ test("AI requires consent, sends bounded facts directly, masks responses and dro
   const exported = await fs.readFile((await (await downloaded).path())!, "utf8");
   expect(exported).not.toContain(key); expect(exported).not.toContain(endpoint); expect(exported).not.toContain("已隐藏密钥");
   await page.reload();
+  await page.getByRole("tab", { name: "AI", exact: true }).click();
   await panel.getByText("配置本次会话", { exact: true }).click();
   await expect(panel.getByLabel("本次会话密钥", { exact: true })).toHaveValue("");
   expect(requests).toHaveLength(1);
 });
 test("AI rejects website proxy, hides provider errors and invalidates cancelled work", async ({ page }) => {
   await load(page);
+  await page.getByRole("tab", { name: "AI", exact: true }).click();
   const panel = page.getByRole("region", { name: "AI 讲解", exact: true });
   await panel.getByText("配置本次会话", { exact: true }).click();
   const key = "synthetic-sensitive-key";

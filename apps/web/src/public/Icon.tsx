@@ -21,6 +21,7 @@ const paths: Record<string, string> = {
   swap: "M4 7h16m-4-4 4 4-4 4M20 17H4m4-4-4 4 4 4",
   cube: "m12 2 9 5v10l-9 5-9-5V7zM3 7l9 5 9-5M12 12v10",
   code: "m8 5-6 7 6 7m8-14 6 7-6 7M14 3l-4 18",
+  github: "M9 21v-4c-4 1-4-2-6-3M15 21v-4c0-1-.4-1.5-1-2 4-.5 6-2 6-6 0-1.5-.5-2.5-1.5-3.5L18 2l-4 2h-4L6 2l-.5 3.5C4.5 6.5 4 7.5 4 9c0 4 2 5.5 6 6-.6.5-1 1-1 2",
   explain: "M4 3h16v14H9l-5 4zM8 7h8M8 11h5",
 };
 export function Icon({ name }: { name: string }) {

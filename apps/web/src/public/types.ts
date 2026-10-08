@@ -13,6 +13,7 @@ export interface GeometryFeature {
   pathWidth?: number;
   pathLength?: number;
   byteOffset?: number;
+  properties?: { attribute: number; value: string }[];
 }
 export interface PickInfo {
   layerId: string;
@@ -47,6 +48,15 @@ export interface Layout {
   warnings: string[];
   missingReferences?: { source: string; target: string; count: number }[];
   incomplete?: boolean;
+  gds?: {
+    version?: number;
+    library?: string;
+    databaseUnitMeters: number;
+    userUnitMeters: number;
+    records: { type: number; count: number; handled: boolean }[];
+    labels: { cell: string; layer: string; text: string; xy: [number, number]; angle: number; magnification: number; reflect: boolean; presentation: number; properties: { attribute: number; value: string }[] }[];
+    references: { cell: string; target: string; kind: "SREF" | "AREF"; xy: [number, number][]; columns: number; rows: number; angle: number; magnification: number; reflect: boolean; absolute: boolean; properties: { attribute: number; value: string }[] }[];
+  };
 }
 export const LIMITS = {
   fileBytes: 32 * 1024 * 1024,

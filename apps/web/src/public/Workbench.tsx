@@ -12,6 +12,8 @@ import { Viewer } from "./Viewer";
 import { featureKind } from "./Viewer";
 import type { CameraPose, ViewerHandle } from "./Viewer";
 import { ExplanationPanel } from "./ExplanationPanel";
+import { SourceData } from "./SourceData";
+import { parseLayerNames, validateLayerNames } from "./layerNames";
 import "./workbench.css";
 import tokens from "./tokens.json";
 type Panel = "layers" | "cells" | "notes" | "bookmarks";
@@ -94,6 +96,11 @@ function Modal({
 export default function Workbench() {
   const { t, locale, setLocale } = useI18n();
   const [selectedObject, setSelectedObject] = useState<PickInfo | null>(null);
+  const [inspectorTab, setInspectorTab] = useState("overview");
+  const [layerNames, setLayerNames] = useState<Record<string, string>>({});
+  const [rename, setRename] = useState<{ id: string; value: string } | null>(null);
+  const mappingInput = useRef<HTMLInputElement>(null);
+  const layerName = (id: string, fallback?: string) => layerNames[id] ?? fallback ?? `Layer ${id}`;
   const [layout, setLayout] = useState<Layout | null>(null),
     [visible, setVisible] = useState<string[]>([]),
     [selected, setSelected] = useState<string | null>(null);
@@ -289,6 +296,8 @@ export default function Workbench() {
       worker.current = null;
       if (timer.current) clearTimeout(timer.current);
       const result = event.data.layout;
+      if (!top) setLayerNames({});
+      setRename(null);
       setLayout(result);
       setVisible(result.layers.map((l) => l.id));
       setSelected(null);
@@ -310,6 +319,11 @@ export default function Workbench() {
             : "已读取单元目录，请选择较小单元",
       );
       if (!result.layers.length) {
+        if (!result.incomplete && result.gds?.labels.length) {
+          setInspectorTab("source"); setRight(true); setLeft(false);
+          setStatus("已读取文字标签，请在源数据中查看");
+          return;
+        }
         setPanel("cells");
         setLeft(true);
         setRight(false);
@@ -387,6 +401,7 @@ export default function Workbench() {
           file: layout.name,
           top: layout.top,
           notes,
+          layerNames,
           bookmarks,
           visible,
           explode,
@@ -466,6 +481,8 @@ export default function Workbench() {
         !pose(data.camera)
       )
         throw new Error("审阅记录无效，或与当前文件及单元不匹配");
+      const restoredNames = validateLayerNames(data.layerNames ?? {});
+      setLayerNames(restoredNames);
       setNotes(data.notes);
       setBookmarks(data.bookmarks);
       setVisible(data.visible);
@@ -482,6 +499,16 @@ export default function Workbench() {
     setLeft(true);
     if (mobile) setRight(false);
     setSearch("");
+  }
+  async function importMapping(file: File) {
+    const id = generation.current;
+    try {
+      if (file.size > 1024 * 1024) throw new Error("图层映射不能超过 1 MB");
+      const names = parseLayerNames(await file.text(), file.name);
+      if (id !== generation.current) return;
+      setLayerNames(names); setRename(null); setError("");
+      setStatus("图层名称已更新，仅保存在当前会话与审阅导出");
+    } catch (e) { if (id === generation.current) setError(e instanceof Error ? e.message : "图层映射无法读取"); }
   }
   function toggleLayer(id: string) {
     setVisible((v) =>
@@ -550,7 +577,7 @@ export default function Workbench() {
   const selectedLayer = layout?.layers.find((l) => l.id === selected),
     shownLayers =
       layout?.layers.filter((l) =>
-        `${l.name} ${l.id}`.toLowerCase().includes(search.toLowerCase()),
+        `${layerName(l.id, l.name)} ${l.id}`.toLowerCase().includes(search.toLowerCase()),
       ) ?? [],
     shownCells =
       layout?.cells.filter((c) =>
@@ -624,6 +651,7 @@ export default function Workbench() {
         {panel === "layers" && (
           <>
             <div className="group-actions">
+              <button className="text-button quiet" disabled={!layout || layout.format !== "gds"} onClick={() => mappingInput.current?.click()}>{t("导入层映射")}</button>
               <button
                 className="text-button quiet"
                 onClick={() =>
@@ -647,7 +675,7 @@ export default function Workbench() {
                 >
                   <input
                     type="checkbox"
-                    aria-label={t("显示 {{0}}", {"0": layer.name})}
+                    aria-label={t("显示 {{0}}", {"0": layerName(layer.id, layer.name)})}
                     checked={visible.includes(layer.id)}
                     onChange={() => toggleLayer(layer.id)}
                   />
@@ -657,11 +685,12 @@ export default function Workbench() {
                   />
                   <button
                     className="layer-name"
-                    title={layer.name}
-                    onClick={() => { setSelected(layer.id); setSelectedObject(null); }}
+                    title={`${layerName(layer.id, layer.name)} · ${layer.id}`}
+                    onClick={() => { setSelected(layer.id); setSelectedObject(null); setInspectorTab("overview"); setRight(true); if (mobile) setLeft(false); }}
                   >
-                    {layer.name}
+                    {layerName(layer.id, layer.name)}
                     <small>
+                      {layerNames[layer.id] && `${layer.id} · `}
                       {layer.polygons.toLocaleString()}{" "}
                       {layout?.format === "gds" ? t("多边形") : t("三角形")}
                     </small>
@@ -822,13 +851,20 @@ export default function Workbench() {
           onClick={() => setRight(false)}
         />
       </div>
+      <div className="inspector-tabs" role="tablist" aria-label={t("检查器标签页")}>
+        {[["overview", t("概览")], ["display", t("显示")], ["source", t("源数据")], ["ai", t("AI")]].map(([id, label], i, tabs) => <button key={id} id={`inspector-tab-${id}`} role="tab" aria-selected={inspectorTab === id} aria-controls={`inspector-panel-${id}`} tabIndex={inspectorTab === id ? 0 : -1} onClick={() => setInspectorTab(id)} onKeyDown={(event) => {
+          const target = event.key === "ArrowRight" ? (i + 1) % tabs.length : event.key === "ArrowLeft" ? (i + tabs.length - 1) % tabs.length : event.key === "Home" ? 0 : event.key === "End" ? tabs.length - 1 : -1;
+          if (target < 0) return; event.preventDefault(); setInspectorTab(tabs[target][0]); document.getElementById(`inspector-tab-${tabs[target][0]}`)?.focus();
+        }}>{label}</button>)}
+      </div>
       <div className="pane-content inspector-content">
+        <div role="tabpanel" id="inspector-panel-overview" aria-labelledby="inspector-tab-overview" hidden={inspectorTab !== "overview"}>
         {selectedObject?.feature && <section className="object-inspection" aria-label={t("选中图形详情")}>
           <h3> {t("选中图形")} </h3>
           <p className="object-name">{t(featureKind(selectedObject.feature.kind))}</p>
           <dl>
             <div><dt> {t("来源单元")} </dt><dd>{selectedObject.feature.cell}</dd></div>
-            <div><dt> {t("图层 / 类型")} </dt><dd>{selectedObject.layerId}</dd></div>
+            <div><dt> {t("图层 / 类型")} </dt><dd>{layerName(selectedObject.layerId)} · {selectedObject.layerId}</dd></div>
             <div><dt> {t("图形标识")} </dt><dd>{selectedObject.feature.id}</dd></div>
             <div><dt> {t("点击坐标")} </dt><dd>{selectedObject.point.slice(0, layout?.format === "gds" ? 2 : 3).map((v) => v.toFixed(3)).join(", ")} {layout?.unit}</dd></div>
             <div><dt> {t("平面范围")} </dt><dd>{selectedObject.feature.bounds.map((v) => v.toFixed(3)).join(", ")} {layout?.unit}</dd></div>
@@ -839,13 +875,14 @@ export default function Workbench() {
             {selectedObject.feature.byteOffset !== undefined && <div><dt> {t("源记录偏移")} </dt><dd>{selectedObject.feature.byteOffset}  {t("字节")} </dd></div>}
           </dl>
           <details><summary> {t("查看引用实例路径")} </summary><p className="instance-path">{selectedObject.feature.instance}</p></details>
+          {!!selectedObject.feature.properties?.length && <details><summary>{t("元素属性")}</summary>{selectedObject.feature.properties.map((property, i) => <p className="instance-path" key={i}>{property.attribute}: {property.value}</p>)}</details>}
           <p className="muted"> {t("几何属性来自文件，电气连通性与工艺用途需要额外资料")} </p>
           <button className="text-button" onClick={() => setSelectedObject(null)}> {t("清除选择")} </button>
         </section>}
         <section>
           <h3>{selectedLayer ? t("选中图层") : t("当前版图")}</h3>
           <p className="object-name">
-            {selectedLayer?.name ?? layout?.top ?? t("尚未打开")}
+            {selectedLayer ? layerName(selectedLayer.id, selectedLayer.name) : layout?.top ?? t("尚未打开")}
           </p>
           <dl>
             <div>
@@ -863,6 +900,17 @@ export default function Workbench() {
               </div>
             )}
           </dl>
+          {selectedLayer && layout?.format === "gds" && (
+            <div className="layer-rename">
+              <p className="muted">{selectedLayer.id} · {t("名称由用户或层映射提供，层号保持不变")}</p>
+              <label>{t("图层名称")}<input aria-label={t("图层名称")} maxLength={128} value={rename?.id === selectedLayer.id ? rename.value : layerNames[selectedLayer.id] ?? ""} placeholder={selectedLayer.name} onChange={(e) => setRename({ id: selectedLayer.id, value: e.target.value })} /></label>
+              <div className="group-actions"><button className="text-button quiet" onClick={() => {
+                const value = rename?.id === selectedLayer.id ? rename.value.trim() : layerNames[selectedLayer.id] ?? "";
+                try { const names = value ? validateLayerNames({ ...layerNames, [selectedLayer.id]: value }) : Object.fromEntries(Object.entries(layerNames).filter(([id]) => id !== selectedLayer.id)); setLayerNames(names); setRename(null); }
+                catch (e) { setError(e instanceof Error ? e.message : "图层映射无法读取"); }
+              }}>{t("保存名称")}</button><button className="text-button quiet" onClick={() => { setLayerNames(Object.fromEntries(Object.entries(layerNames).filter(([id]) => id !== selectedLayer.id))); setRename(null); }}>{t("恢复默认")}</button></div>
+            </div>
+          )}
           {selectedLayer && (
             <button
               className="text-button"
@@ -918,6 +966,8 @@ export default function Workbench() {
             </div>
           </dl>
         </section>
+        </div>
+        <div role="tabpanel" id="inspector-panel-display" aria-labelledby="inspector-tab-display" hidden={inspectorTab !== "display"}>
         <section>
           <h3> {t("图层展开")} </h3>
           <label className="range-label" htmlFor="explode">
@@ -972,6 +1022,9 @@ export default function Workbench() {
             </>
           )}
         </section>
+        </div>
+        <div role="tabpanel" id="inspector-panel-source" aria-labelledby="inspector-tab-source" hidden={inspectorTab !== "source"}>
+        <SourceData layout={layout} />
         <section>
           <h3> {t("解析说明")} </h3>
           {!!layout?.missingReferences?.length && <details className="missing-references"><summary> {t("缺失引用目标（")} {layout.missingReferences.length}  {t("项）")} </summary><ul>{layout.missingReferences.slice(0, 200).map((r) => <li key={`${r.source}/${r.target}`}><strong>{r.target}</strong><span> {t("来源")} {r.source} · {r.count}  {t("次引用")} </span></li>)}</ul><p className="muted"> {t("目标定义未包含在当前文件中，完整显示需要重新导出包含依赖单元的版图库")} </p></details>}
@@ -985,7 +1038,10 @@ export default function Workbench() {
             <p className="muted"> {t("支持本地版图和自包含静态三维模型")} </p>
           )}
         </section>
-        <ExplanationPanel layout={layout} object={selectedObject?.feature} />
+        </div>
+        <div role="tabpanel" id="inspector-panel-ai" aria-labelledby="inspector-tab-ai" hidden={inspectorTab !== "ai"}>
+        <ExplanationPanel layout={layout} object={selectedObject?.feature} layerNames={layerNames} />
+        </div>
         <a
           className="portal-link"
           href="https://aialra.online"
@@ -1045,24 +1101,26 @@ export default function Workbench() {
           <span className="brand-divider" />
           <span className="brand-caption"> {t("芯片版图预览器")} </span>
         </a>
-          <button className="text-button language-toggle" aria-label={t(locale === "zh" ? "切换为英文" : "切换为中文")} onClick={() => setLocale(locale === "zh" ? "en" : "zh")}>{locale === "zh" ? "EN" : "中文"}</button>
         </div>
         <div className="top-actions">
-          <a className="icon-button source-link" aria-label={t("查看源码")} title={t("查看源码 · GitHub")} href="https://github.com/AIALRA-0/GDS-3D-VIEWER" target="_blank" rel="noopener noreferrer"><Icon name="code" /></a>
           <button
             ref={importButton}
-            className="text-button primary"
+            className="icon-button toolbar-button"
+            aria-label={t("打开文件")}
+            title={t("打开文件")}
             onClick={() => fileInput.current?.click()}
           >
             <Icon name="upload" />
-            <span> {t("打开文件")} </span>
           </button>
           <button
-            className="text-button demo-button"
+            className="icon-button toolbar-button demo-button"
+            aria-label={t("加载示例")}
+            title={t("加载示例")}
             onClick={() => void demo()}
             disabled={busy}
           >
-             {t("加载示例")} </button>
+            <Icon name="cube" /></button>
+          <button className="icon-button language-toggle" aria-label={t(locale === "zh" ? "切换为英文" : "切换为中文")} title={t(locale === "zh" ? "切换为英文" : "切换为中文")} onClick={() => setLocale(locale === "zh" ? "en" : "zh")}>{locale === "zh" ? "EN" : "ZH"}</button>
           <Button
             icon="download"
             label={t("导出审阅记录")}
@@ -1079,8 +1137,10 @@ export default function Workbench() {
             label={t("使用说明与隐私")}
             onClick={() => setHelp(true)}
           />
+          <a className="icon-button source-link" aria-label={t("查看源码")} title={t("查看源码 · GitHub")} href="https://github.com/AIALRA-0/GDS-3D-VIEWER" target="_blank" rel="noopener noreferrer"><Icon name="github" /></a>
         </div>
       </header>
+      <input ref={mappingInput} data-testid="layer-mapping-input" type="file" accept=".lyp,.json" hidden onChange={(e) => { const file = e.target.files?.[0]; e.target.value = ""; if (file) void importMapping(file); }} />
       <input
         ref={fileInput}
         data-testid="public-file-input"
@@ -1214,7 +1274,8 @@ export default function Workbench() {
                 explode={explode}
                 theme={theme}
                 selectedObject={selectedObject}
-                onPick={setSelectedObject}
+                onPick={(pick) => { setSelectedObject(pick); if (pick) { setInspectorTab("overview"); setRight(true); if (mobile) setLeft(false); } }}
+                layerNames={layerNames}
                 onSelect={(id) => {
                   setSelected(id);
                   if (mobile) {

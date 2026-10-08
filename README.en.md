@@ -27,6 +27,10 @@ Figure 1 The complete workbench running the original synthetic demonstration
 4. Adjust views and layer separation, write review notes, and export them for later restoration
 
 Opening files requires no account or model key. Parsing happens in the current browser
+Chinese is the default. The `EN` / `ZH` control sits immediately after Load sample and switches the interface and future AI explanations while preserving geometry, layer visibility and notes
+The inspector groups Overview, Display, Source data and AI. Clicking geometry opens Overview; tabs keep the same AI configuration and ephemeral key
+Select a layer to set a manual name, or import a local `.lyp` / `.json` layer map. Unmapped layers keep their numbered defaults; names accompany review exports
+Source data exposes library metadata, searchable text labels, reference transformations and record coverage; see [format support and layer names](docs/GDS-RECORDS.md)
 After refresh, reopen the source file; review exports contain observations and view state rather than the source layout
 
 ## 2 Product showcase
@@ -141,11 +145,11 @@ Table 1 Public preview capabilities and boundaries
 
 | Surface | Current behavior | Boundary |
 | --- | --- | --- |
-| Layouts | Boundaries, boxes, paths, references, arrays and common transforms | Numeric layers when process metadata is unavailable |
+| Layouts | Boundaries, boxes, paths, references, arrays, text and element properties | Text appears in Source data rather than on the 3D canvas |
 | Missing cells | Existing geometry, incomplete banner and missing-target list | Full rendering needs an export containing dependency cells |
 | 3D models | Self-contained, uncompressed static triangle meshes | External resources and images refused; animation not played |
 | Hover/selection | Cell, instance, kind, layer, coordinates and dimensions | Does not establish net names or electrical connectivity |
-| Layer controls | Visibility, isolation, separation and camera views | Display heights are illustrative |
+| Layer controls | Visibility, isolation, manual naming, map import, separation and camera views | Names come from the user or a map; display heights are illustrative |
 | Reviews | Notes, bookmarks, camera and layer state export/restore | Retain source files separately |
 | Comparison | Layer-count and triangle-count changes | No geometric XOR or manufacturing checks |
 | Parsing | 32 MB per file, 45-second limit | Over-budget designs open their cell directory |

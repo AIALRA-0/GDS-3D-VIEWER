@@ -91,10 +91,12 @@ test("GDS units, rotated reflected references and array pitches have known bound
   const r = parseGds(data, "test.gds", "ROTATED");
   r.bounds.forEach((n, i) => expect(n).toBeCloseTo([100, 200, 105, 210][i]));
   expect(r.instances).toBe(2);
+  expect(r.gds!.references[0]).toMatchObject({ cell: "ROTATED", target: "CHILD", kind: "SREF", angle: 90, reflect: true, xy: [[100, 200]] });
   expect(r.tops).toEqual(["ROTATED", "ARRAY"]);
   const a = parseGds(data, "test.gds", "ARRAY");
   a.bounds.forEach((n, i) => expect(n).toBeCloseTo([0, 0, 20, 25][i]));
   expect(a.instances).toBe(7);
+  expect(a.gds!.references[1]).toMatchObject({ kind: "AREF", columns: 2, rows: 3, xy: [[0, 0], [20, 0], [0, 30]] });
   expect(a.layers[0].polygons).toBe(6);
   expect(a.layers[0].features).toHaveLength(6);
   expect(a.layers[0].features![0].cell).toBe("CHILD");
