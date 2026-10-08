@@ -1,0 +1,21 @@
+apps/web/tests/public/instancing.spec.ts
+  s_07756e806a3fa5::t_518b951aef6a7b 42-45
+docs/VERIFICATION-PUBLIC.md
+  s_07756e806a3fa5::t_518b951aef6a7b 56-57
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "5ef8cedd0bab5bfeea8b1b1b2d09bc91a1ef2d67",
+  "prompts": {},
+  "sessions": {
+    "s_07756e806a3fa5": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a11a40-20dc-7732-a5b7-49adf5fb1016",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "AIALRA-0 <aialra@163.com>"
+    }
+  }
+}
