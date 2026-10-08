@@ -969,6 +969,7 @@ export default function Workbench() {
                   : "—"}
               </dd>
             </div>
+            {layout?.rendering && <div><dt>{t("复用源三角形")}</dt><dd>{layout.rendering.storedTriangles.toLocaleString()}</dd></div>}
             <div>
               <dt> {t("平面宽度")} </dt>
               <dd>

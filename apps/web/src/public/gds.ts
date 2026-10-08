@@ -325,6 +325,7 @@ export function parseGds(
   let instances = 0,
     polygons = 0,
     triangles = 0;
+  let directOnly = false;
   const bounds: [number, number, number, number] = [
     Infinity,
     Infinity,
@@ -444,6 +445,7 @@ export function parseGds(
         put(a, z + 0.3);
       }
     }
+    if (directOnly) return;
     for (const [referenceIndex, r] of current.refs.entries()) {
       if (r.absolute)
         throw new Error("暂不支持引用的绝对角度或绝对缩放，请先展开版图");
@@ -476,7 +478,85 @@ export function parseGds(
         }
     }
   };
+  // Count the hierarchy before allocating flattened vertices. Bound arithmetic and detect cycles first.
+  const estimates = new Map<string, { triangles: number; instances: number }>();
+  const estimate = (name: string, stack = new Set<string>()): { triangles: number; instances: number } => {
+    if (stack.has(name) || stack.size >= LIMITS.depth) throw new Error("单元引用循环或层级过深");
+    const cached = estimates.get(name); if (cached) return cached;
+    const current = cells.get(name); if (!current) return { triangles: 0, instances: 1 };
+    let count = current.polygons.reduce((sum, e) => {
+      const last = e.xy[e.xy.length - 1], closed = e.xy.length > 1 && e.xy[0][0] === last[0] && e.xy[0][1] === last[1];
+      return sum + Math.max(0, (e.kind === 9 ? e.xy.length * 2 : e.xy.length - (closed ? 1 : 0)) * 4 - 4);
+    }, 0), placements = 1;
+    for (const r of current.refs) {
+      const sub = estimate(r.name, new Set(stack).add(name));
+      count = Math.min(LIMITS.drawnTriangles + 1, count + sub.triangles * r.cols * r.rows);
+      placements = Math.min(LIMITS.instances + 1, placements + sub.instances * r.cols * r.rows);
+    }
+    const result = { triangles: count, instances: placements }; estimates.set(name, result); return result;
+  };
+  const instanced = (): Layout => {
+    const placements = new Map<string, { matrix: Matrix; path: string }[]>();
+    let pathCharacters = 0;
+    const place = (name: string, matrix: Matrix, path: string, depth: number) => {
+      if (depth >= LIMITS.depth) throw new Error("单元引用循环或层级过深");
+      if (++instances > LIMITS.instances) throw new PreviewLimitError("展开实例超过 150,000 个，请选择较小单元");
+      pathCharacters += path.length;
+      if (path.length > 4096 || pathCharacters > 8_000_000) throw new PreviewLimitError("实例路径超过显示预算，请选择较小单元");
+      const current = cells.get(name); if (!current) { missingVisited.add(name); return; }
+      if (matrix.some(v => !Number.isFinite(v) || Math.abs(v) > 1e15)) throw new Error("展开坐标超过限制");
+      if (current.polygons.length) { const list = placements.get(name) ?? []; list.push({ matrix: [matrix[0], matrix[1], matrix[2], matrix[3], matrix[4] * unit, matrix[5] * unit], path }); placements.set(name, list); }
+      for (const [index, r] of current.refs.entries()) {
+        if (r.absolute) throw new Error("暂不支持引用的绝对角度或绝对缩放，请先展开版图");
+        if (r.xy.length !== (r.kind === 11 ? 3 : 1)) throw new Error("引用坐标记录错误");
+        const theta = r.angle * Math.PI / 180, c = Math.cos(theta) * r.mag, s = Math.sin(theta) * r.mag, reflect = r.reflect ? -1 : 1;
+        for (let row = 0; row < r.rows; row++) for (let col = 0; col < r.cols; col++) {
+          const x = r.xy[0][0] + (r.kind === 11 ? col * (r.xy[1][0] - r.xy[0][0]) / r.cols + row * (r.xy[2][0] - r.xy[0][0]) / r.rows : 0);
+          const y = r.xy[0][1] + (r.kind === 11 ? col * (r.xy[1][1] - r.xy[0][1]) / r.cols + row * (r.xy[2][1] - r.xy[0][1]) / r.rows : 0);
+          place(r.name, multiply(matrix, [c, s, -s * reflect, c * reflect, x, y]), `${path}/ref-${index + 1}[${col},${row}]:${r.name}`, depth + 1);
+        }
+      }
+    };
+    place(top, [1, 0, 0, 1, 0, 0], top, 0);
+    const expandedInstances = instances, output = new Map<string, LayerMesh>(), wholeBounds: Layout["bounds"] = [Infinity, Infinity, -Infinity, -Infinity];
+    let storedTriangles = 0, drawnTriangles = 0, batchCount = 0;
+    directOnly = true;
+    for (const [name, copies] of placements) {
+      groups.clear(); instances = polygons = triangles = 0; bounds[0] = bounds[1] = Infinity; bounds[2] = bounds[3] = -Infinity;
+      visit(name, [1, 0, 0, 1, 0, 0], new Set(), name);
+      for (const [localLayer, source] of [...groups.values()].entries()) {
+        let layer = output.get(source.id);
+        if (!layer) { layer = { id: source.id, name: source.name, color: COLORS[output.size % COLORS.length], positions: new Float32Array(), polygons: 0, batches: [] }; output.set(source.id, layer); }
+        const layerIndex = [...output.keys()].indexOf(source.id);
+        layer.polygons += source.polygons * copies.length;
+        drawnTriangles += source.positions.length / 9 * copies.length;
+        if (drawnTriangles > LIMITS.drawnTriangles) throw new PreviewLimitError("复用几何显示超过 12,000,000 个三角形，请选择较小单元");
+        for (const mirrored of [false, true]) {
+          const selected = copies.filter(p => (p.matrix[0] * p.matrix[3] - p.matrix[1] * p.matrix[2] < 0) === mirrored); if (!selected.length) continue;
+          if (++batchCount > 2048) throw new PreviewLimitError("几何批次数量超过限制，请选择较小单元");
+          storedTriangles += source.positions.length / 9;
+          if (storedTriangles > LIMITS.triangles) throw new PreviewLimitError("源几何超过 2,000,000 个三角形，请选择较小单元");
+          const points = new Float32Array(source.positions);
+          for (let i = 0; i < points.length; i += 3) { points[i + 1] += layerIndex - localLayer; }
+          const transforms = new Float64Array(selected.flatMap(p => p.matrix));
+          layer.batches!.push({ cell: name, positions: points, features: source.features, transforms, paths: selected.map(p => p.path), mirrored });
+          for (const { matrix: m } of selected) for (let i = 0; i < points.length; i += 3) {
+            const x = m[0] * points[i] - m[2] * points[i + 2] + m[4], y = m[1] * points[i] - m[3] * points[i + 2] + m[5];
+            if (!Number.isFinite(x) || !Number.isFinite(y) || Math.abs(x) > 1e12 || Math.abs(y) > 1e12) throw new Error("展开坐标超过限制");
+            wholeBounds[0] = Math.min(wholeBounds[0], x); wholeBounds[1] = Math.min(wholeBounds[1], y); wholeBounds[2] = Math.max(wholeBounds[2], x); wholeBounds[3] = Math.max(wholeBounds[3], y);
+          }
+        }
+      }
+    }
+    if (missingVisited.size) warnings.add(`不完整预览：当前展开缺少 ${missingVisited.size} 种引用目标，只显示文件中实际存在的几何；完整器件形状需要配套单元库`);
+    warnings.add("重复单元复用源几何，完整显示当前顶层；显示高度不代表真实工艺厚度");
+    return { name: filename, format: "gds", layers: [...output.values()], cells: [...cells.values()].map(c => ({ name: c.name, polygons: c.polygons.length, references: c.refs.length })), tops, top, bounds: output.size ? wholeBounds : [0, 0, 0, 0], unit: "µm", instances: expandedInstances, triangles: drawnTriangles, warnings: [...warnings], missingReferences, incomplete: missingVisited.size > 0, gds, rendering: { kind: "instanced", storedTriangles, placements: expandedInstances } };
+  };
   try {
+    const counts = estimate(top);
+    if (counts.instances > LIMITS.instances) throw new PreviewLimitError("展开实例超过 150,000 个，请选择较小单元");
+    if (counts.triangles > LIMITS.drawnTriangles) throw new PreviewLimitError("复用几何显示超过 12,000,000 个三角形，请选择较小单元");
+    if (counts.triangles > LIMITS.triangles || counts.triangles / 12 > LIMITS.polygons) return instanced();
     visit(top, [1, 0, 0, 1, 0, 0], new Set(), top);
   } catch (error) {
     if (selectedTop || !(error instanceof PreviewLimitError)) throw error;

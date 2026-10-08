@@ -10,7 +10,7 @@ self.onmessage = (
       : parseGltf(buffer, name);
     self.postMessage(
       { layout },
-      { transfer: layout.layers.map((layer) => layer.positions.buffer) },
+      { transfer: layout.layers.flatMap((layer) => [layer.positions.buffer, ...(layer.batches ?? []).flatMap(b => [b.positions.buffer, b.transforms.buffer])]) },
     );
   } catch (error) {
     self.postMessage({

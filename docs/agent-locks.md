@@ -2,6 +2,7 @@
 
 | path | owner | purpose | start | eta | status |
 |------|-------|---------|-------|-----|--------|
+| README.md; README.en.md; docs/coordination.md | main | bounded whole-layout instancing and QUIC access diagnosis | 2026-10-07 America/Los_Angeles | current turn | released |
 | README.md; README.en.md; docs/coordination.md | main | orthographic 2D, hierarchy, ruler, mapping round trips and current showcase | 2026-10-07 America/Los_Angeles | current turn | released |
 | README.md; README.en.md; docs/coordination.md | main | sidebar spacing, consistent actions, refreshed screenshots and portal card | 2026-10-07 America/Los_Angeles | current turn | released |
 | README.md; README.en.md; docs/coordination.md | main | unified toolbar, inspector tabs, layer aliases and GDS source metadata | 2026-10-07 America/Los_Angeles | current turn | released |
@@ -23,3 +24,5 @@
 - GDS-3D-VIEWER identity, Chinese-default language switching and safe Markdown explanations are released; old review imports remain compatible and public documentation includes eleven synthetic-only product screenshots
 - Unified toolbar, inspector subtabs and source metadata are released; layer IDs/geometry stay unchanged, names are explicit session data, and old name-free review imports remain compatible
 - Viewer tools and documentation locks are released: orthographic 2D, transient ruler, bounded hierarchy, JSON/LYP exports, twelve synthetic screenshots and backward-compatible camera reviews preserve the browser-only boundary
+
+- Whole-layout reuse and documentation locks released: repeated geometry retains exact instance inspection within explicit budgets; protocol guidance covers Cloudflare domains and no account or browser setting change is claimed

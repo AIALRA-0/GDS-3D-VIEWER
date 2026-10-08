@@ -32,6 +32,7 @@ The inspector groups Overview, Display, Source data and AI. Clicking geometry op
 Select a layer to set a manual name, or import a local `.lyp` / `.json` layer map. Export JSON and Export LYP save the current explicit names; unmapped layers keep numbered defaults
 Maps contain names only, without colors or physical thicknesses. Nested groups and leading-zero IDs work; conflicting names are rejected
 Stored GDS cell names populate an expandable hierarchy and searchable directory. Physical layer names such as metal1 still require a map rather than guessing from layer numbers
+Larger repeated designs automatically share source geometry to display the complete current top, retaining arrays, rotation, reflection, magnification and per-instance inspection. Capacity remains bounded; see [public limits](docs/PUBLIC-PREVIEW.md)
 Orthographic 2D supports panning, zooming and unsnapped two-point measurements. Reviews/bookmarks retain projection and zoom; ruler results are transient
 Source data exposes library metadata, searchable text labels, reference transformations and record coverage; see [format support and layer names](docs/GDS-RECORDS.md)
 After refresh, reopen the source file; review exports contain observations and view state rather than the source layout
@@ -192,7 +193,9 @@ The original Python-backed workflow is documented in [local development](docs/LO
 
 ## 6 Verification and contributions
 
-The 30 public regressions cover missing cells, transforms/arrays, null-word padding, 2D coordinates and zoomed measurements, map round trips, hierarchy browsing, hover/click facts, key lifetime, resource rejection, oversized files, review restoration and mobile layouts
+The 32 public regressions cover complete repeated designs, bounded source storage and instance picking, missing cells, transforms/arrays, null-word padding, 2D coordinates and zoomed measurements, map round trips, hierarchy browsing, hover/click facts, key lifetime, resource rejection, oversized files, review restoration and mobile layouts
+
+Repeated `ERR_QUIC_PROTOCOL_ERROR` is a network-entry issue rather than a parser limit. [Network compatibility](docs/NETWORK-TROUBLESHOOTING.md) explains Cloudflare zone-wide settings, targeted hostname rules and browser workarounds
 Public and legacy production builds pass. See [verification evidence](docs/VERIFICATION-PUBLIC.md) for scope and release checks
 
 ```sh

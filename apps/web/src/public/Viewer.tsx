@@ -9,7 +9,7 @@ import {
 } from "react";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
-import type { Layout, PickInfo, GeometryFeature } from "./types";
+import type { Layout, PickInfo, GeometryFeature, LayerMesh } from "./types";
 export function featureAtTriangle(features: GeometryFeature[], triangle: number) {
   let low = 0, high = features.length - 1;
   while (low <= high) {
@@ -21,6 +21,19 @@ export function featureAtTriangle(features: GeometryFeature[], triangle: number)
   return undefined;
 }
 export const featureKind = (kind?: string) => ({ boundary: "边界多边形", path: "路径几何", box: "框", mesh: "模型网格" }[kind ?? ""] ?? "图层几何");
+export function instanceFeature(layer: LayerMesh, batchIndex: number, placement: number, triangle: number): GeometryFeature | undefined {
+  const batch = layer.batches?.[batchIndex], feature = featureAtTriangle(batch?.features ?? [], triangle);
+  if (!batch || !feature || placement < 0 || placement >= batch.paths.length) return undefined;
+  const m = batch.transforms.subarray(placement * 6, placement * 6 + 6), bounds: GeometryFeature["bounds"] = [Infinity, Infinity, -Infinity, -Infinity];
+  for (let i = feature.firstTriangle * 9; i < (feature.firstTriangle + feature.triangles) * 9; i += 3) {
+    const x = m[0] * batch.positions[i] - m[2] * batch.positions[i + 2] + m[4], y = m[1] * batch.positions[i] - m[3] * batch.positions[i + 2] + m[5];
+    bounds[0] = Math.min(bounds[0], x); bounds[1] = Math.min(bounds[1], y); bounds[2] = Math.max(bounds[2], x); bounds[3] = Math.max(bounds[3], y);
+  }
+  const magnification = Math.hypot(m[0], m[1]), path = batch.paths[placement];
+  return { ...feature, id: path + feature.id.slice(feature.cell.length), instance: path, bounds, batch: batchIndex, placement,
+    ...(feature.area !== undefined ? { area: feature.area * Math.abs(m[0] * m[3] - m[1] * m[2]) } : {}),
+    ...(feature.pathWidth !== undefined ? { pathWidth: feature.pathWidth * magnification, pathLength: feature.pathLength! * magnification } : {}) };
+}
 export interface CameraPose {
   position: number[];
   target: number[];
@@ -208,29 +221,40 @@ export const Viewer = forwardRef<ViewerHandle, Props>(function Viewer(
           : (layout.bounds[1] + layout.bounds[3]) / 2;
     const meshes: THREE.Mesh[] = [];
     for (const layer of layout.layers) {
-      const points = new Float32Array(layer.positions);
+      const sources = layer.batches ?? [{ positions: layer.positions, mirrored: false, transforms: new Float64Array(), paths: [] }];
+      for (const [batchIndex, source] of sources.entries()) {
+      const points = new Float32Array(source.positions);
       for (let i = 0; i < points.length; i += 3) {
-        points[i] = (points[i] - centerX) * scale;
+        points[i] = (layer.batches ? points[i] * (source.mirrored ? -1 : 1) : points[i] - centerX) * scale;
         points[i + 1] *=
           layout.format === "gds"
             ? Math.min(0.18, 2.5 / layout.layers.length)
             : scale;
-        points[i + 2] = (points[i + 2] - centerZ) * scale;
+        points[i + 2] = (layer.batches ? points[i + 2] : points[i + 2] - centerZ) * scale;
       }
       const geometry = new THREE.BufferGeometry();
       geometry.setAttribute("position", new THREE.BufferAttribute(points, 3));
       geometry.computeVertexNormals();
       geometry.computeBoundingSphere();
-      const mesh = new THREE.Mesh(
-        geometry,
-        new THREE.MeshLambertMaterial({
+      const material = new THREE.MeshLambertMaterial({
           color: layer.color,
           side: THREE.DoubleSide,
-        }),
-      );
+        });
+      const mesh = layer.batches ? new THREE.InstancedMesh(geometry, material, source.paths.length) : new THREE.Mesh(geometry, material);
+      if (mesh instanceof THREE.InstancedMesh) {
+        const sign = source.mirrored ? -1 : 1;
+        for (let index = 0; index < source.paths.length; index++) {
+          const m = source.transforms.subarray(index * 6, index * 6 + 6);
+          mesh.setMatrixAt(index, new THREE.Matrix4().set(m[0] * sign, 0, -m[2], (m[4] - centerX) * scale, 0, 1, 0, 0, -m[1] * sign, 0, m[3], (-m[5] - centerZ) * scale, 0, 0, 0, 1));
+        }
+        mesh.instanceMatrix.needsUpdate = true; mesh.computeBoundingBox(); mesh.computeBoundingSphere();
+        mesh.userData.batchIndex = batchIndex;
+      }
       mesh.userData.layerId = layer.id;
+      mesh.userData.layerIndex = layout.layers.indexOf(layer);
       group.add(mesh);
       meshes.push(mesh);
+      }
     }
     const box = new THREE.Box3().setFromObject(group),
       center = box.getCenter(new THREE.Vector3());
@@ -291,7 +315,9 @@ export const Viewer = forwardRef<ViewerHandle, Props>(function Viewer(
       const yScale = layout.format === "gds" ? Math.min(0.18, 2.5 / layout.layers.length) : scale;
       return {
         layerId: layer.id,
-        feature: featureAtTriangle(layer.features ?? [], hit.faceIndex ?? -1),
+        feature: mesh instanceof THREE.InstancedMesh && hit.instanceId !== undefined
+          ? instanceFeature(layer, mesh.userData.batchIndex, hit.instanceId, hit.faceIndex ?? -1)
+          : featureAtTriangle(layer.features ?? [], hit.faceIndex ?? -1),
         point: layout.format === "gds"
           ? [local.x / scale + centerX, -(local.z / scale + centerZ), local.y / yScale]
           : [local.x / scale + centerX, local.y / yScale, local.z / scale + centerZ],
@@ -389,9 +415,9 @@ export const Viewer = forwardRef<ViewerHandle, Props>(function Viewer(
   useEffect(() => {
     const r = runtime.current;
     if (!r) return;
-    r.meshes.forEach((m, i) => {
+    r.meshes.forEach((m) => {
       m.visible = visible.includes(m.userData.layerId);
-      m.position.y = i * explode * 0.1;
+      m.position.y = m.userData.layerIndex * explode * 0.1;
     });
     r.draw();
   }, [visible, explode, layout]);
@@ -399,13 +425,16 @@ export const Viewer = forwardRef<ViewerHandle, Props>(function Viewer(
     setHover(null);
     const r = runtime.current, feature = selectedObject?.feature;
     if (!r || !feature) return;
-    const mesh = r.meshes.find((m) => m.userData.layerId === selectedObject.layerId);
+    const mesh = r.meshes.find((m) => m.userData.layerId === selectedObject.layerId && (feature.batch === undefined || m.userData.batchIndex === feature.batch));
     if (!mesh) return;
     const points = mesh.geometry.getAttribute("position").array.slice(feature.firstTriangle * 9, (feature.firstTriangle + feature.triangles) * 9);
     const geometry = new THREE.BufferGeometry();
     geometry.setAttribute("position", new THREE.BufferAttribute(points, 3));
     const material = new THREE.MeshBasicMaterial({ color: 0xffc66d, wireframe: true, transparent: true, opacity: 0.7, depthTest: false });
     const outline = new THREE.Mesh(geometry, material);
+    if (mesh instanceof THREE.InstancedMesh && feature.placement !== undefined) {
+      const matrix = new THREE.Matrix4(); mesh.getMatrixAt(feature.placement, matrix); outline.applyMatrix4(matrix);
+    }
     outline.renderOrder = 2;
     mesh.add(outline);
     r.draw();

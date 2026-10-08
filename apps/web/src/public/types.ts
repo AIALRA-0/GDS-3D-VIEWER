@@ -14,6 +14,8 @@ export interface GeometryFeature {
   pathLength?: number;
   byteOffset?: number;
   properties?: { attribute: number; value: string }[];
+  batch?: number;
+  placement?: number;
 }
 export interface PickInfo {
   layerId: string;
@@ -28,6 +30,7 @@ export interface LayerMesh {
   positions: Float32Array;
   polygons: number;
   features?: GeometryFeature[];
+  batches?: { cell: string; positions: Float32Array; features: GeometryFeature[]; transforms: Float64Array; paths: string[]; mirrored: boolean }[];
 }
 export interface CellInfo {
   name: string;
@@ -48,6 +51,7 @@ export interface Layout {
   warnings: string[];
   missingReferences?: { source: string; target: string; count: number }[];
   incomplete?: boolean;
+  rendering?: { kind: "instanced"; storedTriangles: number; placements: number };
   gds?: {
     version?: number;
     library?: string;
@@ -65,6 +69,7 @@ export const LIMITS = {
   instances: 150_000,
   polygons: 300_000,
   triangles: 2_000_000,
+  drawnTriangles: 12_000_000,
   depth: 64,
   seconds: 45,
 };

@@ -114,7 +114,7 @@ test("AI rejects website proxy, hides provider errors and invalidates cancelled 
   const panel = page.getByRole("region", { name: "AI 讲解", exact: true });
   await panel.getByText("配置本次会话", { exact: true }).click();
   const key = "synthetic-sensitive-key";
-  await panel.getByLabel("模型接口地址", { exact: true }).fill(new URL("/chat/completions", page.url()).href);
+  await panel.getByLabel("模型接口地址", { exact: true }).fill(new URL("/v1/chat/completions", page.url()).href);
   await panel.getByLabel("本次会话密钥", { exact: true }).fill(key);
   await panel.getByLabel("确认发送所选摘要", { exact: true }).check();
   await panel.getByRole("button", { name: "生成讲解", exact: true }).click();
@@ -123,6 +123,8 @@ test("AI rejects website proxy, hides provider errors and invalidates cancelled 
     let sent = false;
     await page.route(alias, (route) => { sent = true; return route.fulfill({ status: 401, body: "Unexpected viewer request" }); });
     await panel.getByLabel("模型接口地址", { exact: true }).fill(alias);
+    await expect(panel.getByRole("alert")).toHaveCount(0);
+    await expect(panel.getByLabel("确认发送所选摘要", { exact: true })).not.toBeChecked();
     await panel.getByLabel("确认发送所选摘要", { exact: true }).check();
     await panel.getByRole("button", { name: "生成讲解", exact: true }).click();
     await expect(panel.getByRole("alert")).toContainText("不能发送到预览器服务器");

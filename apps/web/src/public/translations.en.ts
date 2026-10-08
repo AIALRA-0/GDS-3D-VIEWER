@@ -1,4 +1,10 @@
 export default {
+  "复用源三角形": "Stored source triangles",
+  "复用几何显示超过 12,000,000 个三角形，请选择较小单元": "Instanced display exceeds 12,000,000 triangles; choose a smaller cell",
+  "源几何超过 2,000,000 个三角形，请选择较小单元": "Source geometry exceeds 2,000,000 triangles; choose a smaller cell",
+  "几何批次数量超过限制，请选择较小单元": "Geometry batch count exceeds the limit; choose a smaller cell",
+  "实例路径超过显示预算，请选择较小单元": "Instance paths exceed the display budget; choose a smaller cell",
+  "重复单元复用源几何，完整显示当前顶层；显示高度不代表真实工艺厚度": "Repeated cells share source geometry; the current top is fully displayed. Heights are illustrative.",
   "关闭": "Close",
   "返回工作台": "Back to workspace",
   "等待打开文件": "Waiting for a file",
