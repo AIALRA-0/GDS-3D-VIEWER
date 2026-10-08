@@ -1,0 +1,25 @@
+apps/web/tests/public/workbench.spec.ts
+  s_175b4d132123f9::t_3e75465aee22e8 37-58
+apps/web/src/public/parser.worker.ts
+  s_175b4d132123f9::t_e81184e5ec61f9 8
+docs/PUBLIC-PREVIEW.md
+  s_175b4d132123f9::t_e81184e5ec61f9 20
+apps/web/src/public/Workbench.tsx
+  s_175b4d132123f9::t_e81184e5ec61f9 245-246,1067,1240,1336
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "e6fb3346513d1a3564394cbc6d9bcbe6e79cce99",
+  "prompts": {},
+  "sessions": {
+    "s_175b4d132123f9": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a11903-4e6d-7740-9d79-7a585557e2c2",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "AIALRA-0 <aialra@163.com>"
+    }
+  }
+}
