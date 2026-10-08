@@ -77,17 +77,26 @@ test("orthographic 2D keeps exact XY, ruler scales with zoom and review restores
   expect(await page.getByRole("tooltip").locator("dt").allTextContents()).toEqual(["单元", "图层", "X", "Y"]);
   const values = await page.getByRole("tooltip").locator("dd").allTextContents();
   expect(parseFloat(values[2])).toBeCloseTo(5, 2); expect(parseFloat(values[3])).toBeCloseTo(5, 2);
+  const beforeRuler = await canvas.evaluate((element) => {
+    const source = element as HTMLCanvasElement, probe = document.createElement("canvas");
+    probe.width = source.width; probe.height = source.height;
+    const context = probe.getContext("2d")!; context.drawImage(source, 0, 0);
+    return Array.from(context.getImageData(Math.floor(source.width / 2 - 20), Math.floor(source.height / 2 - 3), 40, 6).data);
+  });
   await page.getByRole("button", { name: "测量", exact: true }).click();
   await page.mouse.click(x - 30, y); await page.mouse.click(x + 30, y);
-  const rulerPixels = await canvas.evaluate((element) => {
+  // Compare the rendered line with its background: GPU antialiasing blends orange with the blue polygon differently on Linux.
+  await expect.poll(() => canvas.evaluate((element, baseline) => {
     const source = element as HTMLCanvasElement, probe = document.createElement("canvas");
     probe.width = source.width; probe.height = source.height;
     const context = probe.getContext("2d")!; context.drawImage(source, 0, 0);
     const pixels = context.getImageData(Math.floor(source.width / 2 - 20), Math.floor(source.height / 2 - 3), 40, 6).data;
-    let count = 0; for (let i = 0; i < pixels.length; i += 4) if (pixels[i] > 180 && pixels[i + 1] > 60 && pixels[i + 1] < 180 && pixels[i + 2] < 100) count++;
+    let count = 0; for (let i = 0; i < pixels.length; i += 4) {
+      const redGain = pixels[i] - baseline[i], blueLoss = baseline[i + 2] - pixels[i + 2];
+      if (redGain > 0 && blueLoss > 0 && redGain + blueLoss > 30) count++;
+    }
     return count;
-  });
-  expect(rulerPixels).toBeGreaterThan(20);
+  }, beforeRuler)).toBeGreaterThan(20);
   const readDistance = async () => Number((await page.locator(".ruler-result").innerText()).match(/距离 ([\d.]+)/)![1]);
   const before = await readDistance(); expect(before).toBeGreaterThan(0);
   await page.mouse.move(x, y); await page.mouse.wheel(0, -300); await page.waitForTimeout(150);
