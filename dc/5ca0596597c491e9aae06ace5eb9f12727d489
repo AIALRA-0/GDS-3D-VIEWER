@@ -1,0 +1,37 @@
+docs/agent-locks.md
+  s_175b4d132123f9::t_313eeb69f537eb 5,15
+README.md
+  s_175b4d132123f9::t_70f9693a2f2f9e 77,79
+  s_175b4d132123f9::t_e51c50fd6c6e5a 217
+  s_175b4d132123f9::t_7cf5ddf11591af 218-220
+README.en.md
+  s_175b4d132123f9::t_e51c50fd6c6e5a 216
+  s_175b4d132123f9::t_70f9693a2f2f9e 76
+  s_175b4d132123f9::t_b5a2d345aa34ad 78
+  s_175b4d132123f9::t_7cf5ddf11591af 217-219
+apps/web/src/public/Workbench.tsx
+  s_175b4d132123f9::t_a86d635b646623 654,656,664,699,907,911
+docs/assets/readme/PROVENANCE.md
+  s_175b4d132123f9::t_b5a2d345aa34ad 21
+apps/web/src/public/workbench.css
+  s_175b4d132123f9::t_a86d635b646623 371-372,374-394,444,446-447,452,1138-1139
+  s_175b4d132123f9::t_70f9693a2f2f9e 1086-1087
+docs/coordination.md
+  s_175b4d132123f9::t_313eeb69f537eb 3-4
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "dc5ca0596597c491e9aae06ace5eb9f12727d489",
+  "prompts": {},
+  "sessions": {
+    "s_175b4d132123f9": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a11903-4e6d-7740-9d79-7a585557e2c2",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "AIALRA-0 <aialra@163.com>"
+    }
+  }
+}
