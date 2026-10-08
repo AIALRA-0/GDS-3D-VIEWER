@@ -7,6 +7,8 @@
   ],
   "scripts": {
     "build:web": "npm run build --workspace @icviewer/web",
+    "build:legacy": "npm run build --workspace @icviewer/web -- --mode legacy",
+    "test:public": "npm run test:public --workspace @icviewer/web",
     "dev:web": "npm run dev --workspace @icviewer/web",
     "preview:web": "npm run preview --workspace @icviewer/web",
     "test:e2e": "npm run test:e2e --workspace @icviewer/web"

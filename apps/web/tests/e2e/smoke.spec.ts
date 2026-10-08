@@ -7,7 +7,7 @@ const fixtureRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "
 test("fullscreen cockpit runs the backend-backed workflow", async ({ page }) => {
   test.setTimeout(120000);
 
-  await page.goto("/");
+  await page.goto("/legacy.html");
   await expect(page.locator(".empty-stage strong")).toHaveText("Empty", { timeout: 30000 });
 
   await page.getByTestId("upload-input").setInputFiles(path.join(fixtureRoot, "example/example.gds"));

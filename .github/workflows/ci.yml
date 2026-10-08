@@ -36,6 +36,9 @@ jobs:
       - name: Build web
         run: npm run build:web
 
+      - name: Build local legacy entry
+        run: npm run build:legacy
+
       - name: Install API dependencies
         working-directory: apps/api
         run: |
@@ -50,6 +53,9 @@ jobs:
         working-directory: apps/web
         run: npx playwright install --with-deps chromium
 
+      - name: Verify public preview and untrusted file boundaries
+        run: npm run test:public
+
       - name: Start API
         working-directory: apps/api
         run: |
@@ -59,7 +65,7 @@ jobs:
       - name: Start web dev server
         working-directory: apps/web
         run: |
-          npm run dev -- --host 127.0.0.1 --port 4173 > /tmp/icviewer-web.log 2>&1 &
+          npm run dev -- --mode legacy --host 127.0.0.1 --port 4173 > /tmp/icviewer-web.log 2>&1 &
           echo $! > /tmp/icviewer-web.pid
 
       - name: Wait for services

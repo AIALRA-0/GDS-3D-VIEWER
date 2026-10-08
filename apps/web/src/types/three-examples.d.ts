@@ -1,7 +1,7 @@
 declare module "three/examples/jsm/controls/OrbitControls.js" {
   import { Camera, EventDispatcher, MOUSE, TOUCH, Vector3 } from "three";
 
-  export class OrbitControls extends EventDispatcher {
+  export class OrbitControls extends EventDispatcher<{ change: {}; start: {}; end: {} }> {
     constructor(object: Camera, domElement?: HTMLElement);
     object: Camera;
     domElement: HTMLElement;
@@ -10,6 +10,8 @@ declare module "three/examples/jsm/controls/OrbitControls.js" {
     minDistance: number;
     maxDistance: number;
     enableDamping: boolean;
+    enablePan: boolean;
+    zoomToCursor: boolean;
     dampingFactor: number;
     autoRotate: boolean;
     autoRotateSpeed: number;

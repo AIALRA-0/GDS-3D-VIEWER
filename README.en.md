@@ -26,6 +26,12 @@ Figure 1 Project hero banner
 
 </div>
 
+> [!TIP]
+> Public preview deployed on 2026-10-07: [Open ICViewer](https://icviewer.aialra.online)
+> The redesigned interface follows AIALRA-TEMPLATE and parses GDS and self-contained glTF/GLB in the browser, with no password or layout-file upload
+> [Public usage and deployment](docs/PUBLIC-PREVIEW.md) · [Current verification](docs/VERIFICATION-PUBLIC.md)
+> The remaining sections retain the original local backend workflow and its historical verification; that workflow is not connected to the public site
+
 > [!IMPORTANT]
 > ICViewer closes the loop from GDS upload and 3D conversion to interaction, engineering metadata, explanation, operator suggestions, diffing, notes, bookmarks, and session export
 > The code is a reproducible hackathon, teaching, and early-review prototype without authentication, tenant isolation, or production-grade hostile-file defenses
@@ -219,10 +225,10 @@ Return to the repository root in a second terminal
 
 ```bash
 npm ci # Install frontend dependencies from the lock file
-npm run dev:web -- --host 127.0.0.1 --port 4173 # Start the local Vite development server
+npm run dev:web -- --mode legacy --host 127.0.0.1 --port 4173 # Start the original local backend interface
 ```
 
-Open `http://127.0.0.1:4173`
+Open `http://127.0.0.1:4173/legacy.html`
 Select `fixtures/example/example.gds` to reproduce Figure 2.1
 
 ### 8.3 Optional explanation endpoint
@@ -320,7 +326,7 @@ Table 11.1 Directory structure
 - Detailed assets can be deferred for large layouts, but performance mode and simplified rendering remain open
 - AI explanations are supporting information, not a substitute for DRC, timing signoff, or tapeout review
 - Local-rule fallback keeps the demo available but is not a remote-model response
-- The current audit reports 3 high and 2 low frontend-toolchain advisories; upgrades require build and browser regression
+- The historical 2026-08-24 audit reported 3 high and 2 low frontend-toolchain advisories; compatible upgrades now report 0, and builds plus public browser regression pass; see the current verification record
 - The browser test is close to its current timeout and may vary with runner performance
 - The repository declares no open-source license
 

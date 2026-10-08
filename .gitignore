@@ -10,6 +10,7 @@ __pycache__/
 
 node_modules/
 dist/
+dist-local/
 coverage/
 playwright-report/
 test-results/
@@ -26,3 +27,6 @@ pnpm-debug.log*
 
 .idea/
 .vscode/
+.local-design-reference/
+.wrangler/
+.verification/

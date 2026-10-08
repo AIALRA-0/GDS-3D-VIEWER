@@ -20,3 +20,7 @@
 
 - `packages/shared/types.ts` includes optional transport fields such as `sessionId`, `assetUrl`, and `warnings`.
 - `packages/shared/manifest.schema.json` now permits layer provenance fields like `gdsLayer`, `datatype`, and `polygonCount`.
+
+## Public preview contract (2026-10-07)
+
+The public entry parses GDS and self-contained glTF/GLB in a disposable browser Worker. No backend endpoint, cloud session, remote AI, or legacy third-party viewer bundle is deployed. The original React/FastAPI workflow remains available through the local legacy build and legacy.html. Public review files store notes, bookmarks and camera state; they do not contain the source geometry. Large GDS files can open a cell directory without expanding the entire design.

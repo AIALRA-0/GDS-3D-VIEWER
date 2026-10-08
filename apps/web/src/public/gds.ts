@@ -1,0 +1,444 @@
+import { ShapeUtils, Vector2 } from "three";
+import { LIMITS } from "./types";
+import type { Layout, LayerMesh } from "./types";
+
+type Point = [number, number];
+type Matrix = [number, number, number, number, number, number];
+interface Element {
+  kind: number;
+  layer: number;
+  datatype: number;
+  xy: Point[];
+  name: string;
+  width: number;
+  pathType: number;
+  begin: number;
+  end: number;
+  reflect: boolean;
+  angle: number;
+  mag: number;
+  cols: number;
+  rows: number;
+  absolute: boolean;
+}
+interface Cell {
+  name: string;
+  polygons: Element[];
+  refs: Element[];
+}
+class PreviewLimitError extends Error {}
+const COLORS = [
+  "#a7b9d0",
+  "#d9b990",
+  "#91bcac",
+  "#c7a4c4",
+  "#8bb9c6",
+  "#caca91",
+  "#b0a5d2",
+  "#d39891",
+];
+export const newElement = (kind: number): Element => ({
+  kind,
+  layer: 0,
+  datatype: 0,
+  xy: [],
+  name: "",
+  width: 0,
+  pathType: 0,
+  begin: 0,
+  end: 0,
+  reflect: false,
+  angle: 0,
+  mag: 1,
+  cols: 1,
+  rows: 1,
+  absolute: false,
+});
+function real8(view: DataView, offset: number): number {
+  const byte = view.getUint8(offset);
+  let fraction = 0;
+  for (let i = 1; i < 8; i++) fraction += view.getUint8(offset + i) / 256 ** i;
+  return (byte & 128 ? -1 : 1) * fraction * 16 ** ((byte & 127) - 64);
+}
+function multiply(a: Matrix, b: Matrix): Matrix {
+  return [
+    a[0] * b[0] + a[2] * b[1],
+    a[1] * b[0] + a[3] * b[1],
+    a[0] * b[2] + a[2] * b[3],
+    a[1] * b[2] + a[3] * b[3],
+    a[0] * b[4] + a[2] * b[5] + a[4],
+    a[1] * b[4] + a[3] * b[5] + a[5],
+  ];
+}
+function pathPolygon(e: Element): Point[] {
+  if (e.xy.length < 2 || !e.width) return [];
+  const points = e.xy
+    .filter(
+      (p, i, a) => i === 0 || p[0] !== a[i - 1][0] || p[1] !== a[i - 1][1],
+    )
+    .map((p) => [...p] as Point);
+  if (points.length < 2) return [];
+  const half = Math.abs(e.width) / 2;
+  const normals: Point[] = [];
+  for (let i = 1; i < points.length; i++) {
+    const dx = points[i][0] - points[i - 1][0],
+      dy = points[i][1] - points[i - 1][1],
+      length = Math.hypot(dx, dy);
+    normals.push([-dy / length, dx / length]);
+  }
+  const ext = e.pathType === 2 ? half : 0;
+  const begin = e.pathType === 4 ? e.begin : ext,
+    end = e.pathType === 4 ? e.end : ext;
+  points[0][0] -= normals[0][1] * begin;
+  points[0][1] += normals[0][0] * begin;
+  const last = points.length - 1,
+    n = normals[normals.length - 1];
+  points[last][0] += n[1] * end;
+  points[last][1] -= n[0] * end;
+  const left: Point[] = [],
+    right: Point[] = [];
+  for (let i = 0; i < points.length; i++) {
+    const prev = normals[Math.max(0, i - 1)],
+      next = normals[Math.min(i, normals.length - 1)];
+    const nx = prev[0] + next[0],
+      ny = prev[1] + next[1],
+      den = nx * next[0] + ny * next[1];
+    if (Math.abs(den) < 0.1)
+      throw new Error("路径转角过于尖锐，请先在版图工具中转为边界多边形");
+    const ox = (nx * half) / den,
+      oy = (ny * half) / den;
+    left.push([points[i][0] + ox, points[i][1] + oy]);
+    right.push([points[i][0] - ox, points[i][1] - oy]);
+  }
+  return [...left, ...right.reverse()];
+}
+
+// The parser runs only in a disposable Worker. Limits apply before hierarchy expansion.
+export function parseGds(
+  buffer: ArrayBuffer,
+  filename: string,
+  selectedTop?: string,
+): Layout {
+  if (buffer.byteLength > LIMITS.fileBytes)
+    throw new Error("文件超过 32 MB 限制");
+  const view = new DataView(buffer),
+    decoder = new TextDecoder("ascii");
+  if (
+    buffer.byteLength < 6 ||
+    view.getUint16(0) !== 6 ||
+    view.getUint8(2) !== 0
+  )
+    throw new Error("不是有效的 GDS 文件头");
+  const cells = new Map<string, Cell>();
+  let cell: Cell | null = null,
+    element: Element | null = null;
+  let unit = 0.001,
+    records = 0,
+    finished = false;
+  const warnings = new Set<string>();
+  for (let pos = 0; pos < buffer.byteLength;) {
+    if (++records > LIMITS.records) throw new Error("记录数量超过安全限制");
+    if (pos + 4 > buffer.byteLength) throw new Error("文件记录被截断");
+    const length = view.getUint16(pos),
+      type = view.getUint8(pos + 2),
+      data = pos + 4,
+      size = length - 4;
+    if (length < 4 || length % 2 || pos + length > buffer.byteLength)
+      throw new Error("无效或截断的文件记录");
+    const need = (n: number) => {
+      if (size < n) throw new Error("记录字段被截断");
+    };
+    const string = () =>
+      decoder
+        .decode(new Uint8Array(buffer, data, size))
+        .replace(/\0+$/g, "")
+        .slice(0, 256);
+    if (type === 3) {
+      need(16);
+      unit = real8(view, data + 8) * 1e6;
+      if (!Number.isFinite(unit) || unit <= 0 || unit > 1e6)
+        throw new Error("无效的版图单位");
+    } else if (type === 5) {
+      if (cell) throw new Error("单元记录嵌套错误");
+      cell = { name: "", polygons: [], refs: [] };
+    } else if (type === 6) {
+      if (!cell) throw new Error("单元名称出现在单元之外");
+      cell.name = string();
+    } else if (type === 7) {
+      if (!cell?.name || element || cells.has(cell.name))
+        throw new Error("单元名称为空、重复或元素未结束");
+      cells.set(cell.name, cell);
+      cell = null;
+      if (cells.size > LIMITS.cells) throw new Error("单元数量超过限制");
+    } else if ([8, 9, 10, 11, 45].includes(type)) {
+      if (!cell || element) throw new Error("元素结构错误");
+      element = newElement(type);
+    } else if (type === 12) {
+      warnings.add("文字标签未渲染");
+      element = newElement(type);
+    } else if (type === 21) {
+      throw new Error("暂不支持 NODE 元素，请先转换为边界多边形");
+    } else if (type === 17) {
+      if (!cell || !element) throw new Error("元素结束记录错误");
+      if ([8, 9, 45].includes(element.kind)) cell.polygons.push(element);
+      if ([10, 11].includes(element.kind)) cell.refs.push(element);
+      element = null;
+    } else if (type === 4) {
+      finished = true;
+      if (cell || element) throw new Error("未结束的单元或元素");
+      if (pos + length !== buffer.byteLength)
+        throw new Error("库结束记录后存在额外数据");
+    } else if (element) {
+      if (type === 13) {
+        need(2);
+        element.layer = view.getUint16(data);
+      } else if (type === 14 || type === 46) {
+        need(2);
+        element.datatype = view.getUint16(data);
+      } else if (type === 15) {
+        need(4);
+        element.width = view.getInt32(data);
+      } else if (type === 16) {
+        if (size % 8) throw new Error("坐标记录长度错误");
+        for (let i = 0; i < size; i += 8)
+          element.xy.push([
+            view.getInt32(data + i),
+            view.getInt32(data + i + 4),
+          ]);
+      } else if (type === 18) element.name = string();
+      else if (type === 19) {
+        need(4);
+        element.cols = view.getUint16(data);
+        element.rows = view.getUint16(data + 2);
+        if (
+          !element.cols ||
+          !element.rows ||
+          element.cols * element.rows > LIMITS.instances
+        )
+          throw new Error("阵列规模超过限制");
+      } else if (type === 26) {
+        need(2);
+        const flags = view.getUint16(data);
+        element.reflect = Boolean(flags & 0x8000);
+        element.absolute = Boolean(flags & 6);
+      } else if (type === 27) {
+        need(8);
+        element.mag = real8(view, data);
+        if (
+          !Number.isFinite(element.mag) ||
+          element.mag <= 0 ||
+          element.mag > 1e6
+        )
+          throw new Error("无效的引用缩放");
+      } else if (type === 28) {
+        need(8);
+        element.angle = real8(view, data);
+        if (!Number.isFinite(element.angle)) throw new Error("无效的引用角度");
+      } else if (type === 33) {
+        need(2);
+        element.pathType = view.getUint16(data);
+      } else if (type === 48) {
+        need(4);
+        element.begin = view.getInt32(data);
+      } else if (type === 49) {
+        need(4);
+        element.end = view.getInt32(data);
+      }
+    }
+    pos += length;
+  }
+  if (!finished || !cells.size) throw new Error("文件没有完整的版图库");
+  const referenced = new Set(
+    [...cells.values()].flatMap((c) => c.refs.map((r) => r.name)),
+  );
+  const tops = [...cells.keys()].filter((n) => !referenced.has(n));
+  if (!tops.length) throw new Error("单元引用存在循环，找不到顶层单元");
+  const top = selectedTop ?? tops[0];
+  if (!cells.has(top)) throw new Error("所选单元不存在");
+  const groups = new Map<
+    string,
+    {
+      id: string;
+      name: string;
+      color: string;
+      positions: number[];
+      polygons: number;
+    }
+  >();
+  let instances = 0,
+    polygons = 0,
+    triangles = 0;
+  const bounds: [number, number, number, number] = [
+    Infinity,
+    Infinity,
+    -Infinity,
+    -Infinity,
+  ];
+  const visit = (name: string, matrix: Matrix, stack: Set<string>) => {
+    if (stack.size >= LIMITS.depth || stack.has(name))
+      throw new Error("单元引用循环或层级过深");
+    if (++instances > LIMITS.instances)
+      throw new PreviewLimitError("展开实例超过 150,000 个，请选择较小单元");
+    const current = cells.get(name);
+    if (!current) throw new Error("单元引用的目标不存在");
+    const chain = new Set(stack).add(name);
+    for (const e of current.polygons) {
+      if (++polygons > LIMITS.polygons)
+        throw new PreviewLimitError("多边形超过 300,000 个，请选择较小单元");
+      if (e.kind === 9 && (e.pathType === 1 || ![0, 2, 4].includes(e.pathType)))
+        throw new Error("圆端或未知路径类型需要先转为边界多边形");
+      if (e.kind === 9 && e.width < 0)
+        throw new Error("绝对宽度路径需要先转为边界多边形");
+      let points = e.kind === 9 ? pathPolygon(e) : e.xy;
+      if (
+        points.length > 1 &&
+        points[0][0] === points[points.length - 1][0] &&
+        points[0][1] === points[points.length - 1][1]
+      )
+        points = points.slice(0, -1);
+      if (points.length < 3) {
+        warnings.add("跳过了无面积元素");
+        continue;
+      }
+      if (points.length > 8192) throw new Error("单个多边形顶点超过限制");
+      const world = points.map(
+        ([x, y]) =>
+          new Vector2(
+            (matrix[0] * x + matrix[2] * y + matrix[4]) * unit,
+            (matrix[1] * x + matrix[3] * y + matrix[5]) * unit,
+          ),
+      );
+      if (
+        world.some(
+          (p) =>
+            !Number.isFinite(p.x) ||
+            !Number.isFinite(p.y) ||
+            Math.abs(p.x) > 1e12 ||
+            Math.abs(p.y) > 1e12,
+        )
+      )
+        throw new Error("展开坐标超过限制");
+      const faces = ShapeUtils.triangulateShape(world, []);
+      if (!faces.length) throw new Error("多边形无法三角化");
+      triangles += faces.length * 2 + points.length * 2;
+      if (triangles > LIMITS.triangles)
+        throw new PreviewLimitError("三角形超过 2,000,000 个，请选择较小单元");
+      const id = `${e.layer}/${e.datatype}`;
+      let group = groups.get(id);
+      if (!group) {
+        group = {
+          id,
+          name: `Layer ${id}`,
+          color: COLORS[groups.size % COLORS.length],
+          positions: [],
+          polygons: 0,
+        };
+        groups.set(id, group);
+      }
+      group.polygons++;
+      for (const p of world) {
+        bounds[0] = Math.min(bounds[0], p.x);
+        bounds[1] = Math.min(bounds[1], p.y);
+        bounds[2] = Math.max(bounds[2], p.x);
+        bounds[3] = Math.max(bounds[3], p.y);
+      }
+      // Layer index is illustrative; no unverified physical process height is implied.
+      const z = [...groups.keys()].indexOf(id);
+      const put = (p: Vector2, h: number) =>
+        group!.positions.push(p.x, h, -p.y);
+      for (const f of faces) {
+        for (const i of f) put(world[i], z + 0.3);
+        for (const i of [...f].reverse()) put(world[i], z);
+      }
+      for (let i = 0; i < world.length; i++) {
+        const a = world[i],
+          b = world[(i + 1) % world.length];
+        put(a, z);
+        put(b, z);
+        put(b, z + 0.3);
+        put(a, z);
+        put(b, z + 0.3);
+        put(a, z + 0.3);
+      }
+    }
+    for (const r of current.refs) {
+      if (r.absolute)
+        throw new Error("暂不支持引用的绝对角度或绝对缩放，请先展开版图");
+      if (r.xy.length !== (r.kind === 11 ? 3 : 1))
+        throw new Error("引用坐标记录错误");
+      const theta = (r.angle * Math.PI) / 180,
+        c = Math.cos(theta) * r.mag,
+        s = Math.sin(theta) * r.mag,
+        reflect = r.reflect ? -1 : 1;
+      for (let row = 0; row < r.rows; row++)
+        for (let col = 0; col < r.cols; col++) {
+          const x =
+            r.xy[0][0] +
+            (r.kind === 11
+              ? (col * (r.xy[1][0] - r.xy[0][0])) / r.cols +
+                (row * (r.xy[2][0] - r.xy[0][0])) / r.rows
+              : 0);
+          const y =
+            r.xy[0][1] +
+            (r.kind === 11
+              ? (col * (r.xy[1][1] - r.xy[0][1])) / r.cols +
+                (row * (r.xy[2][1] - r.xy[0][1])) / r.rows
+              : 0);
+          visit(
+            r.name,
+            multiply(matrix, [c, s, -s * reflect, c * reflect, x, y]),
+            chain,
+          );
+        }
+    }
+  };
+  try {
+    visit(top, [1, 0, 0, 1, 0, 0], new Set());
+  } catch (error) {
+    if (selectedTop || !(error instanceof PreviewLimitError)) throw error;
+    return {
+      name: filename,
+      format: "gds",
+      layers: [],
+      cells: [...cells.values()].map((c) => ({
+        name: c.name,
+        polygons: c.polygons.length,
+        references: c.refs.length,
+      })),
+      tops,
+      top,
+      bounds: [0, 0, 0, 0],
+      unit: "µm",
+      instances: 0,
+      triangles: 0,
+      warnings: [
+        error.message,
+        "已读取单元目录，完整几何未生成，请选择较小单元",
+      ],
+    };
+  }
+  if (!groups.size) throw new Error("所选单元没有可渲染的几何");
+  if (tops.length > 1) warnings.add("文件含多个顶层单元，可在单元面板中选择");
+  warnings.add("层高度按显示顺序排列，仅用于分层观察，不代表真实工艺厚度");
+  const layers: LayerMesh[] = [...groups.values()].map((g) => ({
+    ...g,
+    positions: new Float32Array(g.positions),
+  }));
+  return {
+    name: filename,
+    format: "gds",
+    layers,
+    cells: [...cells.values()].map((c) => ({
+      name: c.name,
+      polygons: c.polygons.length,
+      references: c.refs.length,
+    })),
+    tops,
+    top,
+    bounds,
+    unit: "µm",
+    instances,
+    triangles,
+    warnings: [...warnings],
+  };
+}

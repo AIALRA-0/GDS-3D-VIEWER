@@ -3,12 +3,17 @@ import react from "@vitejs/plugin-react";
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "");
-  const apiTarget = env.VITE_API_BASE_URL?.trim().replace(/\/$/, "") || "http://127.0.0.1:34000";
+  const apiTarget =
+    env.VITE_API_BASE_URL?.trim().replace(/\/$/, "") ||
+    "http://127.0.0.1:34000";
 
   return {
     plugins: [react()],
+    publicDir: mode === "legacy" ? "public" : "public-static",
     build: {
+      outDir: mode === "legacy" ? "dist-local" : "dist",
       rollupOptions: {
+        input: mode === "legacy" ? "legacy.html" : "index.html",
         output: {
           manualChunks(id) {
             if (id.includes("node_modules/react")) {
@@ -25,7 +30,7 @@ export default defineConfig(({ mode }) => {
       },
     },
     server: {
-      host: "0.0.0.0",
+      host: "127.0.0.1",
       port: 4173,
       proxy: {
         "/api": apiTarget,
@@ -33,7 +38,7 @@ export default defineConfig(({ mode }) => {
       },
     },
     preview: {
-      host: "0.0.0.0",
+      host: "127.0.0.1",
       port: 4173,
     },
   };

@@ -21,7 +21,7 @@ export default defineConfig({
           timeout: 120000
         },
         {
-          command: "npm run dev -- --host 127.0.0.1 --port 4173",
+          command: "npm run dev -- --mode legacy --host 127.0.0.1 --port 4173",
           url: baseURL,
           reuseExistingServer: true,
           timeout: 120000
