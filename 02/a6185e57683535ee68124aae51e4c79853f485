@@ -1,0 +1,59 @@
+apps/web/src/public/types.ts
+  s_07756e806a3fa5::t_c51d24561ccd72 17-18,33,54,72
+apps/web/src/public/Viewer.tsx
+  s_07756e806a3fa5::t_11f8f3ed3b3ef1 12,24-36,224-226,228,233,239,242-252,254,257,318-320,418,420,428,435-437
+README.en.md
+  s_07756e806a3fa5::t_51574b3aa36193 35,196
+  s_07756e806a3fa5::t_3ad427b10f89d4 197-198
+apps/web/tests/public/instancing.spec.ts
+  s_07756e806a3fa5::t_3ad427b10f89d4 14,16-17,19-21,35
+  s_07756e806a3fa5::t_a68f232b1f3b76 28,32
+  s_07756e806a3fa5::t_47242bddedd21c 1-13,15,18,22-27,29-31,33-34,36-56
+docs/agent-locks.md
+  s_07756e806a3fa5::t_c51d24561ccd72 5
+  s_07756e806a3fa5::t_e3622824b22e02 27-28
+apps/web/src/public/parser.worker.ts
+  s_07756e806a3fa5::t_0289a7a929576d 13
+apps/web/src/public/Workbench.tsx
+  s_07756e806a3fa5::t_11f8f3ed3b3ef1 972
+apps/web/src/public/translations.en.ts
+  s_07756e806a3fa5::t_11f8f3ed3b3ef1 2,7
+  s_07756e806a3fa5::t_51574b3aa36193 3-6
+apps/web/tests/public/inspection.spec.ts
+  s_07756e806a3fa5::t_9b9dce821f3482 126-127
+  s_07756e806a3fa5::t_2888f887fa5d7c 117
+docs/NETWORK-TROUBLESHOOTING.md
+  s_07756e806a3fa5::t_1c0c6675b7009b 3
+  s_07756e806a3fa5::t_51574b3aa36193 1-2,4-21
+apps/web/src/public/gds.ts
+  s_07756e806a3fa5::t_1991db37f89290 487-490
+  s_07756e806a3fa5::t_0289a7a929576d 328,448,481-486,491-499,501-503,506-554,556-559
+  s_07756e806a3fa5::t_51574b3aa36193 500,504-505
+docs/security/publication-risk-notes.md
+  s_07756e806a3fa5::t_51574b3aa36193 20
+docs/VERIFICATION-PUBLIC.md
+  s_07756e806a3fa5::t_9576d673fc3b40 3,9,13,25,29,31,35,37,39-45
+docs/coordination.md
+  s_07756e806a3fa5::t_51574b3aa36193 44-47
+README.md
+  s_07756e806a3fa5::t_51574b3aa36193 36,197,231
+docs/PUBLIC-PREVIEW.md
+  s_07756e806a3fa5::t_9b9dce821f3482 25
+  s_07756e806a3fa5::t_9576d673fc3b40 24
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "02a6185e57683535ee68124aae51e4c79853f485",
+  "prompts": {},
+  "sessions": {
+    "s_07756e806a3fa5": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a11a40-20dc-7732-a5b7-49adf5fb1016",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "AIALRA-0 <aialra@163.com>"
+    }
+  }
+}
