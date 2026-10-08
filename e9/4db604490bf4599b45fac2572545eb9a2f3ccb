@@ -1,0 +1,34 @@
+apps/web/tests/public/palettes-controls.spec.ts
+  s_07756e806a3fa5::t_ab4d3976986ecc 93-104
+  s_0e8ff61e9358f0::t_278c91332a354f 92
+docs/security/publication-risk-notes.md
+  s_07756e806a3fa5::t_a5e16f257bce07 23
+docs/VERIFICATION-PUBLIC.md
+  s_07756e806a3fa5::t_ab4d3976986ecc 58-59
+apps/web/src/public/Viewer.tsx
+  s_07756e806a3fa5::t_2dad467422e52d 86,167,289-300,335-336,406,409
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "e94db604490bf4599b45fac2572545eb9a2f3ccb",
+  "prompts": {},
+  "sessions": {
+    "s_07756e806a3fa5": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a11a40-20dc-7732-a5b7-49adf5fb1016",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "AIALRA-0 <aialra@163.com>"
+    },
+    "s_0e8ff61e9358f0": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a10f02-00e5-7440-8971-e8ffd0d490e7",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "AIALRA-0 <aialra@163.com>"
+    }
+  }
+}
