@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layer-properties>
+  <properties>
+    <name>Demo device layers</name><source>*/*</source>
+    <group-members><name>Demo active</name><source>65/0@1</source></group-members>
+    <group-members><name>Demo gate</name><source>66/0@1</source></group-members>
+    <group-members><name>Demo contacts</name><source>67/0@1</source></group-members>
+  </properties>
+  <properties>
+    <name>Demo routing layers</name><source>*/*</source>
+    <group-members><name>Demo local routing</name><source>68/0@1</source></group-members>
+    <group-members><name>Demo vertical routing</name><source>69/0@1</source></group-members>
+    <group-members><name>Demo horizontal routing</name><source>70/0@1</source></group-members>
+    <group-members><name>Demo vias</name><source>71/0@1</source></group-members>
+  </properties>
+</layer-properties>

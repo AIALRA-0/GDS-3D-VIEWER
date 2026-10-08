@@ -62,6 +62,18 @@ const polygon = Buffer.concat([
   points(0, 0, 10, 0, 10, 5, 0, 5, 0, 0),
   rec(17, 0),
 ]);
+
+test("GDS null-word block padding is accepted but nonzero trailers and concatenated streams are refused", () => {
+  const source = Buffer.from(file([cell("PADDED"), polygon, rec(7, 0)]));
+  const padded = Buffer.concat([source, Buffer.alloc(2048 - source.length % 2048)]);
+  const parse = (bytes: Buffer) => parseGds(Uint8Array.from(bytes).buffer, "synthetic.gds");
+  expect(parse(padded)).toEqual(parse(source));
+  const malicious = Buffer.from(padded); malicious[malicious.length - 1] = 1;
+  expect(() => parse(malicious)).toThrow("额外数据");
+  expect(() => parse(Buffer.concat([source, source]))).toThrow("额外数据");
+  expect(() => parse(Buffer.concat([source, Buffer.alloc(1)]))).toThrow("额外数据");
+  expect(() => parse(source.subarray(0, source.length - 2))).toThrow();
+});
 test("GDS units, rotated reflected references and array pitches have known bounds", () => {
   const child = [cell("CHILD"), polygon, rec(7, 0)];
   const rotated = [

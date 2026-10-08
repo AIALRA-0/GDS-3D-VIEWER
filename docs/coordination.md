@@ -37,3 +37,7 @@ The owner requested a complete product rename to GDS-3D-VIEWER and a Chinese-def
 
 
 - Public frontend contract: unified icon toolbar orders sample then language and help then GitHub; inspector tabs preserve mounted AI state, source metadata retains local text/reference coordinates and bounded properties, layer aliases remain separate from geometry and travel only in review exports. Old reviews without names remain valid. No backend or template edits.
+
+## Viewer tools contract (2026-10-07)
+
+The public frontend now switches between an orthographic GDS XY view and perspective 3D without reparsing, adds a transient unsnapped planar ruler, and derives a bounded hierarchy from stored source names/references. Review/bookmark camera projection and zoom are optional backward-compatible fields validated on import. Explicit layer names travel in JSON/LYP mapping exports as well as reviews; both mapping directions retain the 1 MB limit, XML escaping and no-key/no-geometry contract. Stream parsing accepts only null-word padding after a complete ENDLIB and retains nonzero-trailer and expansion checks. Reference features are implemented independently; no upstream GPL code, private sample or original template content is published. Five map fixtures use separate browser contexts to avoid Chromium burst-download throttling while preserving all round-trip assertions.

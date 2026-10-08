@@ -4,7 +4,7 @@
 
 <p><strong>Open chip layouts in your browser and inspect layers, cells and individual geometry</strong></p>
 
-<p>No login · Browser-local files · Hover and click inspection · Optional object explanations</p>
+<p>No login · Browser-local files · 2D/3D · Hierarchy and measurements · Optional explanations</p>
 
 <p>
   <a href="https://gds3d.aialra.online">Open live preview</a> ·
@@ -24,12 +24,15 @@ Figure 1 The complete workbench running the original synthetic demonstration
 1. Open the [live preview](https://gds3d.aialra.online) and click “加载示例” to try the synthetic layout
 2. Click “打开文件” or drag in a local `.gds`, `.gds2`, `.gdsii`, `.gltf` or `.glb` file; suffix matching is case-insensitive
 3. Choose layers or cells, hover for a quick tooltip, and click geometry to pin details in the inspector
-4. Adjust views and layer separation, write review notes, and export them for later restoration
+4. Choose 2D for orthographic viewing and Measure for two-point measurements; choose 3D for spatial viewing, then export review observations
 
 Opening files requires no account or model key. Parsing happens in the current browser
 Chinese is the default. The `EN` / `ZH` control sits immediately after Load sample and switches the interface and future AI explanations while preserving geometry, layer visibility and notes
 The inspector groups Overview, Display, Source data and AI. Clicking geometry opens Overview; tabs keep the same AI configuration and ephemeral key
-Select a layer to set a manual name, or import a local `.lyp` / `.json` layer map. Unmapped layers keep their numbered defaults; names accompany review exports
+Select a layer to set a manual name, or import a local `.lyp` / `.json` layer map. Export JSON and Export LYP save the current explicit names; unmapped layers keep numbered defaults
+Maps contain names only, without colors or physical thicknesses. Nested groups and leading-zero IDs work; conflicting names are rejected
+Stored GDS cell names populate an expandable hierarchy and searchable directory. Physical layer names such as metal1 still require a map rather than guessing from layer numbers
+Orthographic 2D supports panning, zooming and unsnapped two-point measurements. Reviews/bookmarks retain projection and zoom; ruler results are transient
 Source data exposes library metadata, searchable text labels, reference transformations and record coverage; see [format support and layer names](docs/GDS-RECORDS.md)
 After refresh, reopen the source file; review exports contain observations and view state rather than the source layout
 
@@ -119,9 +122,17 @@ Figure 11 Formatted Markdown from an intercepted synthetic-summary demonstration
 
 </div>
 
+<div align="center">
+
+![Orthographic 2D with a two-point ruler reporting distance and signed coordinate differences](docs/assets/readme/planar-ruler.png)
+
+Figure 12 Orthographic 2D with a two-point ruler reporting distance and signed coordinate differences, without snapping
+
+</div>
+
 ## 3 Object explanations and keys
 
-The interface defaults to Chinese. The header's `EN` / `中文` button switches interface labels and the language of future AI explanations; only the language preference is saved
+The interface defaults to Chinese. The header's `EN` / `ZH` button switches interface labels and the language of future AI explanations; only the language preference is saved
 Switching languages preserves the loaded layout, layer selection and notes. Cell names and completed explanations retain their original text
 
 The optional AI panel explains the current cell or clicked geometry using the fixed `gds-3d-viewer-explain-v1` harness
@@ -149,7 +160,8 @@ Table 1 Public preview capabilities and boundaries
 | Missing cells | Existing geometry, incomplete banner and missing-target list | Full rendering needs an export containing dependency cells |
 | 3D models | Self-contained, uncompressed static triangle meshes | External resources and images refused; animation not played |
 | Hover/selection | Cell, instance, kind, layer, coordinates and dimensions | Does not establish net names or electrical connectivity |
-| Layer controls | Visibility, isolation, manual naming, map import, separation and camera views | Names come from the user or a map; display heights are illustrative |
+| Layer controls | Visibility, isolation, manual names, JSON/LYP map import/export and separation | Names come from the user or a map; display heights are illustrative |
+| 2D and hierarchy | Orthographic 2D/3D switching, hierarchy tree, directory search and two-point ruler | No snapping or connectivity inference; bounded tree depth and row count |
 | Reviews | Notes, bookmarks, camera and layer state export/restore | Retain source files separately |
 | Comparison | Layer-count and triangle-count changes | No geometric XOR or manufacturing checks |
 | Parsing | 32 MB per file, 45-second limit | Over-budget designs open their cell directory |
@@ -159,6 +171,8 @@ Table 1 Public preview capabilities and boundaries
 A missing reference is not a suffix error: a file can reference external standard-cell definitions without embedding them
 The inspector reports targets and referring cells; missing shapes are never fabricated
 See [public preview details](docs/PUBLIC-PREVIEW.md) for exact limits
+See [reference features and operations](docs/VIEWER-REFERENCE-FEATURES.md) for GDS3D/KLayout choices and original synthetic [JSON](fixtures/layer-maps/synthetic.json)/[grouped LYP](fixtures/layer-maps/synthetic-grouped.lyp) examples
+These browser operations do not need a command shell. Process-stack reconstruction, wire tracing, DRC and LVS are outside the current name mapping and visual preview capabilities
 
 ## 5 Run locally
 
@@ -178,7 +192,7 @@ The original Python-backed workflow is documented in [local development](docs/LO
 
 ## 6 Verification and contributions
 
-The 15 public regressions cover missing cells, transforms/arrays, hover/click facts, key lifetime, direct summaries, cancellation, resource rejection, oversized files, review restoration and mobile layouts
+The 30 public regressions cover missing cells, transforms/arrays, null-word padding, 2D coordinates and zoomed measurements, map round trips, hierarchy browsing, hover/click facts, key lifetime, resource rejection, oversized files, review restoration and mobile layouts
 Public and legacy production builds pass. See [verification evidence](docs/VERIFICATION-PUBLIC.md) for scope and release checks
 
 ```sh

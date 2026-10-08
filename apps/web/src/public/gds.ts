@@ -204,8 +204,12 @@ export function parseGds(
     } else if (type === 4) {
       finished = true;
       if (cell || element) throw new Error("未结束的单元或元素");
-      if (pos + length !== buffer.byteLength)
+      // Stream exporters may pad the last physical block with null words.
+      // Accept only zero padding after a complete ENDLIB, never another library/payload.
+      if (length !== 4 || view.getUint8(pos + 3) !== 0 || buffer.byteLength % 2 ||
+          new Uint8Array(buffer, pos + length).some((byte) => byte !== 0))
         throw new Error("库结束记录后存在额外数据");
+      break;
     } else if (element) {
       if (type === 13) {
         need(2);

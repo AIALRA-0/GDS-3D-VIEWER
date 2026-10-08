@@ -13,7 +13,8 @@ import { featureKind } from "./Viewer";
 import type { CameraPose, ViewerHandle } from "./Viewer";
 import { ExplanationPanel } from "./ExplanationPanel";
 import { SourceData } from "./SourceData";
-import { parseLayerNames, validateLayerNames } from "./layerNames";
+import { parseLayerNames, validateLayerNames, exportLayerNames } from "./layerNames";
+import { CellHierarchy } from "./CellHierarchy";
 import "./workbench.css";
 import tokens from "./tokens.json";
 type Panel = "layers" | "cells" | "notes" | "bookmarks";
@@ -98,6 +99,9 @@ export default function Workbench() {
   const [selectedObject, setSelectedObject] = useState<PickInfo | null>(null);
   const [inspectorTab, setInspectorTab] = useState("overview");
   const [layerNames, setLayerNames] = useState<Record<string, string>>({});
+  const [viewMode, setViewMode] = useState<"2d" | "3d">("3d");
+  const [measuring, setMeasuring] = useState(false);
+  const [cellView, setCellView] = useState<"list" | "hierarchy">("hierarchy");
   const [rename, setRename] = useState<{ id: string; value: string } | null>(null);
   const mappingInput = useRef<HTMLInputElement>(null);
   const layerName = (id: string, fallback?: string) => layerNames[id] ?? fallback ?? `Layer ${id}`;
@@ -433,6 +437,9 @@ export default function Workbench() {
       if (id !== generation.current) return;
       const pose = (v: CameraPose) =>
         v &&
+        (v.projection === undefined || v.projection === "2d" || v.projection === "3d") &&
+        (v.zoom === undefined || (Number.isFinite(v.zoom) && v.zoom >= 0.05 && v.zoom <= 1000)) &&
+        (v.projection !== "2d" || current.format === "gds") &&
         [v.position, v.target].every(
           (a) =>
             Array.isArray(a) &&
@@ -507,7 +514,7 @@ export default function Workbench() {
       const names = parseLayerNames(await file.text(), file.name);
       if (id !== generation.current) return;
       setLayerNames(names); setRename(null); setError("");
-      setStatus("图层名称已更新，仅保存在当前会话与审阅导出");
+      setStatus(`当前单元匹配 ${layout?.layers.filter((layer) => names[layer.id]).length ?? 0} / ${Object.keys(names).length} 个图层名称，其他名称仍保留在映射中`);
     } catch (e) { if (id === generation.current) setError(e instanceof Error ? e.message : "图层映射无法读取"); }
   }
   function toggleLayer(id: string) {
@@ -588,9 +595,10 @@ export default function Workbench() {
       <Button
         icon="fit"
         label={t("适应整个版图")}
-        onClick={() => viewer.current?.view("iso")}
+        onClick={() => viewer.current?.view("fit")}
         disabled={!layout}
       />
+      <button className="text-button quiet" aria-pressed={viewMode === "2d"} disabled={!layout || layout.format !== "gds" || !layout.layers.length} onClick={() => viewer.current?.view("2d")}>{t("二维")}</button>
       <button
         className="text-button quiet"
         onClick={() => viewer.current?.view("top")}
@@ -606,9 +614,11 @@ export default function Workbench() {
       <button
         className="text-button quiet"
         onClick={() => viewer.current?.view("iso")}
+        aria-pressed={viewMode === "3d"}
         disabled={!layout}
       >
          {t("三维")} </button>
+      <button className="text-button quiet" aria-pressed={measuring} disabled={!layout || layout.format !== "gds" || !layout.layers.length} onClick={() => { if (!measuring) viewer.current?.view("2d"); setMeasuring((value) => !value); }}>{t("测量")}</button>
     </>
   );
   const navigator = (
@@ -652,6 +662,12 @@ export default function Workbench() {
           <>
             <div className="group-actions">
               <button className="text-button" disabled={!layout || layout.format !== "gds"} onClick={() => mappingInput.current?.click()}>{t("导入层映射")}</button>
+              {(["json", "lyp"] as const).map((format) => <button key={format} className="text-button" disabled={!layout || layout.format !== "gds" || !Object.keys(layerNames).length} onClick={() => {
+                try {
+                const url = URL.createObjectURL(new Blob([exportLayerNames(layerNames, format)], { type: format === "json" ? "application/json" : "application/xml" }));
+                const link = document.createElement("a"); link.href = url; link.download = `gds-layer-names.${format}`; link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+                } catch (error) { setError(error instanceof Error ? error.message : "图层映射无法读取"); }
+              }}>{t(format === "json" ? "导出 JSON" : "导出 LYP")}</button>)}
               <button
                 className="text-button"
                 onClick={() =>
@@ -667,6 +683,7 @@ export default function Workbench() {
               >
                  {t("隐藏全部")} </button>
             </div>
+            <p className="muted field-help">{t("映射仅包含自定义名称，不包含颜色、厚度或版图几何")}</p>
             <div className="layer-list">
               {shownLayers.map((layer) => (
                 <div
@@ -719,12 +736,16 @@ export default function Workbench() {
         )}
         {panel === "cells" && (
           <>
+            {layout?.format === "gds" && <div className="group-actions" role="group" aria-label={t("单元浏览方式")}>
+              <button className="text-button" aria-pressed={cellView === "hierarchy"} onClick={() => setCellView("hierarchy")}>{t("层级树")}</button>
+              <button className="text-button" aria-pressed={cellView === "list"} onClick={() => setCellView("list")}>{t("全部单元")}</button>
+            </div>}
             <p className="muted field-help">
               {layout?.format === "gds"
                 ? t("选择单元可独立查看其几何与引用")
                 : t("模型节点与引用数量")}
             </p>
-            <div className="cell-list">
+            {layout?.format === "gds" && cellView === "hierarchy" && !search ? <CellHierarchy key={layout.name} layout={layout} busy={busy} onOpen={(name) => { if (source.current) void openFile(source.current, name); }} /> : <div className="cell-list">
               {shownCells.slice(0, 300).map((cell, index) => (
                 <button
                   key={`${cell.name}-${index}`}
@@ -747,7 +768,7 @@ export default function Workbench() {
                   )}
                 </button>
               ))}
-            </div>
+            </div>}
             {shownCells.length > 300 && (
               <p className="muted"> {t("显示前 300 项，请使用筛选定位")} </p>
             )}
@@ -1264,6 +1285,8 @@ export default function Workbench() {
                 selectedObject={selectedObject}
                 onPick={(pick) => { setSelectedObject(pick); if (pick) { setInspectorTab("overview"); setRight(true); if (mobile) setLeft(false); } }}
                 layerNames={layerNames}
+                onMode={(mode) => { setViewMode(mode); if (mode === "3d") setMeasuring(false); }}
+                measuring={measuring}
                 onSelect={(id) => {
                   setSelected(id);
                   if (mobile) {
@@ -1338,7 +1361,7 @@ export default function Workbench() {
               )}
               {layout && layout.layers.length > 0 && !busy && (
                 <div className="canvas-hint">
-                   {t("拖动旋转 · 右键平移 · 滚轮缩放 · 悬停查看 · 点击固定详情")} </div>
+                   {t(viewMode === "2d" ? "二维正交 · 拖动平移 · 滚轮缩放 · 可开启测量" : "拖动旋转 · 右键平移 · 滚轮缩放 · 悬停查看 · 点击固定详情")} </div>
               )}
               {layout?.incomplete && !busy && <div className="incomplete-banner" role="status"> {t("不完整预览 ·")} {layout.missingReferences?.length ? t("缺失单元定义，当前仅显示已有几何") : t("完整几何尚未生成")}<button className="text-button quiet" onClick={() => { setRight(true); if (mobile) setLeft(false); }}> {t("查看解析说明")} </button></div>}
             </div>
@@ -1399,9 +1422,11 @@ export default function Workbench() {
             <li>
                {t("打开本地 .gds、.gds2、.gdsii、.gltf 或 .glb 文件，也可以加载合成示例")} </li>
             <li>
-               {t("通过图层开关和单元列表选择显示内容，使用俯视、正视和三维视角观察")} </li>
+               {t("通过图层开关和单元层级选择内容，二维可平移与测量，三维可旋转与展开图层")} </li>
             <li> {t("把观察写入审阅记录，保存视角书签，再导出记录以便后续恢复")} </li>
           </ol>
+          <p>{t("测量在二维平面点击起点与终点，不吸附几何，第三次点击重新测量，结果不随审阅记录保存")}</p>
+          <p>{t("单元名称直接读取文件，实际工艺层名需手动命名或导入映射，可导出 JSON 或 LYP，映射不包含颜色与厚度")}</p>
           <h3> {t("文件与会话")} </h3>
           <p>
              {t("解析任务在浏览器中独立运行，不上传你的版图、不共享会话。可选 AI 讲解由浏览器直连你确认的模型服务，只发送预览过的对象摘要；密钥仅留在当前页面，刷新即丢弃")} </p>

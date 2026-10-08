@@ -9,6 +9,9 @@ declare module "three/examples/jsm/controls/OrbitControls.js" {
     target: Vector3;
     minDistance: number;
     maxDistance: number;
+    minZoom: number;
+    maxZoom: number;
+    enableRotate: boolean;
     enableDamping: boolean;
     enablePan: boolean;
     zoomToCursor: boolean;
