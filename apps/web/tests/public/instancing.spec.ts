@@ -51,12 +51,15 @@ test("full repeated layout supports 2D picking, selected-instance highlight and 
     Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")!.set!.call(element, "#00ff00");
     element.dispatchEvent(new Event("input", { bubbles: true }));
   });
+  // CI traces show a complete software-GPU draw taking over six seconds while
+  // the other worker renders another repeated layout. Give the real-pixel read
+  // time to finish; preserve the fixture, color threshold and 60s whole-test cap.
   await expect.poll(() => canvas.evaluate((source: HTMLCanvasElement) => {
     const copy = document.createElement("canvas"); copy.width = source.width; copy.height = source.height;
     const context = copy.getContext("2d")!; context.drawImage(source, 0, 0);
     const [r, g, b] = context.getImageData(source.width / 2, source.height / 2, 1, 1).data;
     return g > r * 2 && g > b * 2;
-  })).toBe(true);
+  }), { timeout: 15_000 }).toBe(true);
   await expect(canvas).toHaveAttribute("data-projection", "orthographic");
   await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
   const tooltip = page.getByRole("tooltip"); await expect(tooltip).toContainText("TILE");
