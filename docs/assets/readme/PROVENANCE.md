@@ -1,6 +1,6 @@
 # Product screenshot provenance
 
-Captured on 2026-10-08 (America/Los_Angeles) using the actual GDS-3D-VIEWER production build in Chromium through Playwright. All seventeen images use original synthetic geometry from `apps/web/public-static/samples/demo.gds`, authored by `scripts/generate-browser-demo.py`. No visitor file, privately supplied design, account, browser toolbar or real API key was captured. No generated mockup replaces product evidence.
+Captured on 2026-10-08 (America/Los_Angeles) using the actual GDS-3D-VIEWER production build in Chromium through Playwright. All eighteen images use original synthetic geometry from `apps/web/public-static/samples/demo.gds`, authored by `scripts/generate-browser-demo.py`. No visitor file, privately supplied design, account, browser toolbar or real API key was captured. No generated mockup replaces product evidence.
 
 | File | View | Pixels |
 | --- | --- | --- |
@@ -9,6 +9,7 @@ Captured on 2026-10-08 (America/Los_Angeles) using the actual GDS-3D-VIEWER prod
 | geometry-hover.png | Actual hit tooltip on logic_tile | 1600 × 1000 |
 | geometry-inspection.png | Pinned primitive facts and instance path | 1600 × 1000 |
 | cell-browser.png | Expandable cell hierarchy and selected logic_tile | 1600 × 1000 |
+| cell-compact.png | The same logic_tile and camera after live compact-height toggle | 1600 × 1000 |
 | exploded-layers.png | Illustrative separated layers | 1600 × 1000 |
 | review-records.png | Original synthetic review observation | 1600 × 1000 |
 | ai-harness.png | Empty-key configuration, summary preview and consent | 1600 × 1320 |
@@ -28,8 +29,10 @@ The current captures include the unified toolbar, EN/ZH control after the sample
 
 Earlier `gds-3d-viewer-cockpit.png` depicts the retained local API workflow; `gds-3d-viewer-hero.svg` is its historical illustration. Neither is current public UI evidence. The template archive/source project is excluded; only the owner's requested copied design parameters underpin the implemented interface. Dependency notices are preserved.
 
-Current captures include directly editable layer swatches, icon actions with accessible help, palette CRUD/default management and grouped exports. Zero separation now packs adjacent illustrative surfaces without native gaps; separation 10 shows clear gaps. All seventeen captures were refreshed from this build.
+Current captures include directly editable layer swatches, icon actions with accessible help, palette CRUD/default management and grouped exports. Zero separation now packs adjacent illustrative surfaces without native gaps; separation 10 shows clear gaps. All eighteen captures were refreshed from this build.
 
 Current captures also show adjacent dimension controls, shared select fields, spacious palette editing, top-cell occurrence highlights and explicitly statistical comparison. Every screenshot was refreshed after the UI audit; heading focus avoids automatically opening the close-control tooltip.
 
 The current refresh includes circular multi-select checkboxes, ten built-in palettes and local JSON palette transfer, enabled default-name JSON/LYP exports, left-drag planar rotation and middle-button pan instructions. File-wide illustrative layer order/thickness is shared by all cell views; it is never physical process evidence.
+
+The paired cell views show actual consistent/compact geometry at the same camera, colors and layer selection; no image editing flattens the model. The toggle is visible in Cells and Display, and all other current product captures were refreshed.

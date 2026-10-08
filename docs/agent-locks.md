@@ -2,6 +2,7 @@
 
 | path | owner | purpose | start | eta | status |
 |------|-------|---------|-------|-----|--------|
+| README.md; README.en.md; docs/coordination.md | main | compact/consistent height toggle, current captures and network investigation | 2026-10-08 America/Los_Angeles | current turn | released |
 | README.md; README.en.md; docs/coordination.md | main | custom dropdowns, planar rotation, palette transfer and stable illustrative heights | 2026-10-08 America/Los_Angeles | current turn | released |
 | README.md; README.en.md; docs/coordination.md | main | unified UI audit, top-cell instance tools and current screenshots | 2026-10-08 America/Los_Angeles | current turn | released |
 | README.md; README.en.md; docs/coordination.md | main | editable palettes, icon actions and export dialogs | 2026-10-08 America/Los_Angeles | current turn | released |
@@ -31,3 +32,5 @@
 - Whole-layout reuse and documentation locks released: repeated geometry retains exact instance inspection within explicit budgets; protocol guidance covers Cloudflare domains and no account or browser setting change is claimed
 
 - Dropdown/rotation/transfer documentation locks released: themed keyboard dropdowns, planar rotation and middle-button pan, ten palettes with local JSON transfer, default-name map exports and file-wide illustrative heights; seventeen synthetic-only screenshots match the current preview
+
+- Height-mode documentation locks released: consistent/compact toggle preserves camera, colors, filters and exact picking, reviews/bookmarks retain the mode, eighteen synthetic captures match the current preview; read-only network evidence distinguishes permission denial from QUIC and does not claim a complete fix

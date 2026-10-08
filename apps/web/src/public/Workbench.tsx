@@ -13,7 +13,7 @@ import { LIMITS } from "./types";
 import type { Layout, PickInfo } from "./types";
 import { Viewer } from "./Viewer";
 import { featureKind } from "./Viewer";
-import type { CameraPose, ViewerHandle } from "./Viewer";
+import type { CameraPose, ViewerHandle, HeightMode } from "./Viewer";
 import { ExplanationPanel } from "./ExplanationPanel";
 import { SourceData } from "./SourceData";
 import { parseLayerNames, validateLayerNames, exportLayerNames } from "./layerNames";
@@ -88,6 +88,8 @@ export default function Workbench() {
   defaultPaletteId.current = palettePreferences.defaultId;
   const applyPalette = (id: string) => { setPaletteId(id); setLayerColors({}); };
   const [viewMode, setViewMode] = useState<"2d" | "3d">("3d");
+  const [heightMode, setHeightMode] = useState<HeightMode>("consistent");
+  const heightControl = () => <div className="height-control"><span>{t("层高显示")}</span><strong>{t(heightMode === "compact" ? "紧凑层高" : "一致层高")}</strong><Button icon="layers" label={t(heightMode === "compact" ? "切换为一致层高" : "切换为紧凑层高")} pressed={heightMode === "compact"} disabled={busy || layout?.format !== "gds" || !layout.layers.length} onClick={() => setHeightMode(mode => mode === "compact" ? "consistent" : "compact")} /></div>;
   const [measuring, setMeasuring] = useState(false);
   const [cellView, setCellView] = useState<"list" | "hierarchy">("hierarchy");
   const [rootTop, setRootTop] = useState("");
@@ -445,6 +447,7 @@ export default function Workbench() {
         (v.projection === undefined || v.projection === "2d" || v.projection === "3d") &&
         (v.zoom === undefined || (Number.isFinite(v.zoom) && v.zoom >= 0.05 && v.zoom <= 1000)) &&
         (v.rotation === undefined || (Number.isFinite(v.rotation) && Math.abs(v.rotation) <= Math.PI * 2)) &&
+        (v.heightMode === undefined || (current.format === "gds" && (v.heightMode === "consistent" || v.heightMode === "compact"))) &&
         (v.projection !== "2d" || current.format === "gds") &&
         [v.position, v.target].every(
           (a) =>
@@ -740,7 +743,7 @@ export default function Workbench() {
                 ? t("选择单元可独立查看其几何与引用")
                 : t("模型节点与引用数量")}
             </p>
-            {layout?.format === "gds" && <div className="cell-root-field"><label>{t("定位顶层")}<SelectField aria-label={t("定位顶层")} value={rootTop} disabled={busy} onChange={name => { setRootTop(name); if (source.current) void openFile(source.current, name); }} options={layout.tops.map(name => ({ value: name, label: name }))} /></label><p className="muted">{t("单元右侧定位按钮查找此顶层中的全部实例，包含子单元几何")}</p></div>}
+            {layout?.format === "gds" && <div className="cell-root-field"><label>{t("定位顶层")}<SelectField aria-label={t("定位顶层")} value={rootTop} disabled={busy} onChange={name => { setRootTop(name); if (source.current) void openFile(source.current, name); }} options={layout.tops.map(name => ({ value: name, label: name }))} /></label>{heightControl()}<p className="muted">{t("单元右侧定位按钮查找此顶层中的全部实例，包含子单元几何")}</p></div>}
             {layout?.format === "gds" && cellView === "hierarchy" && !search ? <CellHierarchy key={layout.name} layout={layout} busy={busy} onInstances={openInstances} onOpen={(name) => { if (source.current) void openFile(source.current, name); }} /> : <div className="cell-list">
               {shownCells.slice(0, 300).map((cell, index) => (
                 <div className="cell-entry" key={`${cell.name}-${index}`}>
@@ -985,6 +988,7 @@ export default function Workbench() {
         <div role="tabpanel" id="inspector-panel-display" aria-labelledby="inspector-tab-display" hidden={inspectorTab !== "display"}>
         <section>
           <h3> {t("图层展开")} </h3>
+          {layout?.format === "gds" && <>{heightControl()}<p className="muted field-help">{t(heightMode === "compact" ? "紧凑层高按当前单元排列，便于观察细节；不用于跨单元厚度比较" : "一致层高共用文件基准，便于对照单元与顶层；均为示意高度")}</p></>}
           <label className="range-label" htmlFor="explode">
              {t("层间距")} <span>{explode}</span>
           </label>
@@ -1262,6 +1266,8 @@ export default function Workbench() {
                 layout={layout}
                 visible={visible}
                 explode={explode}
+                heightMode={heightMode}
+                onHeightMode={setHeightMode}
                 theme={theme}
                 selectedObject={selectedObject}
                 onPick={(pick) => { setSelectedObject(pick); if (pick) { setInspectorTab("overview"); setRight(true); if (mobile) setLeft(false); } }}

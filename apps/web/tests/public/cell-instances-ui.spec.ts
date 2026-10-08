@@ -99,6 +99,9 @@ test("reused descendant filtering compacts placements but preserves original ins
   test.setTimeout(90_000); // Full large-layout load plus several independent GPU display changes.
   await load(page,instanceFixture(25,41,200));
   await focus(page,"高亮全部实例");await expect(page.locator("canvas")).toHaveAttribute("data-cell-highlight-count","1025");
+  await page.locator(".cell-root-field").getByRole("button",{name:"切换为紧凑层高",exact:true}).click();
+  await expect(page.locator("canvas")).toHaveAttribute("data-height-mode","compact");
+  await expect(page.locator("canvas")).toHaveAttribute("data-cell-highlight-count","1025");
   await focus(page,"只看该单元实例");await expect.poll(async()=> (await scan(page)).blue).toBe(0);
   const image=await scan(page);expect(image.red).toBeGreaterThan(100);await clickPixel(page,image.redPoint!);
   await expect(page.locator(".object-inspection")).toContainText(TILE);

@@ -43,12 +43,18 @@ export function instanceFeature(layer: LayerMesh, batchIndex: number, placement:
     ...(feature.area !== undefined ? { area: feature.area * Math.abs(m[0] * m[3] - m[1] * m[2]) } : {}),
     ...(feature.pathWidth !== undefined ? { pathWidth: feature.pathWidth * magnification, pathLength: feature.pathLength! * magnification } : {}) };
 }
+export type HeightMode = "consistent" | "compact";
+export function displayHeightScale(layout: Layout, mode: HeightMode, scale: number) {
+  if (layout.format !== "gds") return scale;
+  return mode === "consistent" && layout.gds?.stack ? layout.gds.stack.pitch * scale : Math.min(0.18, 2.5 / Math.max(layout.layers.length, 1));
+}
 export interface CameraPose {
   position: number[];
   target: number[];
   projection?: "2d" | "3d";
   zoom?: number;
   rotation?: number;
+  heightMode?: HeightMode;
 }
 export interface ViewerHandle {
   view: (name: string) => void;
@@ -69,9 +75,11 @@ interface Props {
   onMode?: (mode: "2d" | "3d") => void;
   measuring?: boolean;
   cellFocus?: CellFocus | null;
+  heightMode?: HeightMode;
+  onHeightMode?: (mode: HeightMode) => void;
 }
 export const Viewer = forwardRef<ViewerHandle, Props>(function Viewer(
-  { layout, visible, explode, theme, onSelect, onPick, selectedObject, layerNames, layerColors, onMode, measuring = false, cellFocus },
+  { layout, visible, explode, theme, onSelect, onPick, selectedObject, layerNames, layerColors, onMode, measuring = false, cellFocus, heightMode = "consistent", onHeightMode },
   ref,
 ) {
   const { t } = useI18n();
@@ -95,6 +103,7 @@ export const Viewer = forwardRef<ViewerHandle, Props>(function Viewer(
       centerZ: number;
       scale: number;
       cellOutline: THREE.LineSegments;
+      heightRatio: number;
     } | null>(null);
   const tooltip = useRef<HTMLDivElement>(null);
   const select = useRef(onSelect);
@@ -108,6 +117,8 @@ export const Viewer = forwardRef<ViewerHandle, Props>(function Viewer(
   const measurementPoints = useRef<number[][]>([]);
   const measure = useRef(measuring), modeChanged = useRef(onMode);
   measure.current = measuring; modeChanged.current = onMode;
+  const height = useRef(heightMode), heightChanged = useRef(onHeightMode);
+  height.current = heightMode; heightChanged.current = onHeightMode;
   const changeMode = (next: "2d" | "3d") => {
     const r = runtime.current;
     if (!r) return;
@@ -155,6 +166,7 @@ export const Viewer = forwardRef<ViewerHandle, Props>(function Viewer(
               target: r.controls.target.toArray(),
               projection: r.camera instanceof THREE.OrthographicCamera ? "2d" : "3d",
               zoom: r.camera.zoom,
+              ...(r.renderer.domElement.dataset.heightMode ? { heightMode: height.current } : {}),
               ...(r.camera instanceof THREE.OrthographicCamera ? { rotation: Math.atan2(-r.camera.up.x, -r.camera.up.z) } : {}),
             }
           : null;
@@ -162,6 +174,7 @@ export const Viewer = forwardRef<ViewerHandle, Props>(function Viewer(
       restore(pose) {
         const r = runtime.current;
         if (r) {
+          heightChanged.current?.(pose.heightMode ?? "consistent");
           changeMode(pose.projection === "2d" ? "2d" : "3d");
           r.camera.position.fromArray(pose.position);
           r.camera.zoom = pose.zoom ?? 1;
@@ -240,7 +253,7 @@ export const Viewer = forwardRef<ViewerHandle, Props>(function Viewer(
         0.000001,
       ),
       scale = 12 / span;
-    const yScale = layout.format === "gds" ? (layout.gds?.stack ? layout.gds.stack.pitch * scale : Math.min(0.18, 2.5 / layout.layers.length)) : scale;
+    const yScale = displayHeightScale(layout, "consistent", scale);
     const centerX = (layout.bounds[0] + layout.bounds[2]) / 2,
       centerZ =
         layout.format === "gds"
@@ -425,7 +438,7 @@ export const Viewer = forwardRef<ViewerHandle, Props>(function Viewer(
     renderer.domElement.addEventListener("pointermove", pointerMove);
     renderer.domElement.addEventListener("pointerleave", pointerLeave);
     renderer.domElement.addEventListener("webglcontextlost", lost);
-    runtime.current = { renderer, scene, camera, perspective: camera, orthographic, controls, meshes, size, draw, flush, ruler, verticalBounds, grid, centerY: center.y, centerX, centerZ, scale, cellOutline };
+    runtime.current = { renderer, scene, camera, perspective: camera, orthographic, controls, meshes, size, draw, flush, ruler, verticalBounds, grid, centerY: center.y, centerX, centerZ, scale, cellOutline, heightRatio: 1 };
     resize();
     return () => {
       if (frame !== undefined) cancelAnimationFrame(frame);
@@ -476,17 +489,23 @@ export const Viewer = forwardRef<ViewerHandle, Props>(function Viewer(
     const r = runtime.current;
     if (!r) return;
     const stack = layout?.gds?.stack;
+    const ratio = layout?.format === "gds" ? displayHeightScale(layout, heightMode, r.scale) / displayHeightScale(layout, "consistent", r.scale) : 1;
+    r.heightRatio = ratio;
+    if (layout?.format === "gds") r.renderer.domElement.dataset.heightMode = heightMode;
+    const scaledBounds = r.verticalBounds.map(([min, max]) => [min * ratio, max * ratio] as [number, number]);
     const stackIndices = new Map(stack?.layers.map((id, index) => [id, index]));
-    const offsets = stack ? layout!.layers.map(layer => stackIndices.get(layer.id)! * explode * 0.1) : layout?.format === "gds" ? packedLayerOffsets(r.verticalBounds, explode * 0.1) : r.verticalBounds.map((_, i) => i * explode * 0.1);
-    if (stack && offsets.length) { const center = (Math.min(...offsets) + Math.max(...offsets)) / 2; for (let i = 0; i < offsets.length; i++) offsets[i] -= center; }
+    const fileStack = !!stack && heightMode === "consistent";
+    const offsets = fileStack ? layout!.layers.map(layer => stackIndices.get(layer.id)! * explode * 0.1) : layout?.format === "gds" ? packedLayerOffsets(scaledBounds, explode * 0.1) : r.verticalBounds.map((_, i) => i * explode * 0.1);
+    if (fileStack && offsets.length) { const center = (Math.min(...offsets) + Math.max(...offsets)) / 2; for (let i = 0; i < offsets.length; i++) offsets[i] -= center; }
     r.meshes.forEach((m) => {
       m.visible = visible.includes(m.userData.layerId);
-      m.position.y = offsets[m.userData.layerIndex];
+      m.scale.y = ratio;
+      m.position.y = offsets[m.userData.layerIndex] + (1 - ratio) * r.centerY;
     });
-    if (layout?.format === "gds") r.grid.position.y = r.verticalBounds.reduce((min, b, i) => Math.min(min, b[0] + offsets[i]), Infinity) - r.centerY - 0.15;
+    if (layout?.format === "gds") r.grid.position.y = scaledBounds.reduce((min, b, i) => Math.min(min, b[0] + offsets[i]), Infinity) - ratio * r.centerY - 0.15;
     setHover(null);
     r.draw();
-  }, [visible, explode, layout]);
+  }, [visible, explode, layout, heightMode]);
   useEffect(() => {
     const r = runtime.current;
     if (!r || !layout) return;
@@ -515,7 +534,11 @@ export const Viewer = forwardRef<ViewerHandle, Props>(function Viewer(
           matrix.fromArray(original, index * 16);
           if (updateMatrices) mesh.setMatrixAt(placements.length, matrix);
           placements.push(index);
-          if (layerVisible && matches?.owners.has(path)) collect(matches.owners.get(path), box.copy(mesh.geometry.boundingBox!).applyMatrix4(matrix).translate(mesh.position));
+          if (layerVisible && matches?.owners.has(path)) {
+            box.copy(mesh.geometry.boundingBox!).applyMatrix4(matrix);
+            box.min.y *= r.heightRatio; box.max.y *= r.heightRatio;
+            collect(matches.owners.get(path), box.translate(mesh.position));
+          }
         }
         if (updateMatrices) {
           mesh.userData.placements = placements; mesh.count = placements.length;
@@ -543,8 +566,8 @@ export const Viewer = forwardRef<ViewerHandle, Props>(function Viewer(
           if (owner === undefined) continue;
           const b = feature.bounds, y = r.verticalBounds[mesh.userData.layerIndex];
           collect(owner, new THREE.Box3(
-            new THREE.Vector3((b[0] - r.centerX) * r.scale, y[0] + mesh.position.y, (-b[3] - r.centerZ) * r.scale),
-            new THREE.Vector3((b[2] - r.centerX) * r.scale, y[1] + mesh.position.y, (-b[1] - r.centerZ) * r.scale),
+            new THREE.Vector3((b[0] - r.centerX) * r.scale, y[0] * r.heightRatio + mesh.position.y, (-b[3] - r.centerZ) * r.scale),
+            new THREE.Vector3((b[2] - r.centerX) * r.scale, y[1] * r.heightRatio + mesh.position.y, (-b[1] - r.centerZ) * r.scale),
           ));
         }
       }
@@ -564,7 +587,7 @@ export const Viewer = forwardRef<ViewerHandle, Props>(function Viewer(
     r.renderer.domElement.dataset.cellHighlightCount = String(boxes.size);
     r.renderer.domElement.dataset.cellFocus = cellFocus?.mode ?? "none";
     setHover(null); r.draw();
-  }, [cellFocus, layout, visible, explode]);
+  }, [cellFocus, layout, visible, explode, heightMode]);
   useEffect(() => {
     setHover(null);
     const r = runtime.current, feature = selectedObject?.feature;

@@ -43,6 +43,7 @@ The Color palettes dialog supports create, copy, edit, delete, search and starre
 The palette dialog imports/exports local JSON containing custom palettes and the default choice. Import merges palettes, updates matching IDs and refuses malformed or over-64 KB files without changing existing choices
 Zero layer spacing makes adjacent surfaces touch while retaining illustrative thickness, with no underlying gap; this is not a physical process stack
 Cells in one file share layer order and an illustrative thickness convention. Standalone cells retain thickness relative to geometry; missing layers reserve their positions. Automatic fitting still changes the overall magnification
+The Cells panel and Display tab offer a height toggle. Consistent heights support comparisons with the top cell; Compact heights restore flatter detail inspection. Switching preserves camera, colors and instance filters. Reviews/bookmarks retain the mode; older records default to consistent heights
 Frequent actions use icons with hover and keyboard-focus help; export choices retain text in a dedicated dialog
 After refresh, reopen the source file; review exports contain observations, view state, layer names and colors, excluding the source layout and keys
 
@@ -80,7 +81,15 @@ Figure 4 Clicking pins and highlights a primitive with source, dimensions and in
 
 ![Inspect smaller cells independently, including designs exceeding the full expansion budget](docs/assets/readme/cell-browser.png)
 
-Figure 5 Inspect smaller cells independently, including designs exceeding the full expansion budget
+Figure 5 Consistent heights with the toggle in the Cells panel, which remains available for expansion-limited designs
+
+</div>
+
+<div align="center">
+
+![The same synthetic cell with compact heights, retaining the camera for a direct visual comparison](docs/assets/readme/cell-compact.png)
+
+Figure 5.1 Compact heights for the same synthetic cell, retaining the camera, colors and layer selection
 
 </div>
 
@@ -242,7 +251,7 @@ The original Python-backed workflow is documented in [local development](docs/LO
 
 ## 6 Verification and contributions
 
-The 47 public regressions cover complete repeated designs, bounded source storage and instance picking, missing cells, transforms/arrays, null-word padding, 2D coordinates and zoomed measurements, map round trips, hierarchy browsing, hover/click facts, key lifetime, resource rejection, oversized files, review restoration and mobile layouts
+The 49 public regressions cover complete repeated designs, bounded source storage and instance picking, missing cells, transforms/arrays, null-word padding, 2D coordinates and zoomed measurements, map round trips, hierarchy browsing, hover/click facts, height modes, key lifetime, resource rejection, oversized files, review restoration and mobile layouts
 
 Repeated `ERR_QUIC_PROTOCOL_ERROR` is a network-entry issue rather than a parser limit. [Network compatibility](docs/NETWORK-TROUBLESHOOTING.md) explains Cloudflare zone-wide settings, targeted hostname rules and browser workarounds
 Public and legacy production builds pass. See [verification evidence](docs/VERIFICATION-PUBLIC.md) for scope and release checks

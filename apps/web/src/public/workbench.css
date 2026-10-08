@@ -1281,6 +1281,11 @@ html[data-theme=light] .button-tooltip { background:#fff; color:#232321; border-
 .hierarchy-row > .icon-button, .cell-entry > .icon-button { width:32px; height:34px; min-height:34px; }
 .cell-root-field { margin:0 16px 18px; display:flex; flex-direction:column; gap:10px; }
 .cell-root-field label { display:flex; flex-direction:column; gap:8px; font-size:12px; color:var(--secondary); }
+.height-control { display:flex; align-items:center; gap:12px; min-width:0; margin:8px 0 14px; }
+.height-control > span { color:var(--secondary); font-size:12px; }
+.height-control > strong { flex:1; min-width:0; font-size:12px; font-weight:500; overflow-wrap:anywhere; text-align:right; }
+.height-control > .icon-button { flex-shrink:0; }
+.cell-root-field .height-control { margin:4px 0; }
 .cell-focus-banner { position:absolute; z-index:2; top:14px; left:14px; display:flex; align-items:center; gap:12px; max-width:calc(100% - 28px); padding:8px 12px; border:1px solid var(--line); border-radius:10px; background:var(--canvas); box-shadow:0 4px 18px #0002; font-size:12px; }
 .cell-focus-banner > svg { color:#e88526; }
 .cell-focus-banner > span { min-width:0; }

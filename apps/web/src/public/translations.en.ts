@@ -508,5 +508,12 @@ export default {
   "导出自定义组合与默认选择；导入时合并组合，同 ID 更新，内置组合随网站提供": "Export custom palettes and the default choice. Import merges palettes and updates matching IDs; built-in palettes ship with the site.",
   "配色文件超过 64 KB": "Palette file exceeds 64 KB.",
   "配色文件无效，原有组合未改变": "Invalid palette file. Existing palettes are unchanged.",
-  "配色已导入并应用默认组合": "Palettes imported; the default palette is applied."
+  "配色已导入并应用默认组合": "Palettes imported; the default palette is applied.",
+  "层高显示": "Layer heights",
+  "紧凑层高": "Compact heights",
+  "一致层高": "Consistent heights",
+  "切换为一致层高": "Switch to consistent heights",
+  "切换为紧凑层高": "Switch to compact heights",
+  "紧凑层高按当前单元排列，便于观察细节；不用于跨单元厚度比较": "Compact heights pack the current cell for detail inspection; avoid comparing thickness across cells.",
+  "一致层高共用文件基准，便于对照单元与顶层；均为示意高度": "Consistent heights share the file baseline for cell/top comparisons. Both modes are illustrative."
 };
