@@ -33,6 +33,9 @@ Select a layer to set a manual name, or import a local `.lyp` / `.json` layer ma
 Maps contain names only, without colors or physical thicknesses. Nested groups and leading-zero IDs work; conflicting names are rejected
 Stored GDS cell names populate an expandable hierarchy and searchable directory. Physical layer names such as metal1 still require a map rather than guessing from layer numbers
 Larger repeated designs automatically share source geometry to display the complete current top, retaining arrays, rotation, reflection, magnification and per-instance inspection. Capacity remains bounded; see [public limits](docs/PUBLIC-PREVIEW.md)
+Adjacent 2D/3D controls form one group; camera presets form another. Dropdown fields share consistent spacing and arrows
+The cell locate icon opens all-occurrence tools in the selected top: highlight, show only, hide and restore. Descendant geometry and layer visibility are respected
+Instance filtering is transient and excluded from review exports; outlines bound visible geometry, so empty cells have no outline
 Orthographic 2D supports panning, zooming and unsnapped two-point measurements. Reviews/bookmarks retain projection and zoom; ruler results are transient
 Source data exposes library metadata, searchable text labels, reference transformations and record coverage; see [format support and layer names](docs/GDS-RECORDS.md)
 Click layer swatches to edit colors immediately. Five built-in palettes offer Original pastel, Classic categorical, Clear contrast, Dark neon and Grayscale structure
@@ -151,6 +154,30 @@ Figure 14 Export content and format choices; reviews retain layer colors while n
 
 </div>
 
+<div align="center">
+
+![Roomy palette color cards, hex values and save action; the entire color surface opens the picker](docs/assets/readme/palette-editor.png)
+
+Figure 15 Roomy palette color cards, hex values and save action; the entire color surface opens the picker
+
+</div>
+
+<div align="center">
+
+![All logic_tile occurrences outlined in the 2D top cell, with highlight, show-only, hide and restore actions](docs/assets/readme/cell-instance-highlights.png)
+
+Figure 16 All logic_tile occurrences outlined in the 2D top cell, with highlight, show-only, hide and restore actions
+
+</div>
+
+<div align="center">
+
+![Statistics comparison shows baseline/current cells and count deltas, without claiming geometric or electrical equivalence](docs/assets/readme/statistics-comparison.png)
+
+Figure 17 Statistics comparison shows baseline/current cells and count deltas, without claiming geometric or electrical equivalence
+
+</div>
+
 ## 3 Object explanations and keys
 
 The interface defaults to Chinese. The header's `EN` / `ZH` button switches interface labels and the language of future AI explanations; only the language preference is saved
@@ -184,7 +211,7 @@ Table 1 Public preview capabilities and boundaries
 | Layer controls | Visibility, isolation, manual names, JSON/LYP map import/export and separation | Names come from the user or a map; display heights are illustrative |
 | 2D and hierarchy | Orthographic 2D/3D switching, hierarchy tree, directory search and two-point ruler | No snapping or connectivity inference; bounded tree depth and row count |
 | Reviews | Notes, bookmarks, camera and layer state export/restore | Retain source files separately |
-| Comparison | Layer-count and triangle-count changes | No geometric XOR or manufacturing checks |
+| Statistics comparison | Baseline/current file and cell with layer, triangle and instance deltas | Size checks only, without geometric/electrical equivalence; incomplete previews are flagged |
 | Parsing | 32 MB per file, 45-second limit | Over-budget designs open their cell directory |
 
 </div>
@@ -213,7 +240,7 @@ The original Python-backed workflow is documented in [local development](docs/LO
 
 ## 6 Verification and contributions
 
-The 32 public regressions cover complete repeated designs, bounded source storage and instance picking, missing cells, transforms/arrays, null-word padding, 2D coordinates and zoomed measurements, map round trips, hierarchy browsing, hover/click facts, key lifetime, resource rejection, oversized files, review restoration and mobile layouts
+The 41 public regressions cover complete repeated designs, bounded source storage and instance picking, missing cells, transforms/arrays, null-word padding, 2D coordinates and zoomed measurements, map round trips, hierarchy browsing, hover/click facts, key lifetime, resource rejection, oversized files, review restoration and mobile layouts
 
 Repeated `ERR_QUIC_PROTOCOL_ERROR` is a network-entry issue rather than a parser limit. [Network compatibility](docs/NETWORK-TROUBLESHOOTING.md) explains Cloudflare zone-wide settings, targeted hostname rules and browser workarounds
 Public and legacy production builds pass. See [verification evidence](docs/VERIFICATION-PUBLIC.md) for scope and release checks

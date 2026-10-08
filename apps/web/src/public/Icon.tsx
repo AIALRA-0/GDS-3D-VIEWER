@@ -1,4 +1,6 @@
 const paths: Record<string, string> = {
+  chevron: "m7 10 5 5 5-5",
+  locate: "M9 3H3v6M15 3h6v6M3 15v6h6M21 15v6h-6M16 12a4 4 0 1 1-8 0 4 4 0 1 1 8 0",
   palette: "M12 3a9 9 0 1 0 0 18h2a2 2 0 0 0 0-4h-1a2 2 0 0 1 0-4h3a5 5 0 0 0 0-10zM7 8h.01M11 6h.01M16 7h.01M6 13h.01",
   plus: "M12 4v16M4 12h16",
   check: "m4 12 5 5L20 6",

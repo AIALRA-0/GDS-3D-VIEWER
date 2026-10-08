@@ -49,3 +49,7 @@ Repeated GDS layouts preflight the hierarchy before allocating flat vertices and
 ## 2026-10-08 Palette and action contract
 
 Frontend adds browser-local palette preferences containing only explicit names/colors/default, per-layer ephemeral overrides, and optional validated `layerColors` in backward-compatible version-1 reviews. Existing AI key and provider boundaries are unchanged. Export actions use native dialogs and shared labeled icon controls. GDS zero spacing packs actual rendered surfaces, retaining illustrative thickness and stable camera/selection; glTF source depth is preserved. No API, template, dependency or workflow change.
+
+## 2026-10-08 Unified UI and top-cell instances
+
+Optional bounded `Layout.occurrences` metadata records source cell, exact path and parent index for flat and reused GDS. Filtering follows parent relationships rather than splitting cell names, and source-template generation does not replace the root occurrence list. The existing path/instance/depth budgets apply before adding metadata. Highlight aggregates visible descendant geometry; flat index filtering and compacted instance matrices retain original picking identities. Filters are transient and excluded from version-1 reviews and preferences. Shared native selects and color surfaces preserve browser keyboard controls; no backend/template/dependency change. Statistics baseline retains incomplete status and warns for partial comparisons. Documentation locks released after synchronized bilingual text and seventeen synthetic captures.

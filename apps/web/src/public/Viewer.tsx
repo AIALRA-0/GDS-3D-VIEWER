@@ -10,6 +10,7 @@ import {
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import type { Layout, PickInfo, GeometryFeature, LayerMesh } from "./types";
+import { cellMatches, type CellFocus } from "./cellInstances";
 export function featureAtTriangle(features: GeometryFeature[], triangle: number) {
   let low = 0, high = features.length - 1;
   while (low <= high) {
@@ -66,9 +67,10 @@ interface Props {
   layerColors?: Record<string, string>;
   onMode?: (mode: "2d" | "3d") => void;
   measuring?: boolean;
+  cellFocus?: CellFocus | null;
 }
 export const Viewer = forwardRef<ViewerHandle, Props>(function Viewer(
-  { layout, visible, explode, theme, onSelect, onPick, selectedObject, layerNames, layerColors, onMode, measuring = false },
+  { layout, visible, explode, theme, onSelect, onPick, selectedObject, layerNames, layerColors, onMode, measuring = false, cellFocus },
   ref,
 ) {
   const { t } = useI18n();
@@ -88,6 +90,10 @@ export const Viewer = forwardRef<ViewerHandle, Props>(function Viewer(
       verticalBounds: [number, number][];
       grid: THREE.GridHelper;
       centerY: number;
+      centerX: number;
+      centerZ: number;
+      scale: number;
+      cellOutline: THREE.LineSegments;
     } | null>(null);
   const tooltip = useRef<HTMLDivElement>(null);
   const select = useRef(onSelect);
@@ -253,6 +259,7 @@ export const Viewer = forwardRef<ViewerHandle, Props>(function Viewer(
       geometry.setAttribute("position", new THREE.BufferAttribute(points, 3));
       geometry.computeVertexNormals();
       geometry.computeBoundingSphere();
+      geometry.computeBoundingBox();
       const material = new THREE.MeshLambertMaterial({
           color: layer.color,
           side: THREE.DoubleSide,
@@ -266,6 +273,8 @@ export const Viewer = forwardRef<ViewerHandle, Props>(function Viewer(
         }
         mesh.instanceMatrix.needsUpdate = true; mesh.computeBoundingBox(); mesh.computeBoundingSphere();
         mesh.userData.batchIndex = batchIndex;
+        mesh.userData.originalMatrices = new Float32Array(mesh.instanceMatrix.array);
+        mesh.userData.placements = source.paths.map((_, i) => i);
       }
       mesh.userData.layerId = layer.id;
       mesh.userData.layerIndex = layerIndex;
@@ -286,6 +295,8 @@ export const Viewer = forwardRef<ViewerHandle, Props>(function Viewer(
     scene.add(light);
     const ruler = new THREE.Line(new THREE.BufferGeometry(), new THREE.LineBasicMaterial({ color: 0xe88526, depthTest: false }));
     ruler.renderOrder = 5; scene.add(ruler);
+    const cellOutline = new THREE.LineSegments(new THREE.BufferGeometry(), new THREE.LineBasicMaterial({ color: 0xffb35c, depthTest: false }));
+    cellOutline.renderOrder = 4; group.add(cellOutline);
     // Effects, resize and camera controls can all invalidate the same frame.
     // Render their final state once instead of repeatedly submitting the layout.
     let frame: number | undefined;
@@ -346,8 +357,8 @@ export const Viewer = forwardRef<ViewerHandle, Props>(function Viewer(
       return {
         layerId: layer.id,
         feature: mesh instanceof THREE.InstancedMesh && hit.instanceId !== undefined
-          ? instanceFeature(layer, mesh.userData.batchIndex, hit.instanceId, hit.faceIndex ?? -1)
-          : featureAtTriangle(layer.features ?? [], hit.faceIndex ?? -1),
+          ? instanceFeature(layer, mesh.userData.batchIndex, mesh.userData.placements[hit.instanceId], hit.faceIndex ?? -1)
+          : featureAtTriangle(layer.features ?? [], mesh.userData.triangleMap?.[hit.faceIndex ?? -1] ?? hit.faceIndex ?? -1),
         point: layout.format === "gds"
           ? [local.x / scale + centerX, -(local.z / scale + centerZ), local.y / yScale]
           : [local.x / scale + centerX, local.y / yScale, local.z / scale + centerZ],
@@ -403,7 +414,7 @@ export const Viewer = forwardRef<ViewerHandle, Props>(function Viewer(
     renderer.domElement.addEventListener("pointermove", pointerMove);
     renderer.domElement.addEventListener("pointerleave", pointerLeave);
     renderer.domElement.addEventListener("webglcontextlost", lost);
-    runtime.current = { renderer, scene, camera, perspective: camera, orthographic, controls, meshes, size, draw, flush, ruler, verticalBounds, grid, centerY: center.y };
+    runtime.current = { renderer, scene, camera, perspective: camera, orthographic, controls, meshes, size, draw, flush, ruler, verticalBounds, grid, centerY: center.y, centerX, centerZ, scale, cellOutline };
     resize();
     return () => {
       if (frame !== undefined) cancelAnimationFrame(frame);
@@ -417,6 +428,7 @@ export const Viewer = forwardRef<ViewerHandle, Props>(function Viewer(
       observer.disconnect();
       controls.dispose();
       ruler.geometry.dispose(); (ruler.material as THREE.Material).dispose();
+      cellOutline.geometry.dispose(); (cellOutline.material as THREE.Material).dispose();
       meshes.forEach((m) => {
         m.geometry.dispose();
         (m.material as THREE.Material).dispose();
@@ -462,6 +474,84 @@ export const Viewer = forwardRef<ViewerHandle, Props>(function Viewer(
     r.draw();
   }, [visible, explode, layout]);
   useEffect(() => {
+    const r = runtime.current;
+    if (!r || !layout) return;
+    const matches = cellFocus ? cellMatches(layout, cellFocus.cell) : null;
+    const boxes = new Map<string, THREE.Box3>();
+    const include = (path: string) => !cellFocus || cellFocus.mode === "highlight" ||
+      (cellFocus.mode === "isolate" ? matches!.owners.has(path) : !matches!.owners.has(path));
+    const collect = (owner: string | undefined, box: THREE.Box3) => {
+      if (owner === undefined || cellFocus?.mode !== "highlight") return;
+      const previous = boxes.get(owner);
+      if (previous) previous.union(box); else boxes.set(owner, box.clone());
+    };
+    for (const mesh of r.meshes) {
+      const layer = layout.layers[mesh.userData.layerIndex];
+      const layerVisible = visible.includes(layer.id);
+      if (mesh instanceof THREE.InstancedMesh) {
+        const batch = layer.batches![mesh.userData.batchIndex];
+        const original = mesh.userData.originalMatrices as Float32Array;
+        const filtering = !!cellFocus && cellFocus.mode !== "highlight";
+        const updateMatrices = filtering || !!mesh.userData.cellFiltered;
+        if (!updateMatrices && cellFocus?.mode !== "highlight") { mesh.visible = layerVisible; continue; }
+        const placements: number[] = [];
+        const matrix = new THREE.Matrix4(), box = new THREE.Box3();
+        for (const [index, path] of batch.paths.entries()) {
+          if (!include(path)) continue;
+          matrix.fromArray(original, index * 16);
+          if (updateMatrices) mesh.setMatrixAt(placements.length, matrix);
+          placements.push(index);
+          if (layerVisible && matches?.owners.has(path)) collect(matches.owners.get(path), box.copy(mesh.geometry.boundingBox!).applyMatrix4(matrix).translate(mesh.position));
+        }
+        if (updateMatrices) {
+          mesh.userData.placements = placements; mesh.count = placements.length;
+          mesh.instanceMatrix.needsUpdate = true; mesh.computeBoundingBox(); mesh.computeBoundingSphere();
+        }
+        mesh.userData.cellFiltered = filtering; mesh.visible = layerVisible && !!mesh.count;
+      } else {
+        const features = layer.features ?? [];
+        if (cellFocus && cellFocus.mode !== "highlight") {
+          const accepted = features.filter(f => include(f.instance));
+          const count = accepted.reduce((sum, f) => sum + f.triangles, 0);
+          const indices = new Uint32Array(count * 3), triangleMap = new Uint32Array(count);
+          let at = 0;
+          for (const feature of accepted) for (let i = feature.firstTriangle; i < feature.firstTriangle + feature.triangles; i++) {
+            triangleMap[at] = i;
+            indices[at * 3] = i * 3; indices[at * 3 + 1] = i * 3 + 1; indices[at * 3 + 2] = i * 3 + 2; at++;
+          }
+          mesh.geometry.setIndex(new THREE.BufferAttribute(indices, 1));
+          mesh.userData.triangleMap = triangleMap; mesh.visible = layerVisible && !!count;
+        } else {
+          mesh.geometry.setIndex(null); delete mesh.userData.triangleMap; mesh.visible = layerVisible;
+        }
+        if (layerVisible && cellFocus?.mode === "highlight") for (const feature of features) {
+          const owner = matches!.owners.get(feature.instance);
+          if (owner === undefined) continue;
+          const b = feature.bounds, y = r.verticalBounds[mesh.userData.layerIndex];
+          collect(owner, new THREE.Box3(
+            new THREE.Vector3((b[0] - r.centerX) * r.scale, y[0] + mesh.position.y, (-b[3] - r.centerZ) * r.scale),
+            new THREE.Vector3((b[2] - r.centerX) * r.scale, y[1] + mesh.position.y, (-b[1] - r.centerZ) * r.scale),
+          ));
+        }
+      }
+    }
+    // A planar outline per occupied instance marks every location in both modes.
+    const lines = new Float32Array(boxes.size * 24);
+    let at = 0;
+    for (const box of boxes.values()) {
+      const { min, max } = box, y = max.y + 0.015;
+      for (const point of [[min.x,y,min.z],[max.x,y,min.z],[max.x,y,min.z],[max.x,y,max.z],[max.x,y,max.z],[min.x,y,max.z],[min.x,y,max.z],[min.x,y,min.z]]) {
+        lines.set(point, at); at += 3;
+      }
+    }
+    r.cellOutline.geometry.dispose();
+    r.cellOutline.geometry = new THREE.BufferGeometry();
+    r.cellOutline.geometry.setAttribute("position", new THREE.BufferAttribute(lines, 3));
+    r.renderer.domElement.dataset.cellHighlightCount = String(boxes.size);
+    r.renderer.domElement.dataset.cellFocus = cellFocus?.mode ?? "none";
+    setHover(null); r.draw();
+  }, [cellFocus, layout, visible, explode]);
+  useEffect(() => {
     setHover(null);
     const r = runtime.current, feature = selectedObject?.feature;
     if (!r || !feature) return;
@@ -473,13 +563,15 @@ export const Viewer = forwardRef<ViewerHandle, Props>(function Viewer(
     const material = new THREE.MeshBasicMaterial({ color: 0xffc66d, wireframe: true, transparent: true, opacity: 0.7, depthTest: false });
     const outline = new THREE.Mesh(geometry, material);
     if (mesh instanceof THREE.InstancedMesh && feature.placement !== undefined) {
-      const matrix = new THREE.Matrix4(); mesh.getMatrixAt(feature.placement, matrix); outline.applyMatrix4(matrix);
+      const index = (mesh.userData.placements as number[]).indexOf(feature.placement);
+      if (index < 0) { geometry.dispose(); material.dispose(); return; }
+      const matrix = new THREE.Matrix4(); mesh.getMatrixAt(index, matrix); outline.applyMatrix4(matrix);
     }
     outline.renderOrder = 2;
     mesh.add(outline);
     r.draw();
     return () => { mesh.remove(outline); geometry.dispose(); material.dispose(); if (runtime.current === r) r.draw(); };
-  }, [selectedObject, layout]);
+  }, [selectedObject, layout, cellFocus]);
   useLayoutEffect(() => {
     if (!hover || !tooltip.current || !host.current) return;
     const tip = tooltip.current, bounds = host.current;

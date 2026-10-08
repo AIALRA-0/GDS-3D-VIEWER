@@ -104,7 +104,7 @@ test("local geometry, layer visibility, review export and restore; no file netwo
     });
   await expect(page.locator(".global-status")).toContainText("审阅记录已恢复");
   await page.getByRole("button", { name: "单元", exact: true }).click();
-  await page.getByRole("button", { name: /logic_tile/ }).click();
+  await page.locator("button.cell-row").filter({ hasText: "logic_tile" }).click();
   await expect(page.locator(".main-foot")).toContainText("logic_tile");
   await expect(page.locator(".canvas-error")).toHaveCount(0);
   await page.screenshot({

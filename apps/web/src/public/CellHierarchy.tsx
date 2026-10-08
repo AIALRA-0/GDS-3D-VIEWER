@@ -1,8 +1,9 @@
 import { useMemo, useState } from "react";
 import type { Layout } from "./types";
 import { useI18n } from "./i18n";
+import { IconButton } from "./IconButton";
 
-export function CellHierarchy({ layout, busy, onOpen }: { layout: Layout; busy: boolean; onOpen: (name: string) => void }) {
+export function CellHierarchy({ layout, busy, onOpen, onInstances }: { layout: Layout; busy: boolean; onOpen: (name: string) => void; onInstances: (name: string) => void }) {
   const { t } = useI18n();
   const [expanded, setExpanded] = useState<Set<string>>(() => new Set(layout.tops.map((name) => JSON.stringify(name))));
   const graph = useMemo(() => {
@@ -35,6 +36,7 @@ export function CellHierarchy({ layout, busy, onOpen }: { layout: Layout; busy: 
       <button className="hierarchy-cell cell-row" disabled={busy || !graph.cells.has(row.name)} onClick={() => onOpen(row.name)} title={row.name}>
         <span>{row.name}</span><small>{row.cycle ? t("循环引用，停止展开") : !graph.cells.has(row.name) ? t("缺失单元定义") : row.depth ? t("{{0}} 个实例", { "0": row.count }) : t("顶层单元")}</small>
       </button>
+      <IconButton icon="locate" label={t("定位 {{0}} 的全部实例", { "0": row.name })} popup="dialog" disabled={busy || !graph.cells.has(row.name)} onClick={() => onInstances(row.name)} />
     </div>)}
     {rows.length >= 300 && <p className="muted field-help">{t("层级仅显示前 300 项，可收起分支或筛选单元")}</p>}
   </div>;

@@ -2,6 +2,7 @@
 
 | path | owner | purpose | start | eta | status |
 |------|-------|---------|-------|-----|--------|
+| README.md; README.en.md; docs/coordination.md | main | unified UI audit, top-cell instance tools and current screenshots | 2026-10-08 America/Los_Angeles | current turn | released |
 | README.md; README.en.md; docs/coordination.md | main | editable palettes, icon actions and export dialogs | 2026-10-08 America/Los_Angeles | current turn | released |
 | README.md; README.en.md; docs/coordination.md | main | bounded whole-layout instancing and QUIC access diagnosis | 2026-10-07 America/Los_Angeles | current turn | released |
 | README.md; README.en.md; docs/coordination.md | main | orthographic 2D, hierarchy, ruler, mapping round trips and current showcase | 2026-10-07 America/Los_Angeles | current turn | released |

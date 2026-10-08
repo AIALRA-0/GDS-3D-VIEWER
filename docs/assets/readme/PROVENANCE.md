@@ -1,6 +1,6 @@
 # Product screenshot provenance
 
-Captured on 2026-10-08 (America/Los_Angeles) using the actual GDS-3D-VIEWER production build in Chromium through Playwright. All fourteen images use original synthetic geometry from `apps/web/public-static/samples/demo.gds`, authored by `scripts/generate-browser-demo.py`. No visitor file, privately supplied design, account, browser toolbar or real API key was captured. No generated mockup replaces product evidence.
+Captured on 2026-10-08 (America/Los_Angeles) using the actual GDS-3D-VIEWER production build in Chromium through Playwright. All seventeen images use original synthetic geometry from `apps/web/public-static/samples/demo.gds`, authored by `scripts/generate-browser-demo.py`. No visitor file, privately supplied design, account, browser toolbar or real API key was captured. No generated mockup replaces product evidence.
 
 | File | View | Pixels |
 | --- | --- | --- |
@@ -18,6 +18,9 @@ Captured on 2026-10-08 (America/Los_Angeles) using the actual GDS-3D-VIEWER prod
 | palette-combinations.png | Five built-ins and an original synthetic custom palette; no visitor preferences | 1600 × 1000 |
 | export-dialog.png | Actual export format dialog; unnamed maps correctly disabled | 1600 × 1000 |
 | planar-ruler.png | Actual orthographic 2D, two clicked points, visible ruler and XY measurement | 1600 × 1000 |
+| palette-editor.png | Roomy palette color cards, hex values and save action; the entire color surface opens the picker | 1600 × 1000 |
+| cell-instance-highlights.png | All logic_tile occurrences outlined in the 2D top cell, with highlight, show-only, hide and restore actions | 1600 × 1000 |
+| statistics-comparison.png | Statistics comparison shows baseline/current cells and count deltas, without claiming geometric or electrical equivalence | 1600 × 1000 |
 
 Reproduce by building the public entry, loading its sample, selecting `logic_tile`, changing view/layer separation and using the inspector and review panels. The AI configuration image shows an outgoing summary and an empty password field. The Markdown image uses a Playwright-intercepted response whose cell name and counts come from that synthetic summary; the response and captions explicitly label it as a format demonstration, and the synthetic key is cleared before capture. No image claims a real model result. Heights are illustrative; screenshots do not establish physical thickness or electrical connectivity.
 
@@ -25,4 +28,6 @@ The current captures include the unified toolbar, EN/ZH control after the sample
 
 Earlier `gds-3d-viewer-cockpit.png` depicts the retained local API workflow; `gds-3d-viewer-hero.svg` is its historical illustration. Neither is current public UI evidence. The template archive/source project is excluded; only the owner's requested copied design parameters underpin the implemented interface. Dependency notices are preserved.
 
-Current captures include directly editable layer swatches, icon actions with accessible help, palette CRUD/default management and grouped exports. Zero separation now packs adjacent illustrative surfaces without native gaps; separation 10 shows clear gaps. All fourteen captures were refreshed from this build.
+Current captures include directly editable layer swatches, icon actions with accessible help, palette CRUD/default management and grouped exports. Zero separation now packs adjacent illustrative surfaces without native gaps; separation 10 shows clear gaps. All seventeen captures were refreshed from this build.
+
+Current captures also show adjacent dimension controls, shared select fields, spacious palette editing, top-cell occurrence highlights and explicitly statistical comparison. Every screenshot was refreshed after the UI audit; heading focus avoids automatically opening the close-control tooltip.

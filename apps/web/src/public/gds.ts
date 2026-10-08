@@ -326,17 +326,28 @@ export function parseGds(
     polygons = 0,
     triangles = 0;
   let directOnly = false;
+  const occurrences: NonNullable<Layout["occurrences"]> = [];
+  let pathCharacters = 0;
+  const occurrence = (cell: string, path: string, parent: number) => {
+    pathCharacters += path.length;
+    if (path.length > 4096 || pathCharacters > 8_000_000)
+      throw new PreviewLimitError("实例路径超过显示预算，请选择较小单元");
+    const index = occurrences.length;
+    occurrences.push({ cell, path, parent });
+    return index;
+  };
   const bounds: [number, number, number, number] = [
     Infinity,
     Infinity,
     -Infinity,
     -Infinity,
   ];
-  const visit = (name: string, matrix: Matrix, stack: Set<string>, instance: string) => {
+  const visit = (name: string, matrix: Matrix, stack: Set<string>, instance: string, parent = -1) => {
     if (stack.size >= LIMITS.depth || stack.has(name))
       throw new Error("单元引用循环或层级过深");
     if (++instances > LIMITS.instances)
       throw new PreviewLimitError("展开实例超过 150,000 个，请选择较小单元");
+    const currentIndex = directOnly ? -1 : occurrence(name, instance, parent);
     const current = cells.get(name);
     if (!current) { missingVisited.add(name); return; }
     const chain = new Set(stack).add(name);
@@ -474,6 +485,7 @@ export function parseGds(
             multiply(matrix, [c, s, -s * reflect, c * reflect, x, y]),
             chain,
             `${instance}/ref-${referenceIndex + 1}[${col},${row}]:${r.name}`,
+            currentIndex,
           );
         }
     }
@@ -497,12 +509,10 @@ export function parseGds(
   };
   const instanced = (): Layout => {
     const placements = new Map<string, { matrix: Matrix; path: string }[]>();
-    let pathCharacters = 0;
-    const place = (name: string, matrix: Matrix, path: string, depth: number) => {
+    const place = (name: string, matrix: Matrix, path: string, depth: number, parent = -1) => {
       if (depth >= LIMITS.depth) throw new Error("单元引用循环或层级过深");
       if (++instances > LIMITS.instances) throw new PreviewLimitError("展开实例超过 150,000 个，请选择较小单元");
-      pathCharacters += path.length;
-      if (path.length > 4096 || pathCharacters > 8_000_000) throw new PreviewLimitError("实例路径超过显示预算，请选择较小单元");
+      const currentIndex = occurrence(name, path, parent);
       const current = cells.get(name); if (!current) { missingVisited.add(name); return; }
       if (matrix.some(v => !Number.isFinite(v) || Math.abs(v) > 1e15)) throw new Error("展开坐标超过限制");
       if (current.polygons.length) { const list = placements.get(name) ?? []; list.push({ matrix: [matrix[0], matrix[1], matrix[2], matrix[3], matrix[4] * unit, matrix[5] * unit], path }); placements.set(name, list); }
@@ -513,7 +523,7 @@ export function parseGds(
         for (let row = 0; row < r.rows; row++) for (let col = 0; col < r.cols; col++) {
           const x = r.xy[0][0] + (r.kind === 11 ? col * (r.xy[1][0] - r.xy[0][0]) / r.cols + row * (r.xy[2][0] - r.xy[0][0]) / r.rows : 0);
           const y = r.xy[0][1] + (r.kind === 11 ? col * (r.xy[1][1] - r.xy[0][1]) / r.cols + row * (r.xy[2][1] - r.xy[0][1]) / r.rows : 0);
-          place(r.name, multiply(matrix, [c, s, -s * reflect, c * reflect, x, y]), `${path}/ref-${index + 1}[${col},${row}]:${r.name}`, depth + 1);
+          place(r.name, multiply(matrix, [c, s, -s * reflect, c * reflect, x, y]), `${path}/ref-${index + 1}[${col},${row}]:${r.name}`, depth + 1, currentIndex);
         }
       }
     };
@@ -550,7 +560,7 @@ export function parseGds(
     }
     if (missingVisited.size) warnings.add(`不完整预览：当前展开缺少 ${missingVisited.size} 种引用目标，只显示文件中实际存在的几何；完整器件形状需要配套单元库`);
     warnings.add("重复单元复用源几何，完整显示当前顶层；显示高度不代表真实工艺厚度");
-    return { name: filename, format: "gds", layers: [...output.values()], cells: [...cells.values()].map(c => ({ name: c.name, polygons: c.polygons.length, references: c.refs.length })), tops, top, bounds: output.size ? wholeBounds : [0, 0, 0, 0], unit: "µm", instances: expandedInstances, triangles: drawnTriangles, warnings: [...warnings], missingReferences, incomplete: missingVisited.size > 0, gds, rendering: { kind: "instanced", storedTriangles, placements: expandedInstances } };
+    return { name: filename, format: "gds", layers: [...output.values()], cells: [...cells.values()].map(c => ({ name: c.name, polygons: c.polygons.length, references: c.refs.length })), tops, top, bounds: output.size ? wholeBounds : [0, 0, 0, 0], unit: "µm", instances: expandedInstances, triangles: drawnTriangles, warnings: [...warnings], missingReferences, incomplete: missingVisited.size > 0, occurrences, gds, rendering: { kind: "instanced", storedTriangles, placements: expandedInstances } };
   };
   try {
     const counts = estimate(top);
@@ -606,6 +616,7 @@ export function parseGds(
     bounds: groups.size ? bounds : [0, 0, 0, 0],
     unit: "µm",
     instances,
+    occurrences,
     triangles,
     warnings: [...warnings],
     missingReferences,

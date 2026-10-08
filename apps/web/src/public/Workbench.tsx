@@ -18,6 +18,9 @@ import { ExplanationPanel } from "./ExplanationPanel";
 import { SourceData } from "./SourceData";
 import { parseLayerNames, validateLayerNames, exportLayerNames } from "./layerNames";
 import { CellHierarchy } from "./CellHierarchy";
+import { SelectField } from "./SelectField";
+import { ColorField } from "./ColorField";
+import { cellMatches, type CellFocus } from "./cellInstances";
 import "./workbench.css";
 import tokens from "./tokens.json";
 type Panel = "layers" | "cells" | "notes" | "bookmarks";
@@ -39,9 +42,11 @@ function Modal({
   const { t } = useI18n();
   const titleId = useId();
   const ref = useRef<HTMLDialogElement>(null);
+  const heading = useRef<HTMLHeadingElement>(null);
   useEffect(() => {
     const previous = document.activeElement;
     ref.current?.showModal();
+    heading.current?.focus({ preventScroll: true });
     return () => {
       ref.current?.close();
       if (previous instanceof HTMLElement && previous.isConnected)
@@ -59,7 +64,7 @@ function Modal({
       aria-labelledby={titleId}
     >
       <div className="modal-head">
-        <h2 id={titleId}>{title}</h2>
+        <h2 ref={heading} tabIndex={-1} id={titleId}>{title}</h2>
         <Button icon="close" label={t("关闭")} onClick={onClose} />
       </div>
       <div className="modal-body">{children}</div>
@@ -85,6 +90,9 @@ export default function Workbench() {
   const [viewMode, setViewMode] = useState<"2d" | "3d">("3d");
   const [measuring, setMeasuring] = useState(false);
   const [cellView, setCellView] = useState<"list" | "hierarchy">("hierarchy");
+  const [rootTop, setRootTop] = useState("");
+  const [instanceCell, setInstanceCell] = useState<string | null>(null);
+  const [cellFocus, setCellFocus] = useState<CellFocus | null>(null);
   const [rename, setRename] = useState<{ id: string; value: string } | null>(null);
   const mappingInput = useRef<HTMLInputElement>(null);
   const layerName = (id: string, fallback?: string) => layerNames[id] ?? fallback ?? `Layer ${id}`;
@@ -110,8 +118,12 @@ export default function Workbench() {
     [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
   const [baseline, setBaseline] = useState<{
       name: string;
+      top: string;
+      format: string;
       layers: number;
       triangles: number;
+      instances: number;
+      incomplete: boolean;
     } | null>(null),
     [storage, setStorage] = useState("偏好仅保存在本次会话");
   const [viewport, setViewport] = useState(innerWidth);
@@ -291,7 +303,8 @@ export default function Workbench() {
       worker.current = null;
       if (timer.current) clearTimeout(timer.current);
       const result = event.data.layout;
-      if (!top) { setLayerNames({}); setLayerColors({}); setPaletteId(defaultPaletteId.current); }
+      if (!top) { setLayerNames({}); setLayerColors({}); setPaletteId(defaultPaletteId.current); setRootTop(result.top); setInstanceCell(null); }
+      setCellFocus(null);
       setRename(null);
       setLayout(result);
       setVisible(result.layers.map((l) => l.id));
@@ -359,7 +372,7 @@ export default function Workbench() {
   }
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && !help && !paletteOpen && !exportOpen) {
+      if (e.key === "Escape" && !help && !paletteOpen && !exportOpen && !instanceCell) {
         if (search) {
           setSearch("");
         } else if (busy) cancel();
@@ -375,7 +388,7 @@ export default function Workbench() {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [help, paletteOpen, exportOpen, search, busy, mobile, cancel]);
+  }, [help, paletteOpen, exportOpen, instanceCell, search, busy, mobile, cancel]);
   function saveBlob(content: string, name: string) {
     const url = URL.createObjectURL(
       new Blob([content], { type: "application/json" }),
@@ -488,6 +501,7 @@ export default function Workbench() {
       setNotes(data.notes);
       setBookmarks(data.bookmarks);
       setVisible(data.visible);
+      setCellFocus(null);
       setExplode(data.explode);
       viewer.current?.restore(data.camera);
       setError("");
@@ -591,6 +605,15 @@ export default function Workbench() {
       layout?.cells.filter((c) =>
         c.name.toLowerCase().includes(search.toLowerCase()),
       ) ?? [];
+  const instances = useMemo(() => cellMatches(layout?.top === rootTop ? layout : null, instanceCell ?? cellFocus?.cell ?? ""), [layout, rootTop, instanceCell, cellFocus?.cell]);
+  const openInstances = (cell: string) => {
+    setInstanceCell(cell); setSelectedObject(null); setCellFocus(null);
+    if (source.current && rootTop && layout?.top !== rootTop) void openFile(source.current, rootTop);
+  };
+  const focusInstances = (mode: CellFocus["mode"]) => {
+    if (!instanceCell || !instances.instances.length || busy) return;
+    setCellFocus({ cell: instanceCell, mode }); setSelectedObject(null); setInstanceCell(null);
+  };
   const tools = (
     <>
       <Button
@@ -599,10 +622,14 @@ export default function Workbench() {
         onClick={() => viewer.current?.view("fit")}
         disabled={!layout}
       />
-      <Button icon="plane" label={t("二维")} pressed={viewMode === "2d"} disabled={!layout || layout.format !== "gds" || !layout.layers.length} onClick={() => viewer.current?.view("2d")} />
+      <div className="view-mode-group" role="group" aria-label={t("显示维度")}>
+      <Button className="dimension-button" icon="plane" label={t("二维")} pressed={viewMode === "2d"} disabled={!layout || layout.format !== "gds" || !layout.layers.length} onClick={() => viewer.current?.view("2d")}><Icon name="plane" /><span>2D</span></Button>
+      <Button className="dimension-button" icon="cube" label={t("三维")} onClick={() => viewer.current?.view("iso")} pressed={viewMode === "3d"} disabled={!layout}><Icon name="cube" /><span>3D</span></Button>
+      </div>
+      <div className="view-angle-group" role="group" aria-label={t("预设视角")}>
       <Button icon="topview" label={t("俯视")} onClick={() => viewer.current?.view("top")} disabled={!layout} />
       <Button icon="frontview" label={t("正视")} onClick={() => viewer.current?.view("front")} disabled={!layout} />
-      <Button icon="cube" label={t("三维")} onClick={() => viewer.current?.view("iso")} pressed={viewMode === "3d"} disabled={!layout} />
+      </div>
       <Button icon="ruler" label={t("测量")} pressed={measuring} disabled={!layout || layout.format !== "gds" || !layout.layers.length} onClick={() => { if (!measuring) viewer.current?.view("2d"); setMeasuring(value => !value); }} />
     </>
   );
@@ -665,8 +692,8 @@ export default function Workbench() {
                     checked={visible.includes(layer.id)}
                     onChange={() => toggleLayer(layer.id)}
                   />
-                  <input type="color" className="layer-color" aria-label={t("修改图层 {{0}} 的颜色", { "0": layer.id })} title={t("修改图层 {{0}} 的颜色", { "0": layer.id })}
-                    value={colorForLayer(layer.id, layout!.layers.indexOf(layer))} onChange={e => setLayerColors(colors => ({ ...colors, [layer.id]: e.target.value }))} />
+                  <ColorField inputClass="layer-color" label={t("修改图层 {{0}} 的颜色", { "0": layer.id })}
+                    value={colorForLayer(layer.id)} onChange={value => setLayerColors(colors => ({ ...colors, [layer.id]: value }))} />
                   <button
                     className="layer-name"
                     title={`${layerName(layer.id, layer.name)} · ${layer.id}`}
@@ -712,10 +739,11 @@ export default function Workbench() {
                 ? t("选择单元可独立查看其几何与引用")
                 : t("模型节点与引用数量")}
             </p>
-            {layout?.format === "gds" && cellView === "hierarchy" && !search ? <CellHierarchy key={layout.name} layout={layout} busy={busy} onOpen={(name) => { if (source.current) void openFile(source.current, name); }} /> : <div className="cell-list">
+            {layout?.format === "gds" && <div className="cell-root-field"><label>{t("定位顶层")}<SelectField aria-label={t("定位顶层")} value={rootTop} disabled={busy} onChange={e => { setRootTop(e.target.value); if (source.current) void openFile(source.current, e.target.value); }}>{layout.tops.map(name => <option key={name} value={name}>{name}</option>)}</SelectField></label><p className="muted">{t("单元右侧定位按钮查找此顶层中的全部实例，包含子单元几何")}</p></div>}
+            {layout?.format === "gds" && cellView === "hierarchy" && !search ? <CellHierarchy key={layout.name} layout={layout} busy={busy} onInstances={openInstances} onOpen={(name) => { if (source.current) void openFile(source.current, name); }} /> : <div className="cell-list">
               {shownCells.slice(0, 300).map((cell, index) => (
+                <div className="cell-entry" key={`${cell.name}-${index}`}>
                 <button
-                  key={`${cell.name}-${index}`}
                   className={`cell-row ${layout?.top === cell.name ? "selected" : ""}`}
                   disabled={busy || layout?.format !== "gds"}
                   onClick={() => {
@@ -734,6 +762,8 @@ export default function Workbench() {
                     <span className="current-label"> {t("当前")} </span>
                   )}
                 </button>
+                {layout?.format === "gds" && <Button icon="locate" label={t("定位 {{0}} 的全部实例", { "0": cell.name })} popup="dialog" disabled={busy} onClick={() => openInstances(cell.name)} />}
+                </div>
               ))}
             </div>}
             {shownCells.length > 300 && (
@@ -799,6 +829,7 @@ export default function Workbench() {
                 key={i}
                 onClick={() => {
                   setVisible(b.visible);
+                  setCellFocus(null);
                   setExplode(b.explode);
                   viewer.current?.restore(b.camera);
                 }}
@@ -974,40 +1005,36 @@ export default function Workbench() {
           <div className="display-palette"><span>{palettePreferences.custom.some(p => p.id === paletteId) ? activePalette.name : t(activePalette.name)}</span><Button icon="palette" label={t("配色组合")} popup="dialog" onClick={() => setPaletteOpen(true)} /><Button icon="reset" label={t("恢复组合颜色")} disabled={!Object.keys(layerColors).length} onClick={() => setLayerColors({})} /></div>
           <p className="muted field-help">{t("点击左侧图层色块打开调色板，颜色立即更新，不重新解析版图")}</p>
         </section>
-        <section>
-          <h3> {t("版图比较")} </h3>
-          <Button icon="swap" label={t("设为比较基线")}
+        <section className="statistics-comparison" aria-label={t("统计对比")}>
+          <h3>{t("统计对比")}</h3>
+          <p className="muted">{t("保存当前文件与单元的数量快照，再打开另一文件或单元，查看数量变化")}</p>
+          <p className="muted field-help">{t("用于快速检查规模变化，不检查图形移动、连线变化或设计是否等价")}</p>
+          <div className="group-actions"><Button icon="swap" label={t("设为比较基线")}
             disabled={!layout}
             onClick={() => {
               if (layout)
                 setBaseline({
                   name: layout.name,
+                  top: layout.top,
+                  format: layout.format,
                   layers: layout.layers.length,
                   triangles: layout.triangles,
+                  instances: layout.instances,
+                  incomplete: !!layout.incomplete,
                 });
               setStatus("当前几何统计已设为比较基线");
             }}
-          />
+          />{baseline && <Button icon="trash" label={t("清除比较基线")} onClick={() => setBaseline(null)} />}</div>
           {baseline && (
             <>
-              <p className="muted"> {t("基线：")} {baseline.name}</p>
-              <dl>
-                <div>
-                  <dt> {t("图层变化")} </dt>
-                  <dd>{layout ? layout.layers.length - baseline.layers : 0}</dd>
-                </div>
-                <div>
-                  <dt> {t("三角形变化")} </dt>
-                  <dd>
-                    {layout
-                      ? (layout.triangles - baseline.triangles).toLocaleString()
-                      : 0}
-                  </dd>
-                </div>
-              </dl>
-              <p className="muted"> {t("仅比较数量，不等同于几何差异检查")} </p>
+              <div className="comparison-files"><p><span>{t("基线")}</span><strong>{baseline.name}</strong><small>{baseline.top}</small></p><p><span>{t("当前")}</span><strong>{layout?.name ?? "—"}</strong><small>{layout?.top ?? "—"}</small></p></div>
+              <div className="comparison-table-wrap"><table><thead><tr><th>{t("指标")}</th><th>{t("基线")}</th><th>{t("当前")}</th><th>{t("变化")}</th></tr></thead><tbody>{[[t("图层"), baseline.layers, layout?.layers.length ?? 0], [t("三角形"), baseline.triangles, layout?.triangles ?? 0], [t("实例"), baseline.instances, layout?.instances ?? 0]].map(([name, oldValue, newValue]) => <tr key={name}><th>{name}</th><td>{Number(oldValue).toLocaleString()}</td><td>{Number(newValue).toLocaleString()}</td><td>{Number(newValue) > Number(oldValue) ? "+" : ""}{(Number(newValue) - Number(oldValue)).toLocaleString()}</td></tr>)}</tbody></table></div>
+              {baseline.format !== layout?.format && <p className="muted">{t("文件格式不同，三角形数量可能受模型转换影响，不能直接判断版图复杂度")}</p>}
+              {(baseline.incomplete || layout?.incomplete) && <p className="muted">{t("基线或当前预览不完整，仅对比已解析部分")}</p>}
+              <p className="muted">{t("相同数量不代表相同版图；快照仅保存在当前页面，刷新即清除")}</p>
             </>
           )}
+          {!baseline && <div className="comparison-empty"><Icon name="swap" /><span>{t("先打开版图，然后点击上方图标保存基线")}</span></div>}
         </section>
         </div>
         <div role="tabpanel" id="inspector-panel-source" aria-labelledby="inspector-tab-source" hidden={inspectorTab !== "source"}>
@@ -1228,6 +1255,7 @@ export default function Workbench() {
               </div>
             </div>
             <div className="canvas-stage">
+              {cellFocus && <div className="cell-focus-banner" role="status"><Icon name="locate" /><span><strong>{cellFocus.cell}</strong><small>{t({ highlight: "高亮全部实例", isolate: "只看该单元实例", hide: "隐藏该单元实例" }[cellFocus.mode])} · {t("{{0}} 个实例", { "0": instances.instances.length })}</small></span><Button icon="reset" label={t("恢复实例显示")} onClick={() => { setCellFocus(null); setSelectedObject(null); }} /></div>}
               <Viewer
                 ref={viewer}
                 layout={layout}
@@ -1240,6 +1268,7 @@ export default function Workbench() {
                 layerColors={displayedColors}
                 onMode={(mode) => { setViewMode(mode); if (mode === "3d") setMeasuring(false); }}
                 measuring={measuring}
+                cellFocus={cellFocus}
                 onSelect={(id) => {
                   setSelected(id);
                   if (mobile) {
@@ -1361,6 +1390,19 @@ export default function Workbench() {
           <span> {t("每次一个文件，最大 32 MB")} </span>
         </div>
       )}
+      {instanceCell !== null && <Modal title={t("顶层实例定位")} onClose={() => setInstanceCell(null)}>
+        <div className="instance-summary"><Icon name="locate" /><div><h3>{instanceCell}</h3><p className="muted">{t("顶层")} · {rootTop || "—"}</p></div><strong className="instance-count">{busy ? "…" : instances.instances.length.toLocaleString()}<small>{t("个实例")}</small></strong></div>
+        <p className="muted">{t("定位该单元在顶层的所有位置，包含其子单元；操作与图层开关共同生效")}</p>
+        {busy && <p role="status" className="muted">{t("正在恢复顶层预览，请稍候")}</p>}
+        {!busy && !instances.instances.length && <p className="muted">{t("此顶层中没有该单元的可定位实例，或顶层超出预览预算")}</p>}
+        {layout?.incomplete && <p className="muted">{t("当前预览不完整，定位仅覆盖已解析部分")}</p>}
+        <div className="instance-options">{([
+          ["highlight", "locate", "高亮全部实例", "在每个含可见几何的实例位置绘制轮廓，保留其他内容"],
+          ["isolate", "eye", "只看该单元实例", "只显示该单元及其子单元，暂时隐藏其余几何"],
+          ["hide", "eyeoff", "隐藏该单元实例", "隐藏该单元及其子单元，保留其余几何"],
+        ] as const).map(([mode, icon, name, caption]) => <button className="export-option" aria-label={t(name)} key={mode} disabled={busy || !instances.instances.length || !layout?.layers.length} onClick={() => focusInstances(mode)}><Icon name={icon} /><span><strong>{t(name)}</strong><small>{t(caption)}</small></span><Icon name="arrow" /></button>)}</div>
+        <p className="muted field-help">{t("空单元没有几何轮廓；画布上方可恢复显示，实例过滤不写入审阅记录或浏览器存储")}</p>
+      </Modal>}
       {paletteOpen && <Modal title={t("配色组合")} onClose={() => setPaletteOpen(false)}><PalettePanel preferences={palettePreferences} activeId={paletteId} currentColors={layout?.layers.map(layer => colorForLayer(layer.id))} onPreferences={setPalettePreferences} onApply={applyPalette} /></Modal>}
       {exportOpen && <Modal title={t(exportOpen === "maps" ? "导出图层映射" : "导出")} onClose={() => setExportOpen(null)}>
         <p className="muted">{t("选择导出内容与格式，文件直接保存到你的电脑")}</p>

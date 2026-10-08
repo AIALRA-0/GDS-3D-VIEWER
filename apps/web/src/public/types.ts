@@ -52,6 +52,7 @@ export interface Layout {
   missingReferences?: { source: string; target: string; count: number }[];
   incomplete?: boolean;
   rendering?: { kind: "instanced"; storedTriangles: number; placements: number };
+  occurrences?: { cell: string; path: string; parent: number }[];
   gds?: {
     version?: number;
     library?: string;
