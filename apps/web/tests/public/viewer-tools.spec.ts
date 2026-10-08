@@ -4,6 +4,7 @@ import { exportLayerNames, validateLayerNames } from "../../src/public/layerName
 import { readFileSync } from "node:fs";
 
 async function download(page: Page, label: string) {
+  await page.getByRole("button", { name: label === "导出审阅记录" ? "导出" : "导出图层映射", exact: true }).click();
   const pending = page.waitForEvent("download"); await page.getByRole("button", { name: label, exact: true }).click();
   const file = await pending, stream = await file.createReadStream(), chunks: Buffer[] = [];
   for await (const chunk of stream!) chunks.push(chunk);

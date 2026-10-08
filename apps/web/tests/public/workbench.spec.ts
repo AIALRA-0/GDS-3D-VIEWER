@@ -69,7 +69,7 @@ test("local geometry, layer visibility, review export and restore; no file netwo
   await page.getByRole("button", { name: "试用合成示例" }).click();
   await expect(page.locator(".main-foot")).toContainText("AIALRA_DEMO");
   await expect(page.locator(".viewer-host canvas")).toBeVisible();
-  const boxes = page.locator(".layer-row input");
+  const boxes = page.locator(".layer-row input[type=checkbox]");
   expect(await boxes.count()).toBe(10);
   await boxes.first().uncheck();
   await expect(boxes.first()).not.toBeChecked();
@@ -87,7 +87,7 @@ test("local geometry, layer visibility, review export and restore; no file netwo
   await page.getByRole("button", { name: "保存当前视角" }).click();
   await expect(page.getByRole("button", { name: "视角 1" })).toBeVisible();
   const download = page.waitForEvent("download");
-  await page.getByRole("button", { name: "导出审阅记录", exact: true }).click();
+  await page.getByRole("button", { name: "导出", exact: true }).click(); await page.getByRole("button", { name: "导出审阅记录", exact: true }).click();
   const downloaded = await download;
   const saved = await downloaded.path();
   expect(saved).toBeTruthy();

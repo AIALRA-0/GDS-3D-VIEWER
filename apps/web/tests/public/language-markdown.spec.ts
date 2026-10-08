@@ -26,7 +26,8 @@ test("Chinese default and English switch preserve geometry, notes and legacy rev
   await expect(page.getByRole("dialog")).toContainText("Files and sessions");
   await page.getByRole("button", { name: "Back to workspace" }).click();
   const download = page.waitForEvent("download");
-  await page.getByRole("button", { name: "Export review" }).click();
+  await page.getByRole("button", { name: "Export", exact: true }).click();
+  await page.getByRole("button", { name: "Export review", exact: true }).click();
   const review = JSON.parse(await fs.readFile((await (await download).path())!, "utf8"));
   expect(review.format).toBe("gds-3d-viewer-review");
   review.format = "icviewer-review";

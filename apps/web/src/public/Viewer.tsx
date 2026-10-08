@@ -21,6 +21,14 @@ export function featureAtTriangle(features: GeometryFeature[], triangle: number)
   return undefined;
 }
 export const featureKind = (kind?: string) => ({ boundary: "边界多边形", path: "路径几何", box: "框", mesh: "模型网格" }[kind ?? ""] ?? "图层几何");
+export function packedLayerOffsets(bounds: [number, number][], gap: number): number[] {
+  if (!bounds.length) return [];
+  const extent = bounds.reduce((all, b) => [Math.min(all[0], b[0]), Math.max(all[1], b[1])], [Infinity, -Infinity]);
+  const center = (extent[0] + extent[1]) / 2;
+  const height = bounds.reduce((sum, b) => sum + b[1] - b[0], 0) + gap * (bounds.length - 1);
+  let bottom = center - height / 2;
+  return bounds.map(([min, max]) => { const offset = bottom - min; bottom += max - min + gap; return offset; });
+}
 export function instanceFeature(layer: LayerMesh, batchIndex: number, placement: number, triangle: number): GeometryFeature | undefined {
   const batch = layer.batches?.[batchIndex], feature = featureAtTriangle(batch?.features ?? [], triangle);
   if (!batch || !feature || placement < 0 || placement >= batch.paths.length) return undefined;
@@ -55,11 +63,12 @@ interface Props {
   onPick?: (pick: PickInfo | null) => void;
   selectedObject?: PickInfo | null;
   layerNames?: Record<string, string>;
+  layerColors?: Record<string, string>;
   onMode?: (mode: "2d" | "3d") => void;
   measuring?: boolean;
 }
 export const Viewer = forwardRef<ViewerHandle, Props>(function Viewer(
-  { layout, visible, explode, theme, onSelect, onPick, selectedObject, layerNames, onMode, measuring = false },
+  { layout, visible, explode, theme, onSelect, onPick, selectedObject, layerNames, layerColors, onMode, measuring = false },
   ref,
 ) {
   const { t } = useI18n();
@@ -75,6 +84,9 @@ export const Viewer = forwardRef<ViewerHandle, Props>(function Viewer(
       size: number;
       draw: () => void;
       ruler: THREE.Line;
+      verticalBounds: [number, number][];
+      grid: THREE.GridHelper;
+      centerY: number;
     } | null>(null);
   const tooltip = useRef<HTMLDivElement>(null);
   const select = useRef(onSelect);
@@ -220,7 +232,9 @@ export const Viewer = forwardRef<ViewerHandle, Props>(function Viewer(
           ? -(layout.bounds[1] + layout.bounds[3]) / 2
           : (layout.bounds[1] + layout.bounds[3]) / 2;
     const meshes: THREE.Mesh[] = [];
+    const verticalBounds: [number, number][] = layout.layers.map(() => [Infinity, -Infinity]);
     for (const layer of layout.layers) {
+      const layerIndex = layout.layers.indexOf(layer);
       const sources = layer.batches ?? [{ positions: layer.positions, mirrored: false, transforms: new Float64Array(), paths: [] }];
       for (const [batchIndex, source] of sources.entries()) {
       const points = new Float32Array(source.positions);
@@ -231,6 +245,8 @@ export const Viewer = forwardRef<ViewerHandle, Props>(function Viewer(
             ? Math.min(0.18, 2.5 / layout.layers.length)
             : scale;
         points[i + 2] = (layer.batches ? points[i + 2] : points[i + 2] - centerZ) * scale;
+        verticalBounds[layerIndex][0] = Math.min(verticalBounds[layerIndex][0], points[i + 1]);
+        verticalBounds[layerIndex][1] = Math.max(verticalBounds[layerIndex][1], points[i + 1]);
       }
       const geometry = new THREE.BufferGeometry();
       geometry.setAttribute("position", new THREE.BufferAttribute(points, 3));
@@ -251,7 +267,7 @@ export const Viewer = forwardRef<ViewerHandle, Props>(function Viewer(
         mesh.userData.batchIndex = batchIndex;
       }
       mesh.userData.layerId = layer.id;
-      mesh.userData.layerIndex = layout.layers.indexOf(layer);
+      mesh.userData.layerIndex = layerIndex;
       group.add(mesh);
       meshes.push(mesh);
       }
@@ -373,7 +389,7 @@ export const Viewer = forwardRef<ViewerHandle, Props>(function Viewer(
     renderer.domElement.addEventListener("pointermove", pointerMove);
     renderer.domElement.addEventListener("pointerleave", pointerLeave);
     renderer.domElement.addEventListener("webglcontextlost", lost);
-    runtime.current = { renderer, scene, camera, perspective: camera, orthographic, controls, meshes, size, draw, ruler };
+    runtime.current = { renderer, scene, camera, perspective: camera, orthographic, controls, meshes, size, draw, ruler, verticalBounds, grid, centerY: center.y };
     resize();
     return () => {
       runtime.current = null;
@@ -415,10 +431,19 @@ export const Viewer = forwardRef<ViewerHandle, Props>(function Viewer(
   useEffect(() => {
     const r = runtime.current;
     if (!r) return;
+    for (const mesh of r.meshes) (mesh.material as THREE.MeshLambertMaterial).color.set(layerColors?.[mesh.userData.layerId] ?? layout!.layers[mesh.userData.layerIndex].color);
+    r.draw();
+  }, [layerColors, layout]);
+  useEffect(() => {
+    const r = runtime.current;
+    if (!r) return;
+    const offsets = layout?.format === "gds" ? packedLayerOffsets(r.verticalBounds, explode * 0.1) : r.verticalBounds.map((_, i) => i * explode * 0.1);
     r.meshes.forEach((m) => {
       m.visible = visible.includes(m.userData.layerId);
-      m.position.y = m.userData.layerIndex * explode * 0.1;
+      m.position.y = offsets[m.userData.layerIndex];
     });
+    if (layout?.format === "gds") r.grid.position.y = r.verticalBounds.reduce((min, b, i) => Math.min(min, b[0] + offsets[i]), Infinity) - r.centerY - 0.15;
+    setHover(null);
     r.draw();
   }, [visible, explode, layout]);
   useEffect(() => {

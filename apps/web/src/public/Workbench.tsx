@@ -1,11 +1,14 @@
 import { useI18n } from "./i18n";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 import type {
   CSSProperties,
   ReactNode,
   PointerEvent as ReactPointerEvent,
 } from "react";
 import { Icon } from "./Icon";
+import { IconButton as Button } from "./IconButton";
+import { PalettePanel } from "./PalettePanel";
+import { PALETTE_STORAGE, DEFAULT_PALETTE_PREFERENCES, readPalettePreferences, resolvePalette, validColor } from "./palettes";
 import { LIMITS } from "./types";
 import type { Layout, PickInfo } from "./types";
 import { Viewer } from "./Viewer";
@@ -24,35 +27,6 @@ interface Bookmark {
   visible: string[];
   explode: number;
 }
-function Button({
-  icon,
-  label,
-  onClick,
-  pressed,
-  disabled = false,
-  className = "",
-}: {
-  icon: string;
-  label: string;
-  onClick: () => void;
-  pressed?: boolean;
-  disabled?: boolean;
-  className?: string;
-}) {
-  return (
-    <button
-      type="button"
-      className={`icon-button ${className}`}
-      onClick={onClick}
-      aria-label={label}
-      title={label}
-      aria-pressed={pressed}
-      disabled={disabled}
-    >
-      <Icon name={icon} />
-    </button>
-  );
-}
 function Modal({
   title,
   children,
@@ -63,6 +37,7 @@ function Modal({
   onClose: () => void;
 }) {
   const { t } = useI18n();
+  const titleId = useId();
   const ref = useRef<HTMLDialogElement>(null);
   useEffect(() => {
     const previous = document.activeElement;
@@ -81,15 +56,15 @@ function Modal({
         onClose();
       }}
       className="modal"
+      aria-labelledby={titleId}
     >
       <div className="modal-head">
-        <h2>{title}</h2>
+        <h2 id={titleId}>{title}</h2>
         <Button icon="close" label={t("关闭")} onClick={onClose} />
       </div>
       <div className="modal-body">{children}</div>
       <div className="modal-foot">
-        <button className="text-button" onClick={onClose}>
-           {t("返回工作台")} </button>
+        <Button icon="back" label={t("返回工作台")} onClick={onClose} />
       </div>
     </dialog>
   );
@@ -99,6 +74,14 @@ export default function Workbench() {
   const [selectedObject, setSelectedObject] = useState<PickInfo | null>(null);
   const [inspectorTab, setInspectorTab] = useState("overview");
   const [layerNames, setLayerNames] = useState<Record<string, string>>({});
+  const [palettePreferences, setPalettePreferences] = useState(() => { try { return readPalettePreferences(); } catch { return DEFAULT_PALETTE_PREFERENCES; } });
+  const [paletteId, setPaletteId] = useState(palettePreferences.defaultId);
+  const [layerColors, setLayerColors] = useState<Record<string, string>>({});
+  const [paletteOpen, setPaletteOpen] = useState(false), [exportOpen, setExportOpen] = useState<"all" | "maps" | null>(null);
+  const activePalette = resolvePalette(paletteId, palettePreferences.custom);
+  const defaultPaletteId = useRef(palettePreferences.defaultId);
+  defaultPaletteId.current = palettePreferences.defaultId;
+  const applyPalette = (id: string) => { setPaletteId(id); setLayerColors({}); };
   const [viewMode, setViewMode] = useState<"2d" | "3d">("3d");
   const [measuring, setMeasuring] = useState(false);
   const [cellView, setCellView] = useState<"list" | "hierarchy">("hierarchy");
@@ -108,6 +91,8 @@ export default function Workbench() {
   const [layout, setLayout] = useState<Layout | null>(null),
     [visible, setVisible] = useState<string[]>([]),
     [selected, setSelected] = useState<string | null>(null);
+  const displayedColors = useMemo(() => Object.fromEntries((layout?.layers ?? []).map((layer, index) => [layer.id, layerColors[layer.id] ?? (activePalette.id === "original" ? layer.color : activePalette.colors[index % activePalette.colors.length])])), [layout, layerColors, activePalette]);
+  const colorForLayer = (id: string, _index?: number) => displayedColors[id] ?? activePalette.colors[0];
   const [busy, setBusy] = useState(false),
     [error, setError] = useState(""),
     [status, setStatus] = useState("等待打开文件");
@@ -143,6 +128,12 @@ export default function Workbench() {
     timer = useRef<ReturnType<typeof setTimeout> | null>(null),
     abort = useRef<AbortController | null>(null);
   const importButton = useRef<HTMLButtonElement>(null);
+  const palettePreferenceReady = useRef(false);
+  useEffect(() => {
+    if (!palettePreferenceReady.current) { palettePreferenceReady.current = true; return; }
+    try { localStorage.setItem(PALETTE_STORAGE, JSON.stringify(palettePreferences)); }
+    catch { setStorage("配色偏好保存失败，当前使用会话模式"); }
+  }, [palettePreferences]);
   useEffect(() => {
     const media = matchMedia("(max-width: 1050px)");
     const update = () => {
@@ -201,7 +192,7 @@ export default function Workbench() {
     });
     aside?.querySelector<HTMLElement>("button")?.focus();
     const trap = (e: KeyboardEvent) => {
-      if (e.key !== "Tab" || !aside) return;
+      if (e.key !== "Tab" || !aside || document.querySelector("dialog[open]")) return;
       const controls = [
         ...aside.querySelectorAll<HTMLElement>(
           "button:not(:disabled),input:not(:disabled),textarea,a[href]",
@@ -300,7 +291,7 @@ export default function Workbench() {
       worker.current = null;
       if (timer.current) clearTimeout(timer.current);
       const result = event.data.layout;
-      if (!top) setLayerNames({});
+      if (!top) { setLayerNames({}); setLayerColors({}); setPaletteId(defaultPaletteId.current); }
       setRename(null);
       setLayout(result);
       setVisible(result.layers.map((l) => l.id));
@@ -368,7 +359,7 @@ export default function Workbench() {
   }
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && !help) {
+      if (e.key === "Escape" && !help && !paletteOpen && !exportOpen) {
         if (search) {
           setSearch("");
         } else if (busy) cancel();
@@ -384,7 +375,7 @@ export default function Workbench() {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [help, search, busy, mobile, cancel]);
+  }, [help, paletteOpen, exportOpen, search, busy, mobile, cancel]);
   function saveBlob(content: string, name: string) {
     const url = URL.createObjectURL(
       new Blob([content], { type: "application/json" }),
@@ -406,6 +397,7 @@ export default function Workbench() {
           top: layout.top,
           notes,
           layerNames,
+          layerColors: Object.fromEntries(layout.layers.map((layer, index) => [layer.id, colorForLayer(layer.id, index)])),
           bookmarks,
           visible,
           explode,
@@ -489,7 +481,10 @@ export default function Workbench() {
       )
         throw new Error("审阅记录无效，或与当前文件及单元不匹配");
       const restoredNames = validateLayerNames(data.layerNames ?? {});
+      const restoredColors = data.layerColors ?? {};
+      if (!restoredColors || typeof restoredColors !== "object" || Array.isArray(restoredColors) || Object.keys(restoredColors).length > current.layers.length || Object.entries(restoredColors).some(([id, color]) => !current.layers.some(layer => layer.id === id) || !validColor(color))) throw new Error("审阅记录中的颜色无效");
       setLayerNames(restoredNames);
+      setLayerColors(restoredColors);
       setNotes(data.notes);
       setBookmarks(data.bookmarks);
       setVisible(data.visible);
@@ -516,6 +511,12 @@ export default function Workbench() {
       setLayerNames(names); setRename(null); setError("");
       setStatus(`当前单元匹配 ${layout?.layers.filter((layer) => names[layer.id]).length ?? 0} / ${Object.keys(names).length} 个图层名称，其他名称仍保留在映射中`);
     } catch (e) { if (id === generation.current) setError(e instanceof Error ? e.message : "图层映射无法读取"); }
+  }
+  function exportMapping(format: "json" | "lyp") {
+    try {
+      const url = URL.createObjectURL(new Blob([exportLayerNames(layerNames, format)], { type: format === "json" ? "application/json" : "application/xml" }));
+      const link = document.createElement("a"); link.href = url; link.download = `gds-layer-names.${format}`; link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000); setExportOpen(null);
+    } catch (error) { setError(error instanceof Error ? error.message : "图层映射无法读取"); }
   }
   function toggleLayer(id: string) {
     setVisible((v) =>
@@ -598,27 +599,11 @@ export default function Workbench() {
         onClick={() => viewer.current?.view("fit")}
         disabled={!layout}
       />
-      <button className="text-button quiet" aria-pressed={viewMode === "2d"} disabled={!layout || layout.format !== "gds" || !layout.layers.length} onClick={() => viewer.current?.view("2d")}>{t("二维")}</button>
-      <button
-        className="text-button quiet"
-        onClick={() => viewer.current?.view("top")}
-        disabled={!layout}
-      >
-         {t("俯视")} </button>
-      <button
-        className="text-button quiet"
-        onClick={() => viewer.current?.view("front")}
-        disabled={!layout}
-      >
-         {t("正视")} </button>
-      <button
-        className="text-button quiet"
-        onClick={() => viewer.current?.view("iso")}
-        aria-pressed={viewMode === "3d"}
-        disabled={!layout}
-      >
-         {t("三维")} </button>
-      <button className="text-button quiet" aria-pressed={measuring} disabled={!layout || layout.format !== "gds" || !layout.layers.length} onClick={() => { if (!measuring) viewer.current?.view("2d"); setMeasuring((value) => !value); }}>{t("测量")}</button>
+      <Button icon="plane" label={t("二维")} pressed={viewMode === "2d"} disabled={!layout || layout.format !== "gds" || !layout.layers.length} onClick={() => viewer.current?.view("2d")} />
+      <Button icon="topview" label={t("俯视")} onClick={() => viewer.current?.view("top")} disabled={!layout} />
+      <Button icon="frontview" label={t("正视")} onClick={() => viewer.current?.view("front")} disabled={!layout} />
+      <Button icon="cube" label={t("三维")} onClick={() => viewer.current?.view("iso")} pressed={viewMode === "3d"} disabled={!layout} />
+      <Button icon="ruler" label={t("测量")} pressed={measuring} disabled={!layout || layout.format !== "gds" || !layout.layers.length} onClick={() => { if (!measuring) viewer.current?.view("2d"); setMeasuring(value => !value); }} />
     </>
   );
   const navigator = (
@@ -661,27 +646,11 @@ export default function Workbench() {
         {panel === "layers" && (
           <>
             <div className="group-actions">
-              <button className="text-button" disabled={!layout || layout.format !== "gds"} onClick={() => mappingInput.current?.click()}>{t("导入层映射")}</button>
-              {(["json", "lyp"] as const).map((format) => <button key={format} className="text-button" disabled={!layout || layout.format !== "gds" || !Object.keys(layerNames).length} onClick={() => {
-                try {
-                const url = URL.createObjectURL(new Blob([exportLayerNames(layerNames, format)], { type: format === "json" ? "application/json" : "application/xml" }));
-                const link = document.createElement("a"); link.href = url; link.download = `gds-layer-names.${format}`; link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
-                } catch (error) { setError(error instanceof Error ? error.message : "图层映射无法读取"); }
-              }}>{t(format === "json" ? "导出 JSON" : "导出 LYP")}</button>)}
-              <button
-                className="text-button"
-                onClick={() =>
-                  setVisible(layout?.layers.map((l) => l.id) ?? [])
-                }
-                disabled={!layout}
-              >
-                 {t("显示全部")} </button>
-              <button
-                className="text-button"
-                onClick={() => setVisible([])}
-                disabled={!layout}
-              >
-                 {t("隐藏全部")} </button>
+              <Button icon="upload" label={t("导入层映射")} disabled={!layout || layout.format !== "gds"} onClick={() => mappingInput.current?.click()} />
+              <Button icon="download" label={t("导出图层映射")} popup="dialog" disabled={!layout || layout.format !== "gds"} onClick={() => setExportOpen("maps")} />
+              <Button icon="palette" label={t("配色组合")} popup="dialog" onClick={() => setPaletteOpen(true)} />
+              <Button icon="eye" label={t("显示全部")} disabled={!layout} onClick={() => setVisible(layout?.layers.map(l => l.id) ?? [])} />
+              <Button icon="eyeoff" label={t("隐藏全部")} disabled={!layout} onClick={() => setVisible([])} />
             </div>
             <p className="muted field-help">{t("映射仅包含自定义名称，不包含颜色、厚度或版图几何")}</p>
             <div className="layer-list">
@@ -696,10 +665,8 @@ export default function Workbench() {
                     checked={visible.includes(layer.id)}
                     onChange={() => toggleLayer(layer.id)}
                   />
-                  <span
-                    className="swatch"
-                    style={{ background: layer.color }}
-                  />
+                  <input type="color" className="layer-color" aria-label={t("修改图层 {{0}} 的颜色", { "0": layer.id })} title={t("修改图层 {{0}} 的颜色", { "0": layer.id })}
+                    value={colorForLayer(layer.id, layout!.layers.indexOf(layer))} onChange={e => setLayerColors(colors => ({ ...colors, [layer.id]: e.target.value }))} />
                   <button
                     className="layer-name"
                     title={`${layerName(layer.id, layer.name)} · ${layer.id}`}
@@ -737,8 +704,8 @@ export default function Workbench() {
         {panel === "cells" && (
           <>
             {layout?.format === "gds" && <div className="group-actions" role="group" aria-label={t("单元浏览方式")}>
-              <button className="text-button" aria-pressed={cellView === "hierarchy"} onClick={() => setCellView("hierarchy")}>{t("层级树")}</button>
-              <button className="text-button" aria-pressed={cellView === "list"} onClick={() => setCellView("list")}>{t("全部单元")}</button>
+              <Button icon="tree" label={t("层级树")} pressed={cellView === "hierarchy"} onClick={() => setCellView("hierarchy")} />
+              <Button icon="list" label={t("全部单元")} pressed={cellView === "list"} onClick={() => setCellView("list")} />
             </div>}
             <p className="muted field-help">
               {layout?.format === "gds"
@@ -790,16 +757,14 @@ export default function Workbench() {
               rows={5}
               placeholder={t("记录当前观察与待核对问题…")}
             />
-            <button
-              className="text-button primary"
+            <Button icon="plus" label={t("加入记录")} className="primary"
               disabled={!layout || !note.trim() || notes.length >= 200}
               onClick={() => {
                 setNotes((n) => [...n, note.trim()]);
                 setNote("");
                 setStatus("记录已加入当前会话，请导出以保留");
               }}
-            >
-               {t("加入记录")} </button>
+            />
             <p className="muted"> {t("关闭页面后会话会清空，请导出记录")} </p>
             {notes.map((n, i) => (
               <article className="note-item" key={i}>
@@ -812,8 +777,7 @@ export default function Workbench() {
         )}
         {panel === "bookmarks" && (
           <div className="bookmarks-content">
-            <button
-              className="text-button"
+            <Button icon="bookmark" label={t("保存当前视角")}
               disabled={!layout || bookmarks.length >= 50}
               onClick={() => {
                 const camera = viewer.current?.camera();
@@ -828,8 +792,7 @@ export default function Workbench() {
                     },
                   ]);
               }}
-            >
-               {t("保存当前视角")} </button>
+            />
             {bookmarks.map((b, i) => (
               <button
                 className="cell-row"
@@ -898,7 +861,7 @@ export default function Workbench() {
           <details><summary> {t("查看引用实例路径")} </summary><p className="instance-path">{selectedObject.feature.instance}</p></details>
           {!!selectedObject.feature.properties?.length && <details><summary>{t("元素属性")}</summary>{selectedObject.feature.properties.map((property, i) => <p className="instance-path" key={i}>{property.attribute}: {property.value}</p>)}</details>}
           <p className="muted"> {t("几何属性来自文件，电气连通性与工艺用途需要额外资料")} </p>
-          <button className="text-button" onClick={() => setSelectedObject(null)}> {t("清除选择")} </button>
+          <Button icon="close" label={t("清除选择")} onClick={() => setSelectedObject(null)} />
         </section>}
         <section>
           <h3>{selectedLayer ? t("选中图层") : t("当前版图")}</h3>
@@ -925,21 +888,19 @@ export default function Workbench() {
             <div className="layer-rename">
               <p className="muted">{selectedLayer.id} · {t("名称由用户或层映射提供，层号保持不变")}</p>
               <label>{t("图层名称")}<input aria-label={t("图层名称")} maxLength={128} value={rename?.id === selectedLayer.id ? rename.value : layerNames[selectedLayer.id] ?? ""} placeholder={selectedLayer.name} onChange={(e) => setRename({ id: selectedLayer.id, value: e.target.value })} /></label>
-              <div className="group-actions"><button className="text-button" onClick={() => {
+              <div className="group-actions"><Button icon="check" label={t("保存名称")} onClick={() => {
                 const value = rename?.id === selectedLayer.id ? rename.value.trim() : layerNames[selectedLayer.id] ?? "";
                 try { const names = value ? validateLayerNames({ ...layerNames, [selectedLayer.id]: value }) : Object.fromEntries(Object.entries(layerNames).filter(([id]) => id !== selectedLayer.id)); setLayerNames(names); setRename(null); }
                 catch (e) { setError(e instanceof Error ? e.message : "图层映射无法读取"); }
-              }}>{t("保存名称")}</button><button className="text-button" onClick={() => { setLayerNames(Object.fromEntries(Object.entries(layerNames).filter(([id]) => id !== selectedLayer.id))); setRename(null); }}>{t("恢复默认")}</button></div>
+              }} /><Button icon="reset" label={t("恢复默认")} onClick={() => { setLayerNames(Object.fromEntries(Object.entries(layerNames).filter(([id]) => id !== selectedLayer.id))); setRename(null); }} /></div>
             </div>
           )}
           {selectedLayer && (
-            <button
-              className="text-button"
+            <Button icon="fit" label={t("隔离当前图层")}
               onClick={() => {
                 setVisible([selectedLayer.id]);
               }}
-            >
-               {t("隔离当前图层")} </button>
+            />
           )}
         </section>
         <section>
@@ -1006,11 +967,16 @@ export default function Workbench() {
             onChange={(e) => setExplode(Number(e.target.value))}
           />
           <p className="muted"> {t("用于观察遮挡关系，不表示工艺尺寸")} </p>
+          <p className="muted field-help">{t(layout?.format === "gltf" ? "三维模型保留原始高度，滑条仅增加展示间距" : "0 表示层面贴合、没有空隙，保留示意层厚度，非真实工艺堆叠")}</p>
+        </section>
+        <section>
+          <h3>{t("配色")}</h3>
+          <div className="display-palette"><span>{palettePreferences.custom.some(p => p.id === paletteId) ? activePalette.name : t(activePalette.name)}</span><Button icon="palette" label={t("配色组合")} popup="dialog" onClick={() => setPaletteOpen(true)} /><Button icon="reset" label={t("恢复组合颜色")} disabled={!Object.keys(layerColors).length} onClick={() => setLayerColors({})} /></div>
+          <p className="muted field-help">{t("点击左侧图层色块打开调色板，颜色立即更新，不重新解析版图")}</p>
         </section>
         <section>
           <h3> {t("版图比较")} </h3>
-          <button
-            className="text-button"
+          <Button icon="swap" label={t("设为比较基线")}
             disabled={!layout}
             onClick={() => {
               if (layout)
@@ -1021,8 +987,7 @@ export default function Workbench() {
                 });
               setStatus("当前几何统计已设为比较基线");
             }}
-          >
-             {t("设为比较基线")} </button>
+          />
           {baseline && (
             <>
               <p className="muted"> {t("基线：")} {baseline.name}</p>
@@ -1113,28 +1078,14 @@ export default function Workbench() {
         </a>
         </div>
         <div className="top-actions">
-          <button
-            ref={importButton}
-            className="icon-button toolbar-button"
-            aria-label={t("打开文件")}
-            title={t("打开文件")}
-            onClick={() => fileInput.current?.click()}
-          >
-            <Icon name="upload" />
-          </button>
-          <button
-            className="icon-button toolbar-button demo-button"
-            aria-label={t("加载示例")}
-            title={t("加载示例")}
-            onClick={() => void demo()}
-            disabled={busy}
-          >
-            <Icon name="cube" /></button>
-          <button className="icon-button language-toggle" aria-label={t(locale === "zh" ? "切换为英文" : "切换为中文")} title={t(locale === "zh" ? "切换为英文" : "切换为中文")} onClick={() => setLocale(locale === "zh" ? "en" : "zh")}>{locale === "zh" ? "EN" : "ZH"}</button>
+          <Button buttonRef={importButton} icon="upload" className="toolbar-button" label={t("打开文件")} onClick={() => fileInput.current?.click()} />
+          <Button icon="cube" className="toolbar-button demo-button" label={t("加载示例")} onClick={() => void demo()} disabled={busy} />
+          <Button icon="language" className="language-toggle" label={t(locale === "zh" ? "切换为英文" : "切换为中文")} onClick={() => setLocale(locale === "zh" ? "en" : "zh")}>{locale === "zh" ? "EN" : "ZH"}</Button>
           <Button
             icon="download"
-            label={t("导出审阅记录")}
-            onClick={exportReview}
+            label={t("导出")}
+            popup="dialog"
+            onClick={() => setExportOpen("all")}
             disabled={!layout}
           />
           <Button
@@ -1286,6 +1237,7 @@ export default function Workbench() {
                 selectedObject={selectedObject}
                 onPick={(pick) => { setSelectedObject(pick); if (pick) { setInspectorTab("overview"); setRight(true); if (mobile) setLeft(false); } }}
                 layerNames={layerNames}
+                layerColors={displayedColors}
                 onMode={(mode) => { setViewMode(mode); if (mode === "3d") setMeasuring(false); }}
                 measuring={measuring}
                 onSelect={(id) => {
@@ -1346,8 +1298,7 @@ export default function Workbench() {
                   <span className="spinner" />
                   <strong>{t(status)}</strong>
                   <span> {t("最多等待 45 秒，已有文件会保留")} </span>
-                  <button className="text-button" onClick={cancel}>
-                     {t("取消导入")} </button>
+                  <Button icon="close" label={t("取消导入")} onClick={cancel} />
                 </div>
               )}
               {error && (
@@ -1364,7 +1315,7 @@ export default function Workbench() {
                 <div className="canvas-hint">
                    {t(viewMode === "2d" ? "二维正交 · 拖动平移 · 滚轮缩放 · 可开启测量" : "拖动旋转 · 右键平移 · 滚轮缩放 · 悬停查看 · 点击固定详情")} </div>
               )}
-              {layout?.incomplete && !busy && <div className="incomplete-banner" role="status"> {t("不完整预览 ·")} {layout.missingReferences?.length ? t("缺失单元定义，当前仅显示已有几何") : t("完整几何尚未生成")}<button className="text-button quiet" onClick={() => { setRight(true); if (mobile) setLeft(false); }}> {t("查看解析说明")} </button></div>}
+              {layout?.incomplete && !busy && <div className="incomplete-banner" role="status"> {t("不完整预览 ·")} {layout.missingReferences?.length ? t("缺失单元定义，当前仅显示已有几何") : t("完整几何尚未生成")}<Button icon="info" label={t("查看解析说明")} onClick={() => { setInspectorTab("source"); setRight(true); if (mobile) setLeft(false); }} /></div>}
             </div>
             <div className="pane-foot main-foot">
               <span>
@@ -1372,12 +1323,7 @@ export default function Workbench() {
                   ? `${layout.top} · ${layout.layers.length ? layout.triangles.toLocaleString() + " " + t("个三角形") : t("仅单元目录")}`
                   : t("拖入一个版图或模型文件即可开始")}
               </span>
-              <button
-                className="foot-action"
-                disabled={!layout}
-                onClick={() => reviewInput.current?.click()}
-              >
-                 {t("导入审阅记录")} </button>
+              <Button icon="upload" label={t("导入审阅记录")} disabled={!layout} onClick={() => reviewInput.current?.click()} />
             </div>
           </main>
           {!mobile && (swapped ? left : right) && (
@@ -1415,6 +1361,18 @@ export default function Workbench() {
           <span> {t("每次一个文件，最大 32 MB")} </span>
         </div>
       )}
+      {paletteOpen && <Modal title={t("配色组合")} onClose={() => setPaletteOpen(false)}><PalettePanel preferences={palettePreferences} activeId={paletteId} currentColors={layout?.layers.map(layer => colorForLayer(layer.id))} onPreferences={setPalettePreferences} onApply={applyPalette} /></Modal>}
+      {exportOpen && <Modal title={t(exportOpen === "maps" ? "导出图层映射" : "导出")} onClose={() => setExportOpen(null)}>
+        <p className="muted">{t("选择导出内容与格式，文件直接保存到你的电脑")}</p>
+        <div className="export-options">
+          {exportOpen === "all" && <>
+            <button className="export-option" aria-label={t("导出审阅记录")} disabled={!layout} onClick={() => { exportReview(); setExportOpen(null); }}><Icon name="note" /><span><strong>{t("导出审阅记录")}</strong><small>{t("JSON · 记录、视角、图层名称与颜色，不包含源版图或密钥")}</small></span></button>
+            <button className="export-option" aria-label={t("保存当前画面")} disabled={!layout?.layers.length} onClick={() => { viewer.current?.screenshot(); setExportOpen(null); }}><Icon name="camera" /><span><strong>{t("保存当前画面")}</strong><small>{t("PNG · 当前视角与显示配色")}</small></span></button>
+          </>}
+          {(["json", "lyp"] as const).map(format => <button className="export-option" aria-label={t(format === "json" ? "导出 JSON" : "导出 LYP")} key={format} disabled={!layout || layout.format !== "gds" || !Object.keys(layerNames).length} onClick={() => exportMapping(format)}><Icon name="layers" /><span><strong>{t(format === "json" ? "导出 JSON" : "导出 LYP")}</strong><small>{t(format === "json" ? "JSON · 图层编号与自定义名称映射" : "LYP · KLayout 图层名称映射")}</small></span></button>)}
+        </div>
+        <p className="muted field-help">{t("名称映射不包含颜色或厚度，配色组合在本机偏好中单独管理")}</p>
+      </Modal>}
       {help && (
         <Modal title={t("使用说明与隐私")} onClose={() => setHelp(false)}>
           <p> {t("GDS-3D-VIEWER 是用于教学、演示和早期版图观察的公开预览器")} </p>
@@ -1432,7 +1390,7 @@ export default function Workbench() {
           <p>
              {t("解析任务在浏览器中独立运行，不上传你的版图、不共享会话。可选 AI 讲解由浏览器直连你确认的模型服务，只发送预览过的对象摘要；密钥仅留在当前页面，刷新即丢弃")} </p>
           <p>
-             {t("网页服务器仍会接收访问网页所需的普通请求，浏览器只保存明暗主题、侧栏和语言偏好")} </p>
+             {t("网页服务器仍会接收访问网页所需的普通请求，浏览器只保存主题、侧栏、语言和你保存的配色组合")} </p>
           <p>
              {t("版图、审阅记录与书签只在本次会话中保留，刷新或关闭前请导出审阅记录并单独保留原始文件")} </p>
           <h3> {t("支持范围")} </h3>
@@ -1443,7 +1401,7 @@ export default function Workbench() {
           <p>
              {t("三维模型只支持自包含、无纹理、无压缩扩展的静态三角形网格，外部缓冲区与纹理均拒绝加载")} </p>
           <p>
-             {t("最大 32 MB、150,000 个展开实例、300,000 个多边形、2,000,000 个三角形，解析超过 45 秒自动终止")} </p>
+             {t("最大 32 MB、150,000 个展开实例，复用几何最多显示 12,000,000 个三角形，解析超过 45 秒自动终止")} </p>
           <h3> {t("观察边界")} </h3>
           <p>
              {t("版图层高度用于展示，不代表工艺厚度；数量比较不等同于几何差异检查，结果不能代替版图规则检查或流片签核")} </p>

@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import type { GeometryFeature, Layout } from "./types";
 import { explanationContext, requestExplanation, HARNESS_VERSION } from "./explanation";
 import { Icon } from "./Icon";
+import { IconButton } from "./IconButton";
 import { Markdown } from "./Markdown";
 
 export function ExplanationPanel({ layout, object, layerNames }: { layout: Layout | null; object?: GeometryFeature; layerNames: Record<string, string> }) {
@@ -66,7 +67,7 @@ export function ExplanationPanel({ layout, object, layerNames }: { layout: Layou
       <label> {t("模型接口地址")} <input aria-label={t("模型接口地址")} type="url" value={endpoint} onChange={(e) => setEndpoint(e.target.value)} spellCheck={false} /></label>
       <label> {t("模型名称")} <input aria-label={t("模型名称")} value={model} onChange={(e) => setModel(e.target.value)} spellCheck={false} /></label>
       <label> {t("本次会话密钥")} <input ref={keyInput} aria-label={t("本次会话密钥")} type="password" autoComplete="off" spellCheck={false} value={apiKey} onChange={(e) => { setApiKey(e.target.value); setConsent(false); }} /></label>
-      <button className="text-button" disabled={!apiKey && !busy} onClick={() => { generation.current++; controller.current?.abort(); setBusy(false); setApiKey(""); setConsent(false); }}> {t("清除密钥")} </button>
+      <IconButton icon="trash" label={t("清除密钥")} disabled={!apiKey && !busy} onClick={() => { generation.current++; controller.current?.abort(); setBusy(false); setApiKey(""); setConsent(false); }} />
       <p className="muted"> {t("密钥只在当前页面内存中，刷新或离开页面即丢弃，不写入存储或审阅导出")} </p>
     </details>
     <label> {t("讲解对象")} <select aria-label={t("讲解对象")} value={geometry && object ? "geometry" : "cell"} onChange={(e) => setGeometry(e.target.value === "geometry")}>
@@ -77,8 +78,8 @@ export function ExplanationPanel({ layout, object, layerNames }: { layout: Layou
     <p className="muted"> {t("浏览器直连你确认的模型服务，仅发送上述摘要，不发送版图文件。密钥会用于向该服务认证；服务须允许浏览器跨域请求")} </p>
     <label className="consent-row"><input type="checkbox" aria-label={t("确认发送所选摘要")} checked={consent} onChange={(e) => setConsent(e.target.checked)} /> {t("我已核对服务地址与摘要，同意发送")} </label>
     <div className="explanation-actions" aria-live="polite">
-      <button className="text-button primary" disabled={!context || !apiKey.trim() || !consent || busy} onClick={() => void explain()}>{busy ? <span className="ai-spinner" aria-hidden="true" /> : <Icon name="explain" />}{busy ? t("正在讲解…") : t("生成讲解")}</button>
-      {busy && <button className="text-button" onClick={() => controller.current?.abort()}> {t("取消讲解")} </button>}
+      <IconButton icon="explain" label={busy ? t("正在讲解…") : t("生成讲解")} loading={busy} className="primary" disabled={!context || !apiKey.trim() || !consent || busy} onClick={() => void explain()} />
+      {busy && <><IconButton icon="close" label={t("取消讲解")} onClick={() => controller.current?.abort()} /><span className="muted">{t("正在讲解…")}</span></>}
     </div>
     {error && <p className="ai-error" role="alert">{t(error)}</p>}
     {result && <div className="explanation-result" aria-label={t("讲解结果")}><p className="muted"> {t("生成内容依据所选摘要，推测需要独立核对")} </p><Markdown content={result} /></div>}

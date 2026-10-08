@@ -29,13 +29,17 @@ Figure 1 The complete workbench running the original synthetic demonstration
 Opening files requires no account or model key. Parsing happens in the current browser
 Chinese is the default. The `EN` / `ZH` control sits immediately after Load sample and switches the interface and future AI explanations while preserving geometry, layer visibility and notes
 The inspector groups Overview, Display, Source data and AI. Clicking geometry opens Overview; tabs keep the same AI configuration and ephemeral key
-Select a layer to set a manual name, or import a local `.lyp` / `.json` layer map. Export JSON and Export LYP save the current explicit names; unmapped layers keep numbered defaults
+Select a layer to set a manual name, or import a local `.lyp` / `.json` layer map. The Export layer mapping icon opens a dialog to choose JSON or LYP for current explicit names; unmapped layers keep numbered defaults
 Maps contain names only, without colors or physical thicknesses. Nested groups and leading-zero IDs work; conflicting names are rejected
 Stored GDS cell names populate an expandable hierarchy and searchable directory. Physical layer names such as metal1 still require a map rather than guessing from layer numbers
 Larger repeated designs automatically share source geometry to display the complete current top, retaining arrays, rotation, reflection, magnification and per-instance inspection. Capacity remains bounded; see [public limits](docs/PUBLIC-PREVIEW.md)
 Orthographic 2D supports panning, zooming and unsnapped two-point measurements. Reviews/bookmarks retain projection and zoom; ruler results are transient
 Source data exposes library metadata, searchable text labels, reference transformations and record coverage; see [format support and layer names](docs/GDS-RECORDS.md)
-After refresh, reopen the source file; review exports contain observations and view state rather than the source layout
+Click layer swatches to edit colors immediately. Five built-in palettes offer Original pastel, Classic categorical, Clear contrast, Dark neon and Grayscale structure
+The Color palettes dialog supports create, copy, edit, delete, search and starred defaults. Only palette names, colors and the default selection persist in this browser
+Zero layer spacing makes adjacent surfaces touch while retaining illustrative thickness, with no underlying gap; this is not a physical process stack
+Frequent actions use icons with hover and keyboard-focus help; export choices retain text in a dedicated dialog
+After refresh, reopen the source file; review exports contain observations, view state, layer names and colors, excluding the source layout and keys
 
 ## 2 Product showcase
 
@@ -128,6 +132,22 @@ Figure 11 Formatted Markdown from an intercepted synthetic-summary demonstration
 ![Orthographic 2D with a two-point ruler reporting distance and signed coordinate differences](docs/assets/readme/planar-ruler.png)
 
 Figure 12 Orthographic 2D with a two-point ruler reporting distance and signed coordinate differences, without snapping
+
+</div>
+
+<div align="center">
+
+![Five built-in palettes and an original synthetic custom palette with default, copy, edit and delete actions](docs/assets/readme/palette-combinations.png)
+
+Figure 13 Built-in and custom palettes, immediate layer-color editing, and browser-local saved preferences
+
+</div>
+
+<div align="center">
+
+![Unified export dialog for review, PNG and layer name maps; maps are disabled until names are provided](docs/assets/readme/export-dialog.png)
+
+Figure 14 Export content and format choices; reviews retain layer colors while name maps exclude palettes and process thickness
 
 </div>
 

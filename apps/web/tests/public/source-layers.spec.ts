@@ -16,7 +16,7 @@ test("source records preserve units, text types and properties without fabricati
 test("toolbar order, named layers, safe source data and review restoration preserve the scene", async ({ page }) => {
   const transfers: string[] = []; page.on("request", (request) => { if (request.method() !== "GET") transfers.push(request.url()); });
   await page.goto("/");
-  expect(await page.locator(".top-actions > *").evaluateAll((controls) => controls.map((control) => control.getAttribute("aria-label")))).toEqual(["打开文件", "加载示例", "切换为英文", "导出审阅记录", "切换浅色主题", "使用说明与隐私", "查看源码"]);
+  expect(await page.locator(".top-actions > *").evaluateAll((controls) => controls.map((control) => control.getAttribute("aria-label")))).toEqual(["打开文件", "加载示例", "切换为英文", "导出", "切换浅色主题", "使用说明与隐私", "查看源码"]);
   const sizes = await page.locator(".top-actions > *").evaluateAll((controls) => controls.map((control) => ({ height: control.getBoundingClientRect().height, background: getComputedStyle(control).backgroundColor })));
   expect(new Set(sizes.map((size) => size.height)).size).toBe(1); expect(new Set(sizes.map((size) => size.background)).size).toBe(1);
   await page.getByTestId("public-file-input").setInputFiles({ name: "synthetic.gds2", mimeType: "application/octet-stream", buffer: metadataFixture() });
@@ -38,7 +38,7 @@ test("toolbar order, named layers, safe source data and review restoration prese
   const mapping = '<layer-properties><properties><name>metal2</name><source>7/3@1</source></properties></layer-properties>';
   await page.getByTestId("layer-mapping-input").setInputFiles({ name: "synthetic.lyp", mimeType: "application/xml", buffer: Buffer.from(mapping) });
   await expect(page.locator(".layer-name")).toContainText("metal2");
-  const download = page.waitForEvent("download"); await page.getByRole("button", { name: "导出审阅记录", exact: true }).click();
+  const download = page.waitForEvent("download"); await page.getByRole("button", { name: "导出", exact: true }).click(); await page.getByRole("button", { name: "导出审阅记录", exact: true }).click();
   const stream = await (await download).createReadStream(); const chunks: Buffer[] = []; for await (const chunk of stream!) chunks.push(chunk); const exported = Buffer.concat(chunks);
   expect(JSON.parse(exported.toString()).layerNames).toEqual({ "7/3": "metal2" }); expect(exported.toString()).not.toContain("synthetic-tab-key");
   await page.getByRole("button", { name: "恢复默认", exact: true }).click();

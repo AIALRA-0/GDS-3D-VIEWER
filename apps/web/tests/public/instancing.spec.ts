@@ -44,6 +44,17 @@ test("full repeated layout supports 2D picking, selected-instance highlight and 
   await expect(page.locator(".inspector-pane")).toContainText("4,800");
   await page.getByRole("button", { name: "二维", exact: true }).click();
   const canvas = page.locator(".viewer-host canvas"), box = (await canvas.boundingBox())!;
+  await page.locator(".layer-color").evaluate((element: HTMLInputElement) => {
+    Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")!.set!.call(element, "#00ff00");
+    element.dispatchEvent(new Event("input", { bubbles: true }));
+  });
+  await expect.poll(() => canvas.evaluate((source: HTMLCanvasElement) => {
+    const copy = document.createElement("canvas"); copy.width = source.width; copy.height = source.height;
+    const context = copy.getContext("2d")!; context.drawImage(source, 0, 0);
+    const [r, g, b] = context.getImageData(source.width / 2, source.height / 2, 1, 1).data;
+    return g > r * 2 && g > b * 2;
+  })).toBe(true);
+  await expect(canvas).toHaveAttribute("data-projection", "orthographic");
   await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
   const tooltip = page.getByRole("tooltip"); await expect(tooltip).toContainText("TILE");
   const values = await tooltip.locator("dd").allTextContents(); expect(parseFloat(values[2])).toBeCloseTo(245, 2); expect(parseFloat(values[3])).toBeCloseTo(405, 2);

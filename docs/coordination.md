@@ -45,3 +45,7 @@ The public frontend now switches between an orthographic GDS XY view and perspec
 ## Whole-layout rendering contract
 
 Repeated GDS layouts preflight the hierarchy before allocating flat vertices and can use per-cell/layer instancing. Source triangles remain capped at two million, with independent twelve-million drawn-triangle, 150,000 placement, 2,048 batch, depth/time and path-character budgets. Reflections use mirrored templates rather than unsupported negative instance scales. Picking creates transformed object facts on demand, without uploading source data; layer separation uses layer indices rather than batch indices. Worker transfer includes geometry and placement buffers. No backend or original template changes; private supplied files remain local. Protocol troubleshooting documents zone-wide or single-host Cloudflare fixes without claiming unavailable DNS-only credentials applied them.
+
+## 2026-10-08 Palette and action contract
+
+Frontend adds browser-local palette preferences containing only explicit names/colors/default, per-layer ephemeral overrides, and optional validated `layerColors` in backward-compatible version-1 reviews. Existing AI key and provider boundaries are unchanged. Export actions use native dialogs and shared labeled icon controls. GDS zero spacing packs actual rendered surfaces, retaining illustrative thickness and stable camera/selection; glTF source depth is preserved. No API, template, dependency or workflow change.

@@ -99,7 +99,7 @@ test("AI requires consent, sends bounded facts directly, masks responses and dro
   const storage = await page.evaluate(() => JSON.stringify({ local: { ...localStorage }, session: { ...sessionStorage } }));
   expect(storage).not.toContain(key); expect(storage).not.toContain(endpoint);
   const downloaded = page.waitForEvent("download");
-  await page.getByRole("button", { name: "导出审阅记录", exact: true }).click();
+  await page.getByRole("button", { name: "导出", exact: true }).click(); await page.getByRole("button", { name: "导出审阅记录", exact: true }).click();
   const exported = await fs.readFile((await (await downloaded).path())!, "utf8");
   expect(exported).not.toContain(key); expect(exported).not.toContain(endpoint); expect(exported).not.toContain("已隐藏密钥");
   await page.reload();
