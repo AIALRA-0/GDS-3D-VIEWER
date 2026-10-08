@@ -1,0 +1,27 @@
+apps/web/tests/public/explanation.spec.ts
+  s_175b4d132123f9::t_b611e3e4885975 16,18-20
+apps/web/tests/public/inspection.spec.ts
+  s_175b4d132123f9::t_608173ab1e1179 118-127
+docs/AI-HARNESS.md
+  s_175b4d132123f9::t_b611e3e4885975 13
+docs/security/publication-risk-notes.md
+  s_175b4d132123f9::t_b611e3e4885975 13
+apps/web/src/public/explanation.ts
+  s_175b4d132123f9::t_b611e3e4885975 46-47
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "780d41f4390bee0ca830f114d5e17aeaf791df9f",
+  "prompts": {},
+  "sessions": {
+    "s_175b4d132123f9": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a11903-4e6d-7740-9d79-7a585557e2c2",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "AIALRA-0 <aialra@163.com>"
+    }
+  }
+}
