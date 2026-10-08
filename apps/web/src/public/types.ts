@@ -54,6 +54,8 @@ export interface Layout {
   rendering?: { kind: "instanced"; storedTriangles: number; placements: number };
   occurrences?: { cell: string; path: string; parent: number }[];
   gds?: {
+    // A file-wide display convention, never a physical process stack.
+    stack?: { layers: string[]; pitch: number };
     version?: number;
     library?: string;
     databaseUnitMeters: number;

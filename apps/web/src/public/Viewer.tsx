@@ -48,6 +48,7 @@ export interface CameraPose {
   target: number[];
   projection?: "2d" | "3d";
   zoom?: number;
+  rotation?: number;
 }
 export interface ViewerHandle {
   view: (name: string) => void;
@@ -113,7 +114,9 @@ export const Viewer = forwardRef<ViewerHandle, Props>(function Viewer(
     r.camera = next === "2d" ? r.orthographic : r.perspective;
     r.controls.object = r.camera;
     r.controls.enableRotate = next === "3d";
-    r.controls.mouseButtons.LEFT = next === "2d" ? THREE.MOUSE.PAN : THREE.MOUSE.ROTATE;
+    r.controls.mouseButtons.LEFT = THREE.MOUSE.ROTATE;
+    r.controls.mouseButtons.MIDDLE = THREE.MOUSE.PAN;
+    r.controls.mouseButtons.RIGHT = -1 as THREE.MOUSE; // Unmapped action: OrbitControls ignores right-button drags.
     r.controls.touches.ONE = next === "2d" ? THREE.TOUCH.PAN : THREE.TOUCH.ROTATE;
     setMode(next); modeChanged.current?.(next); setHover(null);
     r.renderer.domElement.dataset.projection = next === "2d" ? "orthographic" : "perspective";
@@ -139,7 +142,7 @@ export const Viewer = forwardRef<ViewerHandle, Props>(function Viewer(
               ? new THREE.Vector3(0, 0.12, 1)
               : new THREE.Vector3(0.7, 0.6, 0.7);
         r.camera.position.copy(direction.normalize().multiplyScalar(distance));
-        if (name === "2d") { r.camera.zoom = 1; r.camera.updateProjectionMatrix(); }
+        if (name === "2d") { r.camera.up.set(0, 0, -1); r.camera.zoom = 1; r.camera.updateProjectionMatrix(); }
         r.controls.target.set(0, 0, 0);
         r.controls.update();
         r.draw();
@@ -152,6 +155,7 @@ export const Viewer = forwardRef<ViewerHandle, Props>(function Viewer(
               target: r.controls.target.toArray(),
               projection: r.camera instanceof THREE.OrthographicCamera ? "2d" : "3d",
               zoom: r.camera.zoom,
+              ...(r.camera instanceof THREE.OrthographicCamera ? { rotation: Math.atan2(-r.camera.up.x, -r.camera.up.z) } : {}),
             }
           : null;
       },
@@ -161,6 +165,7 @@ export const Viewer = forwardRef<ViewerHandle, Props>(function Viewer(
           changeMode(pose.projection === "2d" ? "2d" : "3d");
           r.camera.position.fromArray(pose.position);
           r.camera.zoom = pose.zoom ?? 1;
+          if (pose.projection === "2d") r.camera.up.set(0, 0, -1).applyAxisAngle(new THREE.Vector3(0, 1, 0), pose.rotation ?? 0);
           r.camera.updateProjectionMatrix();
           r.controls.target.fromArray(pose.target);
           r.controls.update();
@@ -211,6 +216,8 @@ export const Viewer = forwardRef<ViewerHandle, Props>(function Viewer(
     orthographic.up.set(0, 0, -1);
     controls.enableDamping = false;
     controls.enablePan = true;
+    controls.mouseButtons.MIDDLE = THREE.MOUSE.PAN;
+    controls.mouseButtons.RIGHT = -1 as THREE.MOUSE;
     controls.zoomToCursor = true;
     controls.minDistance = 0.05;
     controls.maxDistance = 500;
@@ -233,6 +240,7 @@ export const Viewer = forwardRef<ViewerHandle, Props>(function Viewer(
         0.000001,
       ),
       scale = 12 / span;
+    const yScale = layout.format === "gds" ? (layout.gds?.stack ? layout.gds.stack.pitch * scale : Math.min(0.18, 2.5 / layout.layers.length)) : scale;
     const centerX = (layout.bounds[0] + layout.bounds[2]) / 2,
       centerZ =
         layout.format === "gds"
@@ -247,10 +255,7 @@ export const Viewer = forwardRef<ViewerHandle, Props>(function Viewer(
       const points = new Float32Array(source.positions);
       for (let i = 0; i < points.length; i += 3) {
         points[i] = (layer.batches ? points[i] * (source.mirrored ? -1 : 1) : points[i] - centerX) * scale;
-        points[i + 1] *=
-          layout.format === "gds"
-            ? Math.min(0.18, 2.5 / layout.layers.length)
-            : scale;
+        points[i + 1] *= yScale;
         points[i + 2] = (layer.batches ? points[i + 2] : points[i + 2] - centerZ) * scale;
         verticalBounds[layerIndex][0] = Math.min(verticalBounds[layerIndex][0], points[i + 1]);
         verticalBounds[layerIndex][1] = Math.max(verticalBounds[layerIndex][1], points[i + 1]);
@@ -340,7 +345,7 @@ export const Viewer = forwardRef<ViewerHandle, Props>(function Viewer(
     controls.addEventListener("change", draw);
     const pointer = new THREE.Vector2(),
       caster = new THREE.Raycaster();
-    let down = [0, 0];
+    let down = [0, 0], last = [0, 0];
     let hoverTimer: ReturnType<typeof setTimeout> | undefined;
     const hitTest = (e: PointerEvent): PickInfo | null => {
       // Picking must use current layer transforms even before the queued draw.
@@ -353,7 +358,6 @@ export const Viewer = forwardRef<ViewerHandle, Props>(function Viewer(
       const mesh = hit.object as THREE.Mesh;
       const layer = layout.layers.find((l) => l.id === mesh.userData.layerId)!;
       const local = mesh.worldToLocal(hit.point.clone());
-      const yScale = layout.format === "gds" ? Math.min(0.18, 2.5 / layout.layers.length) : scale;
       return {
         layerId: layer.id,
         feature: mesh instanceof THREE.InstancedMesh && hit.instanceId !== undefined
@@ -367,6 +371,12 @@ export const Viewer = forwardRef<ViewerHandle, Props>(function Viewer(
     };
     const pointerMove = (e: PointerEvent) => {
       if (hoverTimer) clearTimeout(hoverTimer);
+      const current = runtime.current;
+      if ((e.buttons & 1) && e.pointerType !== "touch" && current?.camera instanceof THREE.OrthographicCamera && !measure.current) {
+        current.camera.up.applyAxisAngle(new THREE.Vector3(0, 1, 0), (e.clientX - last[0]) * 0.01);
+        current.camera.lookAt(current.controls.target); current.draw();
+      }
+      last = [e.clientX, e.clientY];
       if (e.buttons) { setHover(null); return; }
       hoverTimer = setTimeout(() => setHover(hitTest(e)), 80);
     };
@@ -376,6 +386,7 @@ export const Viewer = forwardRef<ViewerHandle, Props>(function Viewer(
     };
     const pointerDown = (e: PointerEvent) => {
       down = [e.clientX, e.clientY];
+      last = down;
       pointerLeave();
     };
     const pointerUp = (e: PointerEvent) => {
@@ -464,7 +475,10 @@ export const Viewer = forwardRef<ViewerHandle, Props>(function Viewer(
   useEffect(() => {
     const r = runtime.current;
     if (!r) return;
-    const offsets = layout?.format === "gds" ? packedLayerOffsets(r.verticalBounds, explode * 0.1) : r.verticalBounds.map((_, i) => i * explode * 0.1);
+    const stack = layout?.gds?.stack;
+    const stackIndices = new Map(stack?.layers.map((id, index) => [id, index]));
+    const offsets = stack ? layout!.layers.map(layer => stackIndices.get(layer.id)! * explode * 0.1) : layout?.format === "gds" ? packedLayerOffsets(r.verticalBounds, explode * 0.1) : r.verticalBounds.map((_, i) => i * explode * 0.1);
+    if (stack && offsets.length) { const center = (Math.min(...offsets) + Math.max(...offsets)) / 2; for (let i = 0; i < offsets.length; i++) offsets[i] -= center; }
     r.meshes.forEach((m) => {
       m.visible = visible.includes(m.userData.layerId);
       m.position.y = offsets[m.userData.layerIndex];

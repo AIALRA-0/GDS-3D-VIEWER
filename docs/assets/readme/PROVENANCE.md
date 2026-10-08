@@ -15,8 +15,8 @@ Captured on 2026-10-08 (America/Los_Angeles) using the actual GDS-3D-VIEWER prod
 | mobile-preview.png | Collapsed panels on a narrow viewport | 390 × 844 |
 | public-english.png | English interface retaining the same demo geometry | 1600 × 1000 |
 | ai-markdown.png | Actual Markdown renderer with an intercepted test response; no real model call, cleared key | 1600 × 1320 |
-| palette-combinations.png | Five built-ins and an original synthetic custom palette; no visitor preferences | 1600 × 1000 |
-| export-dialog.png | Actual export format dialog; unnamed maps correctly disabled | 1600 × 1000 |
+| palette-combinations.png | Ten built-ins, local palette-transfer actions and an original synthetic custom palette; no visitor preferences | 1600 × 1000 |
+| export-dialog.png | Actual export format dialog; unnamed layers export numbered defaults | 1600 × 1000 |
 | planar-ruler.png | Actual orthographic 2D, two clicked points, visible ruler and XY measurement | 1600 × 1000 |
 | palette-editor.png | Roomy palette color cards, hex values and save action; the entire color surface opens the picker | 1600 × 1000 |
 | cell-instance-highlights.png | All logic_tile occurrences outlined in the 2D top cell, with highlight, show-only, hide and restore actions | 1600 × 1000 |
@@ -31,3 +31,5 @@ Earlier `gds-3d-viewer-cockpit.png` depicts the retained local API workflow; `gd
 Current captures include directly editable layer swatches, icon actions with accessible help, palette CRUD/default management and grouped exports. Zero separation now packs adjacent illustrative surfaces without native gaps; separation 10 shows clear gaps. All seventeen captures were refreshed from this build.
 
 Current captures also show adjacent dimension controls, shared select fields, spacious palette editing, top-cell occurrence highlights and explicitly statistical comparison. Every screenshot was refreshed after the UI audit; heading focus avoids automatically opening the close-control tooltip.
+
+The current refresh includes circular multi-select checkboxes, ten built-in palettes and local JSON palette transfer, enabled default-name JSON/LYP exports, left-drag planar rotation and middle-button pan instructions. File-wide illustrative layer order/thickness is shared by all cell views; it is never physical process evidence.

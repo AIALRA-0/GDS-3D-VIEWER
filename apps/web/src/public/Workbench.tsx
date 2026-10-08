@@ -444,6 +444,7 @@ export default function Workbench() {
         v &&
         (v.projection === undefined || v.projection === "2d" || v.projection === "3d") &&
         (v.zoom === undefined || (Number.isFinite(v.zoom) && v.zoom >= 0.05 && v.zoom <= 1000)) &&
+        (v.rotation === undefined || (Number.isFinite(v.rotation) && Math.abs(v.rotation) <= Math.PI * 2)) &&
         (v.projection !== "2d" || current.format === "gds") &&
         [v.position, v.target].every(
           (a) =>
@@ -528,7 +529,7 @@ export default function Workbench() {
   }
   function exportMapping(format: "json" | "lyp") {
     try {
-      const url = URL.createObjectURL(new Blob([exportLayerNames(layerNames, format)], { type: format === "json" ? "application/json" : "application/xml" }));
+      const url = URL.createObjectURL(new Blob([exportLayerNames({ ...Object.fromEntries(layout?.layers.map(layer => [layer.id, layer.name]) ?? []), ...layerNames }, format)], { type: format === "json" ? "application/json" : "application/xml" }));
       const link = document.createElement("a"); link.href = url; link.download = `gds-layer-names.${format}`; link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000); setExportOpen(null);
     } catch (error) { setError(error instanceof Error ? error.message : "图层映射无法读取"); }
   }
@@ -679,7 +680,7 @@ export default function Workbench() {
               <Button icon="eye" label={t("显示全部")} disabled={!layout} onClick={() => setVisible(layout?.layers.map(l => l.id) ?? [])} />
               <Button icon="eyeoff" label={t("隐藏全部")} disabled={!layout} onClick={() => setVisible([])} />
             </div>
-            <p className="muted field-help">{t("映射仅包含自定义名称，不包含颜色、厚度或版图几何")}</p>
+            <p className="muted field-help">{t("映射包含当前图层与已保存名称，不包含颜色、厚度或版图几何")}</p>
             <div className="layer-list">
               {shownLayers.map((layer) => (
                 <div
@@ -739,7 +740,7 @@ export default function Workbench() {
                 ? t("选择单元可独立查看其几何与引用")
                 : t("模型节点与引用数量")}
             </p>
-            {layout?.format === "gds" && <div className="cell-root-field"><label>{t("定位顶层")}<SelectField aria-label={t("定位顶层")} value={rootTop} disabled={busy} onChange={e => { setRootTop(e.target.value); if (source.current) void openFile(source.current, e.target.value); }}>{layout.tops.map(name => <option key={name} value={name}>{name}</option>)}</SelectField></label><p className="muted">{t("单元右侧定位按钮查找此顶层中的全部实例，包含子单元几何")}</p></div>}
+            {layout?.format === "gds" && <div className="cell-root-field"><label>{t("定位顶层")}<SelectField aria-label={t("定位顶层")} value={rootTop} disabled={busy} onChange={name => { setRootTop(name); if (source.current) void openFile(source.current, name); }} options={layout.tops.map(name => ({ value: name, label: name }))} /></label><p className="muted">{t("单元右侧定位按钮查找此顶层中的全部实例，包含子单元几何")}</p></div>}
             {layout?.format === "gds" && cellView === "hierarchy" && !search ? <CellHierarchy key={layout.name} layout={layout} busy={busy} onInstances={openInstances} onOpen={(name) => { if (source.current) void openFile(source.current, name); }} /> : <div className="cell-list">
               {shownCells.slice(0, 300).map((cell, index) => (
                 <div className="cell-entry" key={`${cell.name}-${index}`}>
@@ -1342,7 +1343,7 @@ export default function Workbench() {
               )}
               {layout && layout.layers.length > 0 && !busy && (
                 <div className="canvas-hint">
-                   {t(viewMode === "2d" ? "二维正交 · 拖动平移 · 滚轮缩放 · 可开启测量" : "拖动旋转 · 右键平移 · 滚轮缩放 · 悬停查看 · 点击固定详情")} </div>
+                   {t(viewMode === "2d" ? "二维正交 · 左键旋转 · 中键平移 · 滚轮缩放 · 可开启测量" : "左键旋转 · 中键平移 · 滚轮缩放 · 悬停查看 · 点击固定详情")} </div>
               )}
               {layout?.incomplete && !busy && <div className="incomplete-banner" role="status"> {t("不完整预览 ·")} {layout.missingReferences?.length ? t("缺失单元定义，当前仅显示已有几何") : t("完整几何尚未生成")}<Button icon="info" label={t("查看解析说明")} onClick={() => { setInspectorTab("source"); setRight(true); if (mobile) setLeft(false); }} /></div>}
             </div>
@@ -1411,7 +1412,7 @@ export default function Workbench() {
             <button className="export-option" aria-label={t("导出审阅记录")} disabled={!layout} onClick={() => { exportReview(); setExportOpen(null); }}><Icon name="note" /><span><strong>{t("导出审阅记录")}</strong><small>{t("JSON · 记录、视角、图层名称与颜色，不包含源版图或密钥")}</small></span></button>
             <button className="export-option" aria-label={t("保存当前画面")} disabled={!layout?.layers.length} onClick={() => { viewer.current?.screenshot(); setExportOpen(null); }}><Icon name="camera" /><span><strong>{t("保存当前画面")}</strong><small>{t("PNG · 当前视角与显示配色")}</small></span></button>
           </>}
-          {(["json", "lyp"] as const).map(format => <button className="export-option" aria-label={t(format === "json" ? "导出 JSON" : "导出 LYP")} key={format} disabled={!layout || layout.format !== "gds" || !Object.keys(layerNames).length} onClick={() => exportMapping(format)}><Icon name="layers" /><span><strong>{t(format === "json" ? "导出 JSON" : "导出 LYP")}</strong><small>{t(format === "json" ? "JSON · 图层编号与自定义名称映射" : "LYP · KLayout 图层名称映射")}</small></span></button>)}
+          {(["json", "lyp"] as const).map(format => <button className="export-option" aria-label={t(format === "json" ? "导出 JSON" : "导出 LYP")} key={format} disabled={!layout || layout.format !== "gds" || (!layout.layers.length && !Object.keys(layerNames).length)} onClick={() => exportMapping(format)}><Icon name="layers" /><span><strong>{t(format === "json" ? "导出 JSON" : "导出 LYP")}</strong><small>{t(format === "json" ? "JSON · 导出当前图层与已保存名称" : "LYP · 导出 KLayout 图层名称映射")}</small></span></button>)}
         </div>
         <p className="muted field-help">{t("名称映射不包含颜色或厚度，配色组合在本机偏好中单独管理")}</p>
       </Modal>}

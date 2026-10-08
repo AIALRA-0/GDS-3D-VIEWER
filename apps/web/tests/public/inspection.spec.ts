@@ -78,7 +78,7 @@ test("AI requires consent, sends bounded facts directly, masks responses and dro
   });
   await panel.getByLabel("模型接口地址", { exact: true }).fill(endpoint);
   await panel.getByLabel("本次会话密钥", { exact: true }).fill(key);
-  await panel.getByLabel("讲解对象", { exact: true }).selectOption("geometry");
+  await panel.getByRole("combobox", { name: "讲解对象", exact: true }).click(); await page.getByRole("option", { name: /^选中图形/ }).click();
   await panel.getByText("查看将发送的对象摘要", { exact: true }).click();
   await expect(panel.locator(".request-preview")).toContainText('"pathWidth": 30');
   await expect(panel.getByRole("button", { name: "生成讲解", exact: true })).toBeDisabled();

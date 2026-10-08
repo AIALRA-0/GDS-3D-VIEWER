@@ -19,7 +19,7 @@ test("Chinese default and English switch preserve geometry, notes and legacy rev
   expect(await canvas!.evaluate((element) => element.isConnected)).toBe(true);
   await expect(page.getByRole("heading", { name: "Geometry statistics" })).toBeVisible();
   await page.getByRole("tab", { name: "Source data", exact: true }).click();
-  await expect(page.getByText("Layer heights follow display order for inspection and do not represent process thickness", { exact: true })).toBeVisible();
+  await expect(page.getByText("Cells in one file share layer order and illustrative thickness. Missing layers retain their positions; these are not physical process heights.", { exact: true })).toBeVisible();
   await page.getByRole("button", { name: "Layers", exact: true }).click();
   await expect(page.locator(".layer-row input").first()).not.toBeChecked();
   await page.getByRole("button", { name: "Help and privacy" }).click();

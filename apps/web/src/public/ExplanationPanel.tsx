@@ -71,10 +71,10 @@ export function ExplanationPanel({ layout, object, layerNames }: { layout: Layou
       <IconButton icon="trash" label={t("清除密钥")} disabled={!apiKey && !busy} onClick={() => { generation.current++; controller.current?.abort(); setBusy(false); setApiKey(""); setConsent(false); }} />
       <p className="muted"> {t("密钥只在当前页面内存中，刷新或离开页面即丢弃，不写入存储或审阅导出")} </p>
     </details>
-    <label> {t("讲解对象")} <SelectField aria-label={t("讲解对象")} value={geometry && object ? "geometry" : "cell"} onChange={(e) => setGeometry(e.target.value === "geometry")}>
-      <option value="cell"> {t("当前单元：")} {layout?.top ?? t("尚未打开")}</option>
-      <option value="geometry" disabled={!object}> {t("选中图形")} {object ? `：${object.kind}` : t("（请先点击几何）")}</option>
-    </SelectField></label>
+    <label> {t("讲解对象")} <SelectField aria-label={t("讲解对象")} value={geometry && object ? "geometry" : "cell"} onChange={value => setGeometry(value === "geometry")} options={[
+      { value: "cell", label: `${t("当前单元：")} ${layout?.top ?? t("尚未打开")}` },
+      { value: "geometry", label: `${t("选中图形")}${object ? `：${object.kind}` : t("（请先点击几何）")}`, disabled: !object },
+    ]} /></label>
     {context && <details className="request-preview"><summary> {t("查看将发送的对象摘要")} </summary><pre>{JSON.stringify(context, null, 2)}</pre></details>}
     <p className="muted"> {t("浏览器直连你确认的模型服务，仅发送上述摘要，不发送版图文件。密钥会用于向该服务认证；服务须允许浏览器跨域请求")} </p>
     <label className="consent-row"><input type="checkbox" aria-label={t("确认发送所选摘要")} checked={consent} onChange={(e) => setConsent(e.target.checked)} /> {t("我已核对服务地址与摘要，同意发送")} </label>

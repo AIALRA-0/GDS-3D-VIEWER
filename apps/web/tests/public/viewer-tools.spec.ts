@@ -42,10 +42,10 @@ for (const fixture of mappingCases) test(`layer mapping ${fixture.name} round tr
     const input = page.getByTestId("layer-mapping-input");
     await input.setInputFiles({ ...fixture, mimeType: "application/octet-stream" });
     await expect(page.locator(".layer-name")).toContainText(fixture.names["7/3"] ?? "Layer 7/3");
-    const json = await download(page, "导出 JSON"); expect(JSON.parse(json.buffer.toString())).toEqual(fixture.names);
+    const json = await download(page, "导出 JSON"); expect(JSON.parse(json.buffer.toString())).toEqual({ "7/3": "Layer 7/3", ...fixture.names });
     const lyp = await download(page, "导出 LYP");
     await input.setInputFiles({ ...lyp, mimeType: "application/xml" });
-    expect(JSON.parse((await download(page, "导出 JSON")).buffer.toString())).toEqual(fixture.names);
+    expect(JSON.parse((await download(page, "导出 JSON")).buffer.toString())).toEqual({ "7/3": "Layer 7/3", ...fixture.names });
     expect(transfers).toEqual([]);
 });
 

@@ -3,7 +3,7 @@ import { useI18n } from "./i18n";
 import { IconButton } from "./IconButton";
 import { Icon } from "./Icon";
 import { ColorField } from "./ColorField";
-import { BUILTIN_PALETTES, resolvePalette, validatePalettePreferences, type ColorPalette, type PalettePreferences } from "./palettes";
+import { BUILTIN_PALETTES, resolvePalette, validatePalettePreferences, importPalettePreferences, exportPalettePreferences, type ColorPalette, type PalettePreferences } from "./palettes";
 
 export function PalettePanel({ preferences, activeId, currentColors, onPreferences, onApply }: {
   preferences: PalettePreferences; activeId: string; currentColors?: string[]; onPreferences: (value: PalettePreferences) => void; onApply: (id: string) => void;
@@ -11,6 +11,26 @@ export function PalettePanel({ preferences, activeId, currentColors, onPreferenc
   const { t } = useI18n();
   const [query, setQuery] = useState(""), [draft, setDraft] = useState<ColorPalette | null>(null), [error, setError] = useState("");
   const nameInput = useRef<HTMLInputElement>(null);
+  const fileInput = useRef<HTMLInputElement>(null), alive = useRef(true);
+  const [importing, setImporting] = useState(false), [notice, setNotice] = useState("");
+  useEffect(() => { alive.current = true; return () => { alive.current = false; }; }, []);
+  const transfer = async (file?: File) => {
+    if (!file) return;
+    setError(""); setNotice(""); setImporting(true);
+    try {
+      if (file.size > 65536) throw Error("配色文件超过 64 KB");
+      const text = await file.text(); if (!alive.current) return;
+      const next = importPalettePreferences(text, preferences);
+      onPreferences(next); onApply(next.defaultId); setNotice("配色已导入并应用默认组合");
+    } catch (e) { if (alive.current) setError(e instanceof Error && ["配色文件超过 64 KB", "配色组合名称已存在"].includes(e.message) ? e.message : "配色文件无效，原有组合未改变"); }
+    finally { if (alive.current) setImporting(false); }
+  };
+  const download = () => {
+    try {
+      const url = URL.createObjectURL(new Blob([exportPalettePreferences(preferences)], { type: "application/json" }));
+      const link = document.createElement("a"); link.href = url; link.download = "gds-color-palettes.json"; link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+    } catch (e) { setError(e instanceof Error ? e.message : "配色偏好无效"); }
+  };
   useEffect(() => { if (draft) nameInput.current?.focus(); }, [!!draft]);
   const palettes = [...BUILTIN_PALETTES, ...preferences.custom];
   const create = (palette: ColorPalette) => {
@@ -31,23 +51,27 @@ export function PalettePanel({ preferences, activeId, currentColors, onPreferenc
     <div className="palette-intro"><Icon name="palette" /><div><strong>{t(draft ? "设计自己的图层配色" : "为版图选择一套配色")}</strong><p className="muted">{t(draft ? "点击色块调整颜色，保存后立即应用到当前版图" : "点击卡片应用，星标设为新文件的默认组合")}</p></div></div>
     {!draft && <>
       <div className="palette-toolbar"><div className="palette-search"><Icon name="search" /><input aria-label={t("筛选配色组合")} placeholder={t("筛选配色组合")} value={query} maxLength={80} onChange={e => setQuery(e.target.value)} /></div>
-        <IconButton icon="plus" label={t("新增配色组合")} disabled={preferences.custom.length >= 32} onClick={() => create({ ...resolvePalette(activeId, preferences.custom), ...(currentColors?.length ? { colors: currentColors.slice(0, 32) } : {}) })} />
+        <IconButton icon="upload" label={t("导入配色组合")} disabled={importing} onClick={() => fileInput.current?.click()} />
+        <IconButton icon="download" label={t("导出配色组合")} disabled={importing} onClick={download} />
+        <IconButton icon="plus" label={t("新增配色组合")} disabled={importing || preferences.custom.length >= 32} onClick={() => create({ ...resolvePalette(activeId, preferences.custom), ...(currentColors?.length ? { colors: currentColors.slice(0, 32) } : {}) })} />
       </div>
+      <input ref={fileInput} type="file" hidden data-testid="palette-file-input" accept=".json,application/json" onChange={e => { void transfer(e.target.files?.[0]); e.target.value = ""; }} />
+      <p className="muted palette-transfer-help">{t("导出自定义组合与默认选择；导入时合并组合，同 ID 更新，内置组合随网站提供")}</p>
       <div className="palette-list">
         {palettes.filter(p => `${t(p.name)} ${p.name}`.toLowerCase().includes(query.toLowerCase())).map(palette => {
           const custom = preferences.custom.some(p => p.id === palette.id), name = custom ? palette.name : t(palette.name);
           const selected = activeId === palette.id;
           return <div className={`palette-row ${selected ? "selected" : ""}`} key={palette.id}>
-            <button className="palette-apply" aria-label={t("应用配色 {{0}}", { "0": name })} aria-pressed={selected} onClick={() => onApply(palette.id)}>
+            <button className="palette-apply" disabled={importing} aria-label={t("应用配色 {{0}}", { "0": name })} aria-pressed={selected} onClick={() => onApply(palette.id)}>
               <span className="palette-card-title"><strong>{name}</strong>{selected && <span className="palette-active-badge"><Icon name="check" />{t("已应用")}</span>}</span>
               <span className="palette-strip" aria-hidden="true">{palette.colors.map((color, i) => <span key={i} style={{ background: color }} />)}</span>
             </button>
             <div className="palette-card-foot"><span className="palette-card-meta">{t(custom ? "自定义" : "预设")} · {palette.colors.length} {t("色")}</span><div className="palette-actions">
-              <IconButton icon="star" label={t("设为默认配色 {{0}}", { "0": name })} pressed={preferences.defaultId === palette.id} onClick={() => { onPreferences({ ...preferences, defaultId: palette.id }); onApply(palette.id); }} />
-              <IconButton icon="copy" label={t("复制配色 {{0}}", { "0": name })} disabled={preferences.custom.length >= 32} onClick={() => create(palette)} />
+              <IconButton icon="star" label={t("设为默认配色 {{0}}", { "0": name })} disabled={importing} pressed={preferences.defaultId === palette.id} onClick={() => { onPreferences({ ...preferences, defaultId: palette.id }); onApply(palette.id); }} />
+              <IconButton icon="copy" label={t("复制配色 {{0}}", { "0": name })} disabled={importing || preferences.custom.length >= 32} onClick={() => create(palette)} />
               {custom && <>
-                <IconButton icon="edit" label={t("编辑配色 {{0}}", { "0": palette.name })} onClick={() => { setDraft({ ...palette, colors: [...palette.colors] }); setError(""); }} />
-                <IconButton icon="trash" label={t("删除配色 {{0}}", { "0": palette.name })} onClick={() => {
+                <IconButton icon="edit" label={t("编辑配色 {{0}}", { "0": palette.name })} disabled={importing} onClick={() => { setDraft({ ...palette, colors: [...palette.colors] }); setError(""); }} />
+                <IconButton icon="trash" label={t("删除配色 {{0}}", { "0": palette.name })} disabled={importing} onClick={() => {
                   onPreferences({ ...preferences, custom: preferences.custom.filter(p => p.id !== palette.id), defaultId: preferences.defaultId === palette.id ? "original" : preferences.defaultId });
                   if (activeId === palette.id) onApply("original");
                 }} />
@@ -72,6 +96,7 @@ export function PalettePanel({ preferences, activeId, currentColors, onPreferenc
       <div className="palette-editor-actions"><IconButton icon="back" label={t("取消编辑配色")} onClick={() => { setDraft(null); setError(""); }} /><button className="text-button primary" onClick={save}><Icon name="check" />{t("保存并应用配色")}</button></div>
     </section>}
     {error && <p role="alert" className="ai-error">{t(error)}</p>}
+    {notice && <p role="status" className="muted">{t(notice)}</p>}
     <div className="palette-privacy"><Icon name="shield" /><p className="muted">{t("仅将组合名称、颜色和默认组合保存在本机浏览器，版图与密钥不写入配色偏好")}</p></div>
   </div>;
 }

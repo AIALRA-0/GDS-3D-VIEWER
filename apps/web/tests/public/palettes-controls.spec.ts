@@ -1,7 +1,7 @@
 import { expect, test, type Page, type Locator } from "@playwright/test";
 import { metadataFixture } from "./metadata-fixture";
 import { packedLayerOffsets } from "../../src/public/Viewer";
-import { PALETTE_STORAGE, validatePalettePreferences } from "../../src/public/palettes";
+import { PALETTE_STORAGE, BUILTIN_PALETTES, validatePalettePreferences } from "../../src/public/palettes";
 
 async function load(page: Page) {
   await page.goto("/");
@@ -45,7 +45,7 @@ test("palette CRUD, search and default survive refresh without retaining layout 
   const key = page.getByLabel("本次会话密钥", { exact: true }); await key.fill("synthetic-palette-key");
   await page.getByRole("button", { name: "配色组合", exact: true }).click();
   const dialog = page.getByRole("dialog", { name: "配色组合", exact: true });
-  await expect(dialog.locator(".palette-row")).toHaveCount(5);
+  await expect(dialog.locator(".palette-row")).toHaveCount(BUILTIN_PALETTES.length);
   await dialog.getByRole("button", { name: "复制配色 清晰对比", exact: true }).click();
   await dialog.getByLabel("组合名称", { exact: true }).fill("我的组合");
   await color(dialog.getByLabel("组合颜色 1", { exact: true }), "#abcdef");
@@ -67,7 +67,7 @@ test("palette CRUD, search and default survive refresh without retaining layout 
   await page.getByRole("button", { name: "配色组合", exact: true }).click();
   await dialog.getByRole("button", { name: "删除配色 我的新组合", exact: true }).click();
   expect(JSON.parse(await page.evaluate(storage => localStorage.getItem(storage)!, PALETTE_STORAGE)).defaultId).toBe("original");
-  await expect(dialog.locator(".palette-row")).toHaveCount(5);
+  await expect(dialog.locator(".palette-row")).toHaveCount(BUILTIN_PALETTES.length);
 });
 
 test("layer color changes actual pixels and review round trips while preserving the camera and canvas", async ({ page }) => {

@@ -2,6 +2,7 @@
 
 | path | owner | purpose | start | eta | status |
 |------|-------|---------|-------|-----|--------|
+| README.md; README.en.md; docs/coordination.md | main | custom dropdowns, planar rotation, palette transfer and stable illustrative heights | 2026-10-08 America/Los_Angeles | current turn | released |
 | README.md; README.en.md; docs/coordination.md | main | unified UI audit, top-cell instance tools and current screenshots | 2026-10-08 America/Los_Angeles | current turn | released |
 | README.md; README.en.md; docs/coordination.md | main | editable palettes, icon actions and export dialogs | 2026-10-08 America/Los_Angeles | current turn | released |
 | README.md; README.en.md; docs/coordination.md | main | bounded whole-layout instancing and QUIC access diagnosis | 2026-10-07 America/Los_Angeles | current turn | released |
@@ -28,3 +29,5 @@
 - Viewer tools and documentation locks are released: orthographic 2D, transient ruler, bounded hierarchy, JSON/LYP exports, twelve synthetic screenshots and backward-compatible camera reviews preserve the browser-only boundary
 
 - Whole-layout reuse and documentation locks released: repeated geometry retains exact instance inspection within explicit budgets; protocol guidance covers Cloudflare domains and no account or browser setting change is claimed
+
+- Dropdown/rotation/transfer documentation locks released: themed keyboard dropdowns, planar rotation and middle-button pan, ten palettes with local JSON transfer, default-name map exports and file-wide illustrative heights; seventeen synthetic-only screenshots match the current preview

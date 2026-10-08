@@ -491,5 +491,22 @@ export default {
   "例如：我的金属层配色": "e.g. My metal-layer palette",
   "颜色顺序": "Color sequence",
   "颜色 {{0}}": "Color {{0}}",
-  "颜色按图层顺序依次使用，图层较多时循环组合": "Colors follow layer order and repeat when there are more layers."
+  "颜色按图层顺序依次使用，图层较多时循环组合": "Colors follow layer order and repeat when there are more layers.",
+  "二维正交 · 左键旋转 · 中键平移 · 滚轮缩放 · 可开启测量": "Orthographic 2D · Left drag to rotate · Middle drag to pan · Scroll to zoom · Ruler available",
+  "左键旋转 · 中键平移 · 滚轮缩放 · 悬停查看 · 点击固定详情": "Left drag to rotate · Middle drag to pan · Scroll to zoom · Hover to inspect · Click to pin",
+  "JSON · 导出当前图层与已保存名称": "JSON · Current layers and saved names",
+  "LYP · 导出 KLayout 图层名称映射": "LYP · KLayout layer-name mapping",
+  "映射包含当前图层与已保存名称，不包含颜色、厚度或版图几何": "Maps contain current layers and saved names, excluding colors, thickness and layout geometry.",
+  "同一文件共用图层层序与示意厚度，缺少的图层保留位置；不代表真实工艺厚度": "Cells in one file share layer order and illustrative thickness. Missing layers retain their positions; these are not physical process heights.",
+  "海岸蓝绿": "Coastal blues",
+  "暖色陶土": "Earth tones",
+  "复古终端": "Retro terminal",
+  "低饱和雾色": "Muted mist",
+  "高亮彩虹": "Bright spectrum",
+  "导入配色组合": "Import palettes",
+  "导出配色组合": "Export palettes",
+  "导出自定义组合与默认选择；导入时合并组合，同 ID 更新，内置组合随网站提供": "Export custom palettes and the default choice. Import merges palettes and updates matching IDs; built-in palettes ship with the site.",
+  "配色文件超过 64 KB": "Palette file exceeds 64 KB.",
+  "配色文件无效，原有组合未改变": "Invalid palette file. Existing palettes are unchanged.",
+  "配色已导入并应用默认组合": "Palettes imported; the default palette is applied."
 };

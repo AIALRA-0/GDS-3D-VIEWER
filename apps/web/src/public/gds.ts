@@ -279,7 +279,21 @@ export function parseGds(
     pos += length;
   }
   if (!finished || !cells.size) throw new Error("文件没有完整的版图库");
+  const layerIds = new Set<string>();
+  let sourceSpan = 0.000001;
+  for (const cell of cells.values()) {
+    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+    for (const element of cell.polygons) {
+      layerIds.add(`${element.layer}/${element.datatype}`);
+      const padding = element.kind === 9 ? Math.abs(element.width) / 2 : 0;
+      for (const [x, y] of element.xy) { minX = Math.min(minX, x - padding); minY = Math.min(minY, y - padding); maxX = Math.max(maxX, x + padding); maxY = Math.max(maxY, y + padding); }
+    }
+    if (Number.isFinite(minX)) sourceSpan = Math.max(sourceSpan, (maxX - minX) * unit, (maxY - minY) * unit);
+  }
+  const stackLayers = [...layerIds].sort((a, b) => { const aa = a.split("/").map(Number), bb = b.split("/").map(Number); return aa[0] - bb[0] || aa[1] - bb[1]; });
+  const stackIndex = new Map(stackLayers.map((id, index) => [id, index]));
   const gds: NonNullable<Layout["gds"]> = {
+    stack: { layers: stackLayers, pitch: sourceSpan * 0.02 },
     version, library, databaseUnitMeters: unit / 1e6, userUnitMeters,
     records: [...recordCounts].map(([type, count]) => ({ type, count, handled: handled.has(type) })),
     labels: [], references: [],
@@ -438,7 +452,7 @@ export function parseGds(
         bounds[3] = Math.max(bounds[3], p.y);
       }
       // Layer index is illustrative; no unverified physical process height is implied.
-      const z = [...groups.keys()].indexOf(id);
+      const z = stackIndex.get(id)! * 0.3;
       const put = (p: Vector2, h: number) =>
         group!.positions.push(p.x, h, -p.y);
       for (const f of faces) {
@@ -534,10 +548,9 @@ export function parseGds(
     for (const [name, copies] of placements) {
       groups.clear(); instances = polygons = triangles = 0; bounds[0] = bounds[1] = Infinity; bounds[2] = bounds[3] = -Infinity;
       visit(name, [1, 0, 0, 1, 0, 0], new Set(), name);
-      for (const [localLayer, source] of [...groups.values()].entries()) {
+      for (const source of groups.values()) {
         let layer = output.get(source.id);
         if (!layer) { layer = { id: source.id, name: source.name, color: COLORS[output.size % COLORS.length], positions: new Float32Array(), polygons: 0, batches: [] }; output.set(source.id, layer); }
-        const layerIndex = [...output.keys()].indexOf(source.id);
         layer.polygons += source.polygons * copies.length;
         drawnTriangles += source.positions.length / 9 * copies.length;
         if (drawnTriangles > LIMITS.drawnTriangles) throw new PreviewLimitError("复用几何显示超过 12,000,000 个三角形，请选择较小单元");
@@ -547,7 +560,6 @@ export function parseGds(
           storedTriangles += source.positions.length / 9;
           if (storedTriangles > LIMITS.triangles) throw new PreviewLimitError("源几何超过 2,000,000 个三角形，请选择较小单元");
           const points = new Float32Array(source.positions);
-          for (let i = 0; i < points.length; i += 3) { points[i + 1] += layerIndex - localLayer; }
           const transforms = new Float64Array(selected.flatMap(p => p.matrix));
           layer.batches!.push({ cell: name, positions: points, features: source.features, transforms, paths: selected.map(p => p.path), mirrored });
           for (const { matrix: m } of selected) for (let i = 0; i < points.length; i += 3) {
@@ -597,7 +609,7 @@ export function parseGds(
   if (!groups.size && !missingVisited.size && !cells.get(top)?.labels.length) throw new Error("所选单元没有可渲染的几何");
   if (missingVisited.size) warnings.add(`不完整预览：当前展开缺少 ${missingVisited.size} 种引用目标，只显示文件中实际存在的几何；完整器件形状需要配套单元库`);
   if (tops.length > 1) warnings.add("文件含多个顶层单元，可在单元面板中选择");
-  warnings.add("层高度按显示顺序排列，仅用于分层观察，不代表真实工艺厚度");
+  warnings.add("同一文件共用图层层序与示意厚度，缺少的图层保留位置；不代表真实工艺厚度");
   const layers: LayerMesh[] = [...groups.values()].map((g) => ({
     ...g,
     positions: new Float32Array(g.positions),

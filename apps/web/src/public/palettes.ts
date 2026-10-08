@@ -7,6 +7,11 @@ export const BUILTIN_PALETTES: ColorPalette[] = [
   { id: "contrast", name: "清晰对比", colors: ["#0072b2", "#e69f00", "#009e73", "#cc79a7", "#56b4e9", "#d55e00", "#f0e442", "#888888"] },
   { id: "neon", name: "深色霓虹", colors: ["#00d4ff", "#ff6b9d", "#a7f432", "#ffd166", "#c792ea", "#ff8c42", "#69f0ae", "#82aaff"] },
   { id: "mono", name: "灰阶结构", colors: ["#d9d9d9", "#999999", "#eeeeee", "#666666", "#bbbbbb", "#808080", "#f5f5f5", "#aaaaaa"] },
+  { id: "coast", name: "海岸蓝绿", colors: ["#22577a", "#38a3a5", "#57cc99", "#80ed99", "#c7f9cc", "#468faf", "#89c2d9", "#e9d8a6"] },
+  { id: "earth", name: "暖色陶土", colors: ["#bc6c25", "#dda15e", "#606c38", "#a3b18a", "#e9c46a", "#e76f51", "#8d5b4c", "#f4a261"] },
+  { id: "retro", name: "复古终端", colors: ["#33ff99", "#ffcc33", "#66ccff", "#ff6699", "#cc99ff", "#99dd66", "#ff9966", "#99cccc"] },
+  { id: "muted", name: "低饱和雾色", colors: ["#899f99", "#ac9fbb", "#c5ada0", "#8198b2", "#b9bc96", "#c69a9c", "#8ba9b2", "#c6bbac"] },
+  { id: "spectrum", name: "高亮彩虹", colors: ["#e63946", "#ff9f1c", "#f4d35e", "#52b788", "#00b4d8", "#4361ee", "#9d4edd", "#f15bb5"] },
 ];
 export const DEFAULT_PALETTE_PREFERENCES: PalettePreferences = { version: 1, custom: [], defaultId: "original" };
 export function validColor(value: unknown): value is string { return typeof value === "string" && /^#[0-9a-f]{6}$/i.test(value); }
@@ -28,3 +33,19 @@ export function readPalettePreferences(): PalettePreferences {
   return validatePalettePreferences(JSON.parse(raw));
 }
 export function resolvePalette(id: string, custom: ColorPalette[]) { return [...BUILTIN_PALETTES, ...custom].find(p => p.id === id) ?? BUILTIN_PALETTES[0]; }
+
+export function exportPalettePreferences(preferences: PalettePreferences): string {
+  const text = JSON.stringify(validatePalettePreferences(preferences), null, 2);
+  if (new TextEncoder().encode(text).length > 65536) throw Error("配色文件超过 64 KB");
+  return text;
+}
+export function importPalettePreferences(text: string, current: PalettePreferences): PalettePreferences {
+  if (new TextEncoder().encode(text).length > 65536) throw Error("配色文件超过 64 KB");
+  const imported = validatePalettePreferences(JSON.parse(text));
+  const merged = new Map(current.custom.map(p => [p.id, p]));
+  for (const palette of imported.custom) merged.set(palette.id, palette);
+  const result = validatePalettePreferences({ version: 1, custom: [...merged.values()], defaultId: imported.defaultId });
+  const names = new Set(BUILTIN_PALETTES.map(p => p.name.toLowerCase()));
+  for (const palette of result.custom) { const name = palette.name.toLowerCase(); if (names.has(name)) throw Error("配色组合名称已存在"); names.add(name); }
+  return result;
+}
