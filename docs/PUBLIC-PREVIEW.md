@@ -17,6 +17,7 @@ The synthetic sample is authored by `scripts/generate-browser-demo.py`. It conta
 
 ## Public boundary
 
+- Binary GDS layout inputs accept `.gds`, `.gds2` and `.gdsii` suffixes, case-insensitively, through both file selection and drag-and-drop
 - File bytes remain in the visitor's browser. No upload endpoint, remote AI credential, shared database, or remote session exists in the public bundle
 - Each import uses a disposable Worker. Replacing or cancelling an import invalidates old results and stops the old task; parsing stops after 45 seconds
 - Limits: 32 MB input, 1,000,000 GDS records, 20,000 cells, 150,000 expanded instances, 300,000 polygons, 2,000,000 triangles, hierarchy depth 64

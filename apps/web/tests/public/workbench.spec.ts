@@ -34,6 +34,28 @@ function model(uri?: string) {
     }),
   );
 }
+test("GDS2 suffix works through file selection and uppercase drag-and-drop", async ({ page }) => {
+  const sample = await fs.readFile(path.join(root, "apps/web/public-static/samples/demo.gds"));
+  await page.goto("/");
+  const input = page.getByTestId("public-file-input");
+  await expect(input).toHaveAttribute("accept", /\.gds2(?:,|$)/);
+  await input.setInputFiles({ name: "picked.gds2", mimeType: "application/octet-stream", buffer: sample });
+  await expect(page.locator(".filename")).toHaveText("picked.gds2");
+  await expect(page.locator(".main-foot")).toContainText("AIALRA_DEMO");
+  await expect(page.locator(".viewer-host canvas")).toBeVisible();
+  const transfer = await page.evaluateHandle((bytes) => {
+    const data = new DataTransfer();
+    data.items.add(new File([new Uint8Array(bytes)], "dropped.GDS2", { type: "application/octet-stream" }));
+    return data;
+  }, Array.from(sample));
+  await page.locator(".viewer-host").dispatchEvent("drop", { dataTransfer: transfer });
+  await expect(page.locator(".filename")).toHaveText("dropped.GDS2");
+  await expect(page.locator(".main-foot")).toContainText("198,492");
+  await expect(page.locator(".viewer-host canvas")).toBeVisible();
+  await expect(page.getByRole("alert")).toHaveCount(0);
+  await transfer.dispose();
+});
+
 test("local geometry, layer visibility, review export and restore; no file network transfer", async ({
   page,
 }) => {

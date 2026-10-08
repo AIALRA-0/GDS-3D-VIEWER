@@ -5,7 +5,7 @@ self.onmessage = (
 ) => {
   try {
     const { buffer, name, top } = event.data;
-    const layout = /\.(gds|gdsii)$/i.test(name)
+    const layout = /\.(gds|gds2|gdsii)$/i.test(name)
       ? parseGds(buffer, name, top)
       : parseGltf(buffer, name);
     self.postMessage(

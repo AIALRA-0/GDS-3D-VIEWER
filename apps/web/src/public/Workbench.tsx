@@ -242,8 +242,8 @@ export default function Workbench() {
     abort.current?.abort();
     if (timer.current) clearTimeout(timer.current);
     setError("");
-    if (!/\.(gds|gdsii|gltf|glb)$/i.test(file.name)) {
-      setError("请选择 .gds、.gdsii、.gltf 或 .glb 文件");
+    if (!/\.(gds|gds2|gdsii|gltf|glb)$/i.test(file.name)) {
+      setError("请选择 .gds、.gds2、.gdsii、.gltf 或 .glb 文件");
       setBusy(false);
       return;
     }
@@ -1064,7 +1064,7 @@ export default function Workbench() {
         ref={fileInput}
         data-testid="public-file-input"
         type="file"
-        accept=".gds,.gdsii,.gltf,.glb"
+        accept=".gds,.gds2,.gdsii,.gltf,.glb"
         hidden
         onChange={(e) => {
           const f = e.target.files?.[0];
@@ -1237,7 +1237,7 @@ export default function Workbench() {
                     </button>
                   </div>
                   <p className="file-formats">
-                    GDS / GDSII · glTF / GLB · 最大 32 MB
+                    GDS / GDS2 / GDSII · glTF / GLB · 最大 32 MB
                   </p>
                   <div className="privacy-caption">
                     <Icon name="shield" />
@@ -1333,7 +1333,7 @@ export default function Workbench() {
           <h3>开始查看</h3>
           <ol>
             <li>
-              打开本地 .gds、.gdsii、.gltf 或 .glb 文件，也可以加载合成示例
+              打开本地 .gds、.gds2、.gdsii、.gltf 或 .glb 文件，也可以加载合成示例
             </li>
             <li>
               通过图层开关和单元列表选择显示内容，使用俯视、正视和三维视角观察
