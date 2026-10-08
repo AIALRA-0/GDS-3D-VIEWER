@@ -89,6 +89,19 @@ test("layer color changes actual pixels and review round trips while preserving 
   review.layerColors = { "7/3": "invalid" };
   await page.getByTestId("review-file-input").setInputFiles({ name: "bad-review.json", mimeType: "application/json", buffer: Buffer.from(JSON.stringify(review)) });
   await expect(page.getByRole("alert")).toContainText("颜色无效"); await expect(swatch).toHaveValue("#0000ff");
+  await page.getByRole("button", { name: "导出", exact: true }).click();
+  const pngPending = page.waitForEvent("download");
+  await page.getByRole("button", { name: "保存当前画面", exact: true }).last().click();
+  const pngStream = await (await pngPending).createReadStream(), pngChunks: Buffer[] = [];
+  for await (const chunk of pngStream!) pngChunks.push(chunk);
+  const exportedBlue = await page.evaluate(async bytes => {
+    const image = await createImageBitmap(new Blob([Uint8Array.from(bytes)], { type: "image/png" }));
+    const copy = document.createElement("canvas"); copy.width = image.width; copy.height = image.height;
+    const context = copy.getContext("2d")!; context.drawImage(image, 0, 0); image.close();
+    const [r, , b] = context.getImageData(copy.width / 2, copy.height / 2, 1, 1).data;
+    return b > r * 2;
+  }, Array.from(Buffer.concat(pngChunks)));
+  expect(exportedBlue).toBe(true);
   expect(transfers).toEqual([]);
 });
 

@@ -83,6 +83,7 @@ export const Viewer = forwardRef<ViewerHandle, Props>(function Viewer(
       meshes: THREE.Mesh[];
       size: number;
       draw: () => void;
+      flush: () => void;
       ruler: THREE.Line;
       verticalBounds: [number, number][];
       grid: THREE.GridHelper;
@@ -163,7 +164,7 @@ export const Viewer = forwardRef<ViewerHandle, Props>(function Viewer(
       screenshot() {
         const r = runtime.current;
         if (!r) return;
-        r.draw();
+        r.flush();
         r.renderer.domElement.toBlob((blob) => {
           if (!blob) return;
           const url = URL.createObjectURL(blob),
@@ -285,7 +286,18 @@ export const Viewer = forwardRef<ViewerHandle, Props>(function Viewer(
     scene.add(light);
     const ruler = new THREE.Line(new THREE.BufferGeometry(), new THREE.LineBasicMaterial({ color: 0xe88526, depthTest: false }));
     ruler.renderOrder = 5; scene.add(ruler);
-    const draw = () => renderer.render(scene, runtime.current?.camera ?? camera);
+    // Effects, resize and camera controls can all invalidate the same frame.
+    // Render their final state once instead of repeatedly submitting the layout.
+    let frame: number | undefined;
+    const render = () => {
+      frame = undefined;
+      renderer.render(scene, runtime.current?.camera ?? camera);
+    };
+    const draw = () => { if (frame === undefined) frame = requestAnimationFrame(render); };
+    const flush = () => {
+      if (frame !== undefined) cancelAnimationFrame(frame);
+      render();
+    };
     const rect = container.getBoundingClientRect();
     camera.aspect = rect.width / Math.max(rect.height, 1);
     const halfFov = Math.atan(
@@ -320,6 +332,8 @@ export const Viewer = forwardRef<ViewerHandle, Props>(function Viewer(
     let down = [0, 0];
     let hoverTimer: ReturnType<typeof setTimeout> | undefined;
     const hitTest = (e: PointerEvent): PickInfo | null => {
+      // Picking must use current layer transforms even before the queued draw.
+      scene.updateMatrixWorld(true);
       const rect = renderer.domElement.getBoundingClientRect();
       pointer.set(((e.clientX - rect.left) / rect.width) * 2 - 1, (-(e.clientY - rect.top) / rect.height) * 2 + 1);
       caster.setFromCamera(pointer, runtime.current?.camera ?? camera);
@@ -389,9 +403,10 @@ export const Viewer = forwardRef<ViewerHandle, Props>(function Viewer(
     renderer.domElement.addEventListener("pointermove", pointerMove);
     renderer.domElement.addEventListener("pointerleave", pointerLeave);
     renderer.domElement.addEventListener("webglcontextlost", lost);
-    runtime.current = { renderer, scene, camera, perspective: camera, orthographic, controls, meshes, size, draw, ruler, verticalBounds, grid, centerY: center.y };
+    runtime.current = { renderer, scene, camera, perspective: camera, orthographic, controls, meshes, size, draw, flush, ruler, verticalBounds, grid, centerY: center.y };
     resize();
     return () => {
+      if (frame !== undefined) cancelAnimationFrame(frame);
       runtime.current = null;
       renderer.domElement.removeEventListener("pointerdown", pointerDown);
       renderer.domElement.removeEventListener("pointerup", pointerUp);
