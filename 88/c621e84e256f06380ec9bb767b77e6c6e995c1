@@ -1,0 +1,82 @@
+apps/web/src/public/gds.ts
+  s_07756e806a3fa5::t_eb6947f775d1f5 329-338,345,350,488,512,515,526,563,619
+apps/web/src/public/ColorField.tsx
+  s_07756e806a3fa5::t_eb6947f775d1f5 1-9
+docs/assets/readme/PROVENANCE.md
+  s_07756e806a3fa5::t_5db33615f8b529 3,21-23,31-33
+apps/web/src/public/cellInstances.ts
+  s_07756e806a3fa5::t_eb6947f775d1f5 1-16
+apps/web/src/public/Icon.tsx
+  s_07756e806a3fa5::t_eb6947f775d1f5 2-3
+apps/web/src/public/Workbench.tsx
+  s_07756e806a3fa5::t_5e0045f5145c85 45,49,67,126,1023,1033
+  s_07756e806a3fa5::t_faac4796d7c714 1008-1012,1018-1019,1022,1027,1030-1032,1034,1037
+  s_07756e806a3fa5::t_bd6ee8c9d4b5a8 1258,1393-1402,1405
+  s_07756e806a3fa5::t_0c2a9e9d2b718a 21-23,93-95,121-122,125,306-307,375,391,609-616,625-629,632,695-696,742-743,745,765,1271
+  s_07756e806a3fa5::t_e32741ead2fe79 504,608,832,1404
+  s_07756e806a3fa5::t_400d0a18226932 1403
+  s_175b4d132123f9::t_bc3c8ce9e8d983 766
+apps/web/src/public/types.ts
+  s_07756e806a3fa5::t_eb6947f775d1f5 55
+apps/web/tests/public/cell-instances-ui.spec.ts
+  s_07756e806a3fa5::t_4b40228c7f1401 1-86,90-94,103-137,140-146
+  s_07756e806a3fa5::t_4b9565494481ea 87-89,95-102,138-139
+apps/web/src/public/Viewer.tsx
+  s_07756e806a3fa5::t_eb74123cda8f31 494-496,502-503,506-510
+  s_07756e806a3fa5::t_e9659b564ef45c 13,70,73,93-96,262,276-277,298-299,360-361,417,431,476-493,497-501,504-505,511-553,566-568,574
+apps/web/src/public/ExplanationPanel.tsx
+  s_07756e806a3fa5::t_eb6947f775d1f5 7,74,77
+apps/web/src/public/SelectField.tsx
+  s_07756e806a3fa5::t_eb6947f775d1f5 1-6
+docs/VERIFICATION-PUBLIC.md
+  s_07756e806a3fa5::t_a95142faf4c214 9,13,17,60-63
+apps/web/src/public/CellHierarchy.tsx
+  s_07756e806a3fa5::t_339aeae0aafebf 4,6,39
+apps/web/src/public/workbench.css
+  s_07756e806a3fa5::t_e3577b5b538658 201,1153
+  s_07756e806a3fa5::t_f036211b94cc67 1238-1342
+apps/web/tests/public/workbench.spec.ts
+  s_07756e806a3fa5::t_1760e1dbdf99e0 107
+docs/agent-locks.md
+  s_07756e806a3fa5::t_5e0045f5145c85 5
+README.en.md
+  s_07756e806a3fa5::t_4f88bde37daab7 36-38,157-180,214,243
+README.md
+  s_07756e806a3fa5::t_03be42a5562823 37-39,158-181,214,244
+apps/web/src/public/PalettePanel.tsx
+  s_07756e806a3fa5::t_3a4a74fce6ad1b 1,4-5,13-14,31-60,62-63,66-67,69,71-72,75
+apps/web/src/public/translations.en.ts
+  s_07756e806a3fa5::t_049ba2194b1e94 2,450-494
+docs/INTERFACE-DESIGN.md
+  s_07756e806a3fa5::t_072e9e31f7a29e 8-11
+docs/NETWORK-TROUBLESHOOTING.md
+  s_07756e806a3fa5::t_bb7cce1a6067a0 30-33
+docs/coordination.md
+  s_07756e806a3fa5::t_b52a5d0d96e494 52-55
+docs/security/publication-risk-notes.md
+  s_07756e806a3fa5::t_55650f6b8ed97d 24-27
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "88c621e84e256f06380ec9bb767b77e6c6e995c1",
+  "prompts": {},
+  "sessions": {
+    "s_07756e806a3fa5": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a11a40-20dc-7732-a5b7-49adf5fb1016",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "AIALRA-0 <aialra@163.com>"
+    },
+    "s_175b4d132123f9": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a11903-4e6d-7740-9d79-7a585557e2c2",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "AIALRA-0 <aialra@163.com>"
+    }
+  }
+}
