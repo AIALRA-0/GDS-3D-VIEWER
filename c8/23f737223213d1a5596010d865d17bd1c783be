@@ -1,0 +1,53 @@
+docs/agent-locks.md
+  s_07756e806a3fa5::t_505c9fafb2b912 5,35-36
+apps/web/src/public/Viewer.tsx
+  s_07756e806a3fa5::t_203067ae9d8a61 46-50,57,78-79,82,106,120-121,169,177,256,441,492-495,497-499,502-503,505,508,537-541,569-570,590
+apps/web/src/public/Workbench.tsx
+  s_07756e806a3fa5::t_95eb665324a9bb 92
+  s_07756e806a3fa5::t_203067ae9d8a61 16,91,450,746,991,1269-1270
+apps/web/tests/public/height-modes.spec.ts
+  s_07756e806a3fa5::t_2565add17cc6cd 33,62
+  s_07756e806a3fa5::t_fa6a448d894778 1-32,34-61,63-73
+docs/security/publication-risk-notes.md
+  s_07756e806a3fa5::t_bcbd540d4bccf8 30-31
+docs/assets/readme/PROVENANCE.md
+  s_07756e806a3fa5::t_bcbd540d4bccf8 3,12,32,37-38
+docs/VERIFICATION-PUBLIC.md
+  s_07756e806a3fa5::t_505c9fafb2b912 9,13,17,72-73
+  s_07756e806a3fa5::t_bcbd540d4bccf8 70-71
+README.en.md
+  s_07756e806a3fa5::t_f22bd147ccb36d 46,90-91,254
+  s_07756e806a3fa5::t_c6c12e29b62b5a 84-89,92
+docs/NETWORK-TROUBLESHOOTING.md
+  s_07756e806a3fa5::t_f22bd147ccb36d 34-41
+  s_07756e806a3fa5::t_505c9fafb2b912 42-43
+apps/web/src/public/translations.en.ts
+  s_07756e806a3fa5::t_95eb665324a9bb 511-518
+docs/coordination.md
+  s_07756e806a3fa5::t_f22bd147ccb36d 58-59
+apps/web/tests/public/cell-instances-ui.spec.ts
+  s_07756e806a3fa5::t_2e9674d9dfabe5 102-104
+apps/web/src/public/workbench.css
+  s_07756e806a3fa5::t_95eb665324a9bb 1284-1288
+README.md
+  s_07756e806a3fa5::t_f22bd147ccb36d 47,91-92,255
+  s_07756e806a3fa5::t_c6c12e29b62b5a 85-90,93
+docs/PUBLIC-PREVIEW.md
+  s_07756e806a3fa5::t_f22bd147ccb36d 58-59
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "c823f737223213d1a5596010d865d17bd1c783be",
+  "prompts": {},
+  "sessions": {
+    "s_07756e806a3fa5": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a11a40-20dc-7732-a5b7-49adf5fb1016",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "AIALRA-0 <aialra@163.com>"
+    }
+  }
+}
