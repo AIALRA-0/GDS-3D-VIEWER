@@ -10,3 +10,4 @@
 - Missing library references must not erase valid routing or fabricate dependency geometry. Preserve known facts and mark incomplete previews; regress a synthetic PATH with an absent target and a missing-only cell
 - Markdown model output is untrusted: retain the HTML/image exclusion and inert links when changing renderers; regress actual formatting with executable HTML and remote-resource probes
 - Interface localization must preserve source cell names, file names and user notes; changing language cancels pending AI requests and resets consent without persisting credentials. Retain legacy review import compatibility when renaming the project
+- A renamed viewer's previous public hostname is still a website destination, even though it differs from the current browser origin. Refuse both known preview hostnames before any model fetch, including local/custom deployments; regress the previous alias as well as the current origin

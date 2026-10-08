@@ -43,7 +43,8 @@ export function validateEndpoint(value: string, siteOrigin?: string) {
   const loopback = ["localhost", "127.0.0.1"].includes(url.hostname);
   if ((url.protocol !== "https:" && !(loopback && url.protocol === "http:")) || url.username || url.password || url.search || url.hash)
     throw new Error("接口必须使用 HTTPS（本机回环地址可用 HTTP），地址中不能包含密钥、查询参数或账号");
-  if (url.origin === siteOrigin) throw new Error("模型请求必须直连你选择的服务，不能发送到预览器服务器");
+  if (url.origin === siteOrigin || ["gds3d.aialra.online", "icviewer.aialra.online"].includes(url.hostname))
+    throw new Error("模型请求必须直连你选择的服务，不能发送到预览器服务器");
   if (!url.pathname.endsWith("/chat/completions")) throw new Error("请填写兼容聊天完成协议的完整 /chat/completions 地址");
   return url.href;
 }

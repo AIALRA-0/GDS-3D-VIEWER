@@ -115,6 +115,16 @@ test("AI rejects website proxy, hides provider errors and invalidates cancelled 
   await panel.getByLabel("确认发送所选摘要", { exact: true }).check();
   await panel.getByRole("button", { name: "生成讲解", exact: true }).click();
   await expect(panel.getByRole("alert")).toContainText("不能发送到预览器服务器");
+  for (const alias of ["https://gds3d.aialra.online/chat/completions", "https://icviewer.aialra.online/chat/completions"]) {
+    let sent = false;
+    await page.route(alias, (route) => { sent = true; return route.fulfill({ status: 401, body: "Unexpected viewer request" }); });
+    await panel.getByLabel("模型接口地址", { exact: true }).fill(alias);
+    await panel.getByLabel("确认发送所选摘要", { exact: true }).check();
+    await panel.getByRole("button", { name: "生成讲解", exact: true }).click();
+    await expect(panel.getByRole("alert")).toContainText("不能发送到预览器服务器");
+    expect(sent).toBe(false);
+    await page.unroute(alias);
+  }
   const endpoint = "https://models.example.invalid/v1/chat/completions";
   await page.route(endpoint, (route) => route.fulfill({ status: 401, contentType: "application/json", body: JSON.stringify({ error: `Do not expose ${key}` }) }));
   await panel.getByLabel("模型接口地址", { exact: true }).fill(endpoint);

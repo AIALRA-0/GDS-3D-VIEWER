@@ -13,6 +13,9 @@ test("fixed explanation context excludes file bytes and preserves unknown facts"
 test("model endpoints reject credential URLs and the website origin", () => {
   expect(validateEndpoint("https://models.example.invalid/v1/chat/completions")).toContain("/v1/chat/completions");
   expect(validateEndpoint("http://localhost:11434/v1/chat/completions")).toContain("localhost");
-  for (const value of ["http://models.example.invalid/chat/completions", "https://key:secret@models.example.invalid/chat/completions", "https://models.example.invalid/chat/completions?key=secret", "https://gds3d.aialra.online/chat/completions", "file:///chat/completions"])
+  for (const value of ["http://models.example.invalid/chat/completions", "https://key:secret@models.example.invalid/chat/completions", "https://models.example.invalid/chat/completions?key=secret", "https://gds3d.aialra.online/chat/completions", "https://icviewer.aialra.online/chat/completions", "file:///chat/completions"])
     expect(() => validateEndpoint(value, "https://gds3d.aialra.online")).toThrow();
+  // Known preview hosts remain refused even from a local or custom-domain deployment
+  expect(() => validateEndpoint("https://gds3d.aialra.online/chat/completions")).toThrow();
+  expect(() => validateEndpoint("https://icviewer.aialra.online/chat/completions", "http://localhost:4175")).toThrow();
 });

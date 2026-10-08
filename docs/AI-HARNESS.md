@@ -10,7 +10,7 @@ The key exists only in current-page React state, with a masked input and autocom
 
 ## Protocol
 
-Use a full HTTPS address ending in `/chat/completions`. HTTP is accepted only for `localhost` or `127.0.0.1`; browser local-network and mixed-content policies may still restrict local models. URL credentials, query strings, fragments and the viewer's own origin are refused. The provider must allow browser cross-origin requests with Authorization and Content-Type headers.
+Use a full HTTPS address ending in `/chat/completions`. HTTP is accepted only for `localhost` or `127.0.0.1`; browser local-network and mixed-content policies may still restrict local models. URL credentials, query strings, fragments, the viewer's own origin and both its current/previous public hostnames are refused before sending credentials. The provider must allow browser cross-origin requests with Authorization and Content-Type headers.
 
 The default example is `https://api.deepseek.com/chat/completions`, model `deepseek-flash`, following [DeepSeek's official API introduction](https://api-docs.deepseek.com/en/). The visitor can choose a compatible provider and must verify its model names and browser support.
 
