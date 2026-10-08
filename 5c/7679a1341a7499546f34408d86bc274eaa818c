@@ -1,0 +1,91 @@
+apps/web/tests/public/metadata-fixture.ts
+  s_175b4d132123f9::t_240707d0b481d5 13,19
+fixtures/layer-maps/synthetic-grouped.lyp
+  s_175b4d132123f9::t_512337ac4d093f 1-16
+README.md
+  s_175b4d132123f9::t_4edce1040e8eb1 7,27,33-36,126-133,163-164,174-175
+  s_175b4d132123f9::t_cb158d03e8798c 196
+docs/agent-locks.md
+  s_175b4d132123f9::t_e64d43bc1c704b 5,25
+apps/web/src/public/translations.en.ts
+  s_175b4d132123f9::t_14c6c0e39fb85d 394-398
+  s_175b4d132123f9::t_52924045361316 372-391
+  s_175b4d132123f9::t_38815038a1e066 392
+  s_175b4d132123f9::t_512337ac4d093f 393
+README.en.md
+  s_175b4d132123f9::t_14c6c0e39fb85d 135
+  s_175b4d132123f9::t_4edce1040e8eb1 7,27,32-35,125-132,163-164,174-175
+  s_175b4d132123f9::t_cb158d03e8798c 195
+docs/security/publication-risk-notes.md
+  s_175b4d132123f9::t_1d087163e579e0 17-19
+docs/assets/readme/PROVENANCE.md
+  s_175b4d132123f9::t_2722c992997915 3,18
+  s_175b4d132123f9::t_890e5c74c26eb0 11
+apps/web/src/public/Workbench.tsx
+  s_175b4d132123f9::t_7e5326bb9fe09a 16-17,102-104,440-442,598,601,621,665,667-668,670,686,739-742,748,771,1288-1289
+  s_175b4d132123f9::t_13814e81ecb71f 617
+  s_175b4d132123f9::t_90994c28dacfe8 1364
+  s_175b4d132123f9::t_2722c992997915 517
+  s_175b4d132123f9::t_14c6c0e39fb85d 666,669,1425,1428-1429
+apps/web/src/types/three-examples.d.ts
+  s_175b4d132123f9::t_6253361d9ea7aa 12-14
+docs/VIEWER-REFERENCE-FEATURES.md
+  s_175b4d132123f9::t_512337ac4d093f 1-21
+apps/web/index.html
+  s_175b4d132123f9::t_cb158d03e8798c 7
+apps/web/src/public/CellHierarchy.tsx
+  s_175b4d132123f9::t_7e5326bb9fe09a 1-6,8-33,36-41
+  s_175b4d132123f9::t_52924045361316 7,34-35
+apps/web/src/public/workbench.css
+  s_175b4d132123f9::t_52924045361316 1141-1152
+  s_175b4d132123f9::t_13814e81ecb71f 994,999-1000
+  s_175b4d132123f9::t_6253361d9ea7aa 600
+  s_175b4d132123f9::t_38815038a1e066 579-580,601,1153
+apps/web/src/public/Viewer.tsx
+  s_175b4d132123f9::t_a3bf4d430b9d60 27-28,45-46,49,57-59,64,73-74,76-84,86-88,96,98-99,110,122,129,131-132,160,162,177,185-187,246-248,266-271,285,321-327,336,350,362,374-376,380,424-431,434-440
+  s_175b4d132123f9::t_4edce1040e8eb1 378-379
+  s_175b4d132123f9::t_90994c28dacfe8 6,66,103-105,179,414-419,422
+  s_175b4d132123f9::t_59866c60fac112 75,161,328-334,377
+  s_175b4d132123f9::t_6253361d9ea7aa 85,95,121,320
+  s_175b4d132123f9::t_31422dccf58d0e 335,441
+apps/web/src/public/layerNames.ts
+  s_175b4d132123f9::t_9289853b4f0483 5-21
+  s_175b4d132123f9::t_14c6c0e39fb85d 22-25
+apps/web/tests/public/parsers.spec.ts
+  s_175b4d132123f9::t_5bbd217189980c 65-68,70-76
+  s_175b4d132123f9::t_65c247df9fec48 69
+docs/GDS-RECORDS.md
+  s_175b4d132123f9::t_59866c60fac112 21-22,24-25
+  s_175b4d132123f9::t_1d087163e579e0 23
+docs/coordination.md
+  s_175b4d132123f9::t_1d087163e579e0 40-43
+apps/web/tests/public/viewer-tools.spec.ts
+  s_175b4d132123f9::t_240707d0b481d5 1-3,5-24,28-29,31-33,42,44-47,57-81,91-122
+  s_175b4d132123f9::t_cae73aa0579473 4,43
+  s_175b4d132123f9::t_4b9c376003b035 30,34-41,48-56
+  s_175b4d132123f9::t_14c6c0e39fb85d 25-27
+  s_175b4d132123f9::t_59866c60fac112 82-90
+fixtures/layer-maps/synthetic.json
+  s_175b4d132123f9::t_512337ac4d093f 1-10
+apps/web/src/public/gds.ts
+  s_175b4d132123f9::t_5bbd217189980c 207-210,212
+docs/VERIFICATION-PUBLIC.md
+  s_175b4d132123f9::t_13814e81ecb71f 17,23-25,34-35
+  s_175b4d132123f9::t_e64d43bc1c704b 9,13,36-37
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "5c7679a1341a7499546f34408d86bc274eaa818c",
+  "prompts": {},
+  "sessions": {
+    "s_175b4d132123f9": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a11903-4e6d-7740-9d79-7a585557e2c2",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "AIALRA-0 <aialra@163.com>"
+    }
+  }
+}
