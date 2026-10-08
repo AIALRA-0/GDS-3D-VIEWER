@@ -1,0 +1,73 @@
+README.en.md
+  s_175b4d132123f9::t_57efc7aa2b5579 5,7,10-13,16-18,20,22,24-27,29-30,32,34-36,40,42,48,50,56,58,64,66,72,74,80,82,88,90,96,98,102,104-106,108-111,113,115,119,121-130,134-136,138,140,142-149,151-152,154,156-157,159-166,170,172,174-180,184-185,187,189-191,193-194
+apps/web/tests/public/parsers.spec.ts
+  s_175b4d132123f9::t_07de59517ee072 99-117
+docs/AI-HARNESS.md
+  s_175b4d132123f9::t_054b776ec86510 1-36
+apps/web/src/public/Viewer.tsx
+  s_175b4d132123f9::t_a9f7437170b216 10-21,38-39,42,57-59,122,228-256,259,267-269,277-278,286-288,320-333,335,338-344
+  s_175b4d132123f9::t_e7e31225edc443 334
+docs/assets/readme/PROVENANCE.md
+  s_175b4d132123f9::t_054b776ec86510 1-13,15-19
+  s_175b4d132123f9::t_621785b480ddb9 14
+apps/web/tests/public/inspection.spec.ts
+  s_175b4d132123f9::t_952b0aadf36c29 56-57
+  s_175b4d132123f9::t_70bd9e0f6a56d4 121
+  s_175b4d132123f9::t_06ec08b714cdb5 1-55,58-120,122-136
+apps/web/src/public/types.ts
+  s_175b4d132123f9::t_7dc92348d50398 1-22,29,48-49
+apps/web/src/public/gltf.ts
+  s_175b4d132123f9::t_7ce19803ac6b30 3,215,227,262,299,304-305,316-319,325,330,332
+apps/web/tests/public/explanation.spec.ts
+  s_175b4d132123f9::t_07de59517ee072 1-18
+docs/coordination.md
+  s_175b4d132123f9::t_e488f513b924e6 27-30
+docs/LOCAL-WORKFLOW.md
+  s_175b4d132123f9::t_054b776ec86510 1-48
+docs/security/publication-risk-notes.md
+  s_175b4d132123f9::t_054b776ec86510 9-10
+docs/VERIFICATION-PUBLIC.md
+  s_175b4d132123f9::t_b3de67073841e6 9,15-17,21
+  s_175b4d132123f9::t_5f417712084258 22
+apps/web/src/public/ExplanationPanel.tsx
+  s_175b4d132123f9::t_7943b2c1275164 1-76
+apps/web/src/public/gds.ts
+  s_175b4d132123f9::t_7ce19803ac6b30 257-262,293,454-455,458-459,477,482-483
+  s_175b4d132123f9::t_7dc92348d50398 3,23,57,178,275,287,295,345,350-373,399,426,432
+apps/web/src/public/explanation.ts
+  s_175b4d132123f9::t_e7e31225edc443 35,84
+  s_175b4d132123f9::t_7943b2c1275164 1-34,36-83,85
+docs/PUBLIC-PREVIEW.md
+  s_175b4d132123f9::t_054b776ec86510 21-22,26-27,33,43
+docs/agent-locks.md
+  s_175b4d132123f9::t_b3de67073841e6 9,17
+README.md
+  s_175b4d132123f9::t_2bf855f25011f4 5,7,10-13,16-18,20,22,24-27,29-30,32,34-36,40,42,48,50,56,58,64,66,72,74,80,82,88,90,96,98,102,104,106-108,110-113,115,117,121,123-132,136-138,140,142-143,145-152,154-155,157,159-160,162-169,173,175,177-183,187-188,190,192-194,196-197
+apps/web/src/public/Workbench.tsx
+  s_175b4d132123f9::t_c8b63e279979e4 306-308
+  s_175b4d132123f9::t_06ec08b714cdb5 1377
+  s_175b4d132123f9::t_505c87700d1197 996
+  s_175b4d132123f9::t_e488f513b924e6 9,11,13,94,293,305,664,679,832-850,985,1058,1224-1225,1240,1307,1310
+scripts/nginx/icviewer-public.conf
+  s_175b4d132123f9::t_e7e31225edc443 22
+apps/web/src/public/Icon.tsx
+  s_175b4d132123f9::t_e488f513b924e6 23-24
+apps/web/src/public/workbench.css
+  s_175b4d132123f9::t_9eef055fed87cf 1128-1147
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "794b62dffc71e8f168d10f0c44cf443a59a2da21",
+  "prompts": {},
+  "sessions": {
+    "s_175b4d132123f9": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a11903-4e6d-7740-9d79-7a585557e2c2",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "AIALRA-0 <aialra@163.com>"
+    }
+  }
+}
