@@ -1,0 +1,31 @@
+.agent-project-control/iterations/IT-0003_20261009T022233-0700_full-gds-performance/ITERATION.md
+  s_07756e806a3fa5::t_fce730ea6b35a0 4
+.agent-project-control/iterations/IT-0003_20261009T022233-0700_full-gds-performance/turns/TR-0003_20261009T022233-0700_full-gds-performance/CHECKLIST.md
+  s_07756e806a3fa5::t_5da0ff178bb060 4-8
+.agent-project-control/iterations/IT-0003_20261009T022233-0700_full-gds-performance/turns/TR-0003_20261009T022233-0700_full-gds-performance/TEST.md
+  s_07756e806a3fa5::t_6a04674429ab1a 6-12
+.agent-project-control/iterations/IT-0003_20261009T022233-0700_full-gds-performance/turns/TR-0003_20261009T022233-0700_full-gds-performance/TURN.md
+  s_07756e806a3fa5::t_d08adfc986efa2 4,6,10-96
+.agent-project-control/materials/INDEX.md
+  s_07756e806a3fa5::t_8f487150ec4275 7
+CURRENT.md
+  s_07756e806a3fa5::t_ec67bfda36ad16 4-6,12-19,21,25,27,29,33-39,43-47,51-57,61,63,65,67,69,71-77,81-84,88,92,96
+docs/agent-locks.md
+  s_07756e806a3fa5::t_1748c65906e4af 5-7
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "4f9ceed417d256efc818baf76f5afc26615e165f",
+  "prompts": {},
+  "sessions": {
+    "s_07756e806a3fa5": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a11a40-20dc-7732-a5b7-49adf5fb1016",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "AIALRA-0 <aialra@163.com>"
+    }
+  }
+}
