@@ -1,0 +1,31 @@
+.agent-project-control/scripts/selfcheck.py
+  s_07756e806a3fa5::t_5a58a4a0baf559 2577
+  s_07756e806a3fa5::t_c9e64a7c880ec0 1131-1143,1148-1165,1423,1429
+  s_07756e806a3fa5::t_7a99091e9eeca1 1144-1147
+.agent-project-control/scripts/routing_activity.py
+  s_07756e806a3fa5::t_c9e64a7c880ec0 337-345
+docs/AGENT-WORKFLOW.md
+  s_07756e806a3fa5::t_8ceb6c192c8e05 40-41
+docs/NETWORK-TROUBLESHOOTING.md
+  s_07756e806a3fa5::t_8ceb6c192c8e05 52
+docs/agent-locks.md
+  s_07756e806a3fa5::t_8ceb6c192c8e05 5
+docs/security/publication-risk-notes.md
+  s_07756e806a3fa5::t_8ceb6c192c8e05 32-33
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "47c5fa001de9cf47c5e06b12f400744c26ba86fc",
+  "prompts": {},
+  "sessions": {
+    "s_07756e806a3fa5": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a11a40-20dc-7732-a5b7-49adf5fb1016",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "AIALRA-0 <aialra@163.com>"
+    }
+  }
+}
