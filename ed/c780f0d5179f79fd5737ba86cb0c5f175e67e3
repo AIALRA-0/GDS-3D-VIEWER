@@ -1,0 +1,38 @@
+.agent-project-control/iterations/IT-0001_20261008T164827-0700_framework-adoption-ui-network/turns/TR-0001_20261008T165228-0700_framework-ui-local-network/TURN.md
+  s_07756e806a3fa5::t_e018c66096a614 6-13,17-104
+  s_07756e806a3fa5::t_138206f6816379 4
+.agent-project-control/regressions/REG-0001_20261008T174550-0700_committed-baseline-content/REGRESSION.md
+  s_07756e806a3fa5::t_dcb0d3c010044e 1-40
+.agent-project-control/generated/TREE.html
+  s_07756e806a3fa5::t_080ceee8ba25bd 2
+.agent-project-control/generated/TREE.md
+  s_07756e806a3fa5::t_32463a8a0ade19 65-66
+.agent-project-control/iterations/IT-0001_20261008T164827-0700_framework-adoption-ui-network/ITERATION.md
+  s_07756e806a3fa5::t_91aee6a0dabff8 4
+.agent-project-control/iterations/IT-0001_20261008T164827-0700_framework-adoption-ui-network/turns/TR-0001_20261008T165228-0700_framework-ui-local-network/CHECKLIST.md
+  s_07756e806a3fa5::t_ad6fbb6603e4c0 4-9
+.agent-project-control/iterations/IT-0001_20261008T164827-0700_framework-adoption-ui-network/turns/TR-0001_20261008T165228-0700_framework-ui-local-network/TEST.md
+  s_07756e806a3fa5::t_6e120c68252573 4-11
+.agent-project-control/regressions/INDEX.md
+  s_07756e806a3fa5::t_2b3af7d827365c 6
+.agent-project-control/regressions/REG-0001_20261008T174550-0700_committed-baseline-content/.apcf-dir.yaml
+  s_07756e806a3fa5::t_32c9495f968811 1-3
+CURRENT.md
+  s_07756e806a3fa5::t_3c478800baf5cc 4-97
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "edc780f0d5179f79fd5737ba86cb0c5f175e67e3",
+  "prompts": {},
+  "sessions": {
+    "s_07756e806a3fa5": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a11a40-20dc-7732-a5b7-49adf5fb1016",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "AIALRA-0 <aialra@163.com>"
+    }
+  }
+}
