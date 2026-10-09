@@ -225,6 +225,19 @@ def _metadata_errors(rel: str, entries: dict, get_blob) -> list:
     except (KeyError, PublishScanError):
         return [f"{rel}: staged object is unreadable"]
     meta = _parse_meta(payload)
+    if rel in RUNTIME_SCAFFOLD:
+        # These eight empty-directory markers describe the private lifecycle
+        # area; they contain no private execution material. No other runtime
+        # object, extra field, comment or payload is covered by this exception.
+        try:
+            lines = payload.decode("utf-8").splitlines()
+        except UnicodeError:
+            lines = []
+        if (meta == {"schema": 1, "visibility": "private"}
+                and len(lines) == 3
+                and lines[1:] == ["schema: 1", "visibility: private"]):
+            return []
+        return [f"{rel}: runtime scaffold must contain only private schema-1 metadata"]
     sidecar_path = rel + ".apcf-meta.yaml"
     sidecar_entry = entries.get(sidecar_path)
     sidecar_meta = None

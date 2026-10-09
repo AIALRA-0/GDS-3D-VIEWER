@@ -2,6 +2,9 @@
 
 | path | owner | purpose | start | eta | status |
 |------|-------|---------|-------|-----|--------|
+| .agent-project-control/rules/01-context-state.md; .agent-project-control/rules/03-verification-regression.md; .agent-project-control/scripts/; .agent-project-control/runtime/ scaffold markers | PA-0004 | adopt closeout v2 core while preserving native framework regressions | 2026-10-09 America/Los_Angeles | current turn | released |
+| README.md; README.en.md | PA-0005 | clarify first-use steps and validate bilingual rendered entry | 2026-10-09 America/Los_Angeles | current turn | released |
+| docs/AGENT-WORKFLOW.md; docs/agent-locks.md; current IT-0002/TR-0002 records; generated framework tree | main | integrate current core and README evidence without changing product source | 2026-10-09 America/Los_Angeles | current turn | released |
 | README.md; README.en.md; docs/AGENT-WORKFLOW.md; docs/NETWORK-TROUBLESHOOTING.md; docs/security/publication-risk-notes.md; .github/workflows/ci.yml | main | template framework adoption, local network investigation and conservative design iteration | 2026-10-08 America/Los_Angeles | current turn | released |
 | README.md; README.en.md; docs/coordination.md | main | compact/consistent height toggle, current captures and network investigation | 2026-10-08 America/Los_Angeles | current turn | released |
 | README.md; README.en.md; docs/coordination.md | main | custom dropdowns, planar rotation, palette transfer and stable illustrative heights | 2026-10-08 America/Los_Angeles | current turn | released |

@@ -82,6 +82,15 @@ def _render_target_tree(target: Path) -> None:
     )
 
 
+def _run_design_contract(target: Path, action: str) -> None:
+    script = target / ".agent-project-control" / "scripts" / "design_contract.py"
+    if script.is_symlink() or not script.is_file():
+        raise SystemExit("FAIL: Design contract script is missing or unsafe")
+    result = subprocess.run([sys.executable, "-B", str(script), action], check=False)
+    if result.returncode:
+        raise SystemExit(f"FAIL: design_contract.py {action} rejected {target} (exit {result.returncode})")
+
+
 def _inventory(root: Path) -> dict:
     files = []
     for path in sorted(root.rglob("*")):
@@ -122,6 +131,12 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--output", help="new output directory; defaults to runtime/distribution/<timestamp>")
     parser.add_argument("--manifest", help="optional private JSON inventory written outside the candidate")
+    parser.add_argument(
+        "--profile",
+        choices=("core",),
+        default=None,
+        help="build a Core-only candidate without optional design/components; omitted keeps the existing distribution behavior",
+    )
     args = parser.parse_args()
 
     output = Path(args.output).expanduser().resolve() if args.output else (
@@ -148,7 +163,15 @@ def main():
     staging = Path(tempfile.mkdtemp(prefix=f".{output.name}.distribution-staging-", dir=output.parent))
     manifest_written = False
     try:
-        populate_target(staging)
+        if args.profile == "core":
+            # Validate the source registry before filtering it. Otherwise a damaged
+            # optional component could disappear silently from the Core candidate.
+            _run_design_contract(ROOT, "--check")
+        populate_target(staging, profile=args.profile)
+        if args.profile == "core":
+            # INDEX is a generated view of the candidate's actual registrations.
+            _run_design_contract(staging, "--sync")
+            _run_design_contract(staging, "--check")
         _copy_root_documents(staging)
         _copy_examples(staging)
         # The candidate contents are the explicit public distribution surface;

@@ -7,6 +7,8 @@
 
 通用规则、脚本、接口、写作标准、设计规则、Profile 和设计案例组件均从维护者的模板副本安装，模板运行输出和历史执行单元没有导入，原项目源码、测试和部署位置保持原位
 
+本次升级采用维护者提供的 0.3.0 closeout v2 核心包，按当前项目合并通用规则和执行脚本，保留真实项目配置、设计采用、已冻结记录和原生工具适配；完整核心包作为私有资料保留，不替换产品首页
+
 项目职责见 [PROJECT.md](../.agent-project-control/PROJECT.md)，实现边界见 [ARCHITECTURE.md](../.agent-project-control/ARCHITECTURE.md)，实际设计采用见 [DESIGN.md](../.agent-project-control/DESIGN.md)
 
 ## 1.2. 执行入口
@@ -16,6 +18,8 @@
 启动、动作、并行、收口和发布按 `gate.toml` 的现有入口执行，适用规则、技能和对象摘要发生变化时重新路由并复核实际内容，不能把加载成功当作产品验收成功
 
 常用脚本和参数以 `.agent-project-control/scripts/` 中相应 `--help` 为准，规范正文只在路由指向的位置维护，本页不复制第二套执行规则
+
+新轮次的 `TEST.md` 使用第二版格式，已有冻结记录保留原格式；具体结构和兼容要求以 [验收规范](../.agent-project-control/rules/03-verification-regression.md) 为准，术语检查随当前内容复核执行
 
 ## 1.3. 技能和设计
 

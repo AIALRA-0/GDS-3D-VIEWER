@@ -1,23 +1,29 @@
 # APCF-META {"schema":1,"visibility":"public"}
+import hashlib
+import json
+import os
 import re
-from functools import lru_cache
 from pathlib import Path
 from common import ROOT,FRAMEWORK_ROOT,parse_meta
 from rule_sync import MODULES,RULE_HEADING,sync as sync_rules
 from design_contract import validate as validate_design
 from standards_contract import validate as validate_standards
 
+RUNTIME_SCAFFOLD=('testbed','runs','downloads','tmp','cache','large','distribution')
+MANAGED_TEXT_SUFFIXES={'.md','.yaml','.py','.html'}
+FROZEN_HASH_SCOPE='sha256-tree-v1-excluding-apcf-dir-yaml'
+FROZEN_MARKER_KEYS={'schema','visibility','kind','path','sha256','freeze_id','hash_scope'}
+FROZEN_MARKER_TRIGGER_KEYS={'kind','path','sha256','freeze_id','hash_scope'}
 
-@lru_cache(maxsize=None)
-def _private_directory(path: Path) -> bool:
-    meta = parse_meta(path / ".apcf-dir.yaml")
+def _private_directory(path):
+    meta = parse_meta(Path(path) / ".apcf-dir.yaml")
     return bool(meta and meta.get("visibility") == "private")
 
 
-def _private_testbed_payload(path: Path) -> bool:
-    """Ignore payload below private fixture directories, while checking their markers."""
+def _private_testbed_payload(path, framework_root=FRAMEWORK_ROOT):
+    """Exclude private testbed payloads while retaining scaffold metadata checks."""
     path = Path(path)
-    testbed = FRAMEWORK_ROOT / "runtime" / "testbed"
+    testbed = Path(framework_root) / "runtime" / "testbed"
     try:
         path.relative_to(testbed)
     except ValueError:
@@ -34,6 +40,161 @@ def _private_testbed_payload(path: Path) -> bool:
         current = current.parent
     return False
 
+
+def _walk_framework_without_runtime(framework_root=FRAMEWORK_ROOT):
+    """Walk managed content while checking runtime scaffold directories only."""
+    framework_root = Path(framework_root)
+    runtime_root = framework_root / "runtime"
+    for current, dirs, files in os.walk(framework_root, topdown=True, followlinks=False):
+        current_path = Path(current)
+        if current_path == runtime_root:
+            # Include each canonical scaffold root so directory markers remain
+            # subject to the normal managed-directory check. The dedicated
+            # runtime boundary check validates their private marker contents.
+            dirs[:] = [name for name in RUNTIME_SCAFFOLD if name in dirs]
+            files[:] = []
+        elif current_path.parent == runtime_root:
+            # Runtime payloads and testbed fixtures are private output. Do not
+            # recurse into them or treat their files as canonical framework text.
+            dirs[:] = []
+            files[:] = []
+        else:
+            dirs[:] = [name for name in dirs
+                       if name != "__pycache__" and not _private_testbed_payload(current_path / name, framework_root)]
+            files[:] = [name for name in files
+                        if not _private_testbed_payload(current_path / name, framework_root)]
+        yield current_path, dirs, files
+
+
+def managed_text_files(framework_root=FRAMEWORK_ROOT):
+    """Return managed text files outside the runtime temporary-content tree."""
+    files=[]
+    for current,_,names in _walk_framework_without_runtime(framework_root):
+        files.extend(current/name for name in names
+                     if name!='.apcf-dir.yaml' and Path(name).suffix.lower() in MANAGED_TEXT_SUFFIXES)
+    return sorted(files)
+
+def managed_directories(framework_root=FRAMEWORK_ROOT):
+    """Return normal managed directories without walking runtime descendants."""
+    return [current for current,_,_ in _walk_framework_without_runtime(framework_root)]
+
+def metadata_errors(files,root=ROOT):
+    """Report managed text files without an embedded header or metadata sidecar."""
+    root=Path(root)
+    errors=[]
+    for path in files:
+        path=Path(path)
+        if path.name=='.apcf-dir.yaml' or not path.exists():
+            continue
+        if not (parse_meta(path) or parse_meta(path.with_name(path.name+'.apcf-meta.yaml'))):
+            errors.append('metadata missing: '+str(path.relative_to(root)))
+    return errors
+
+def runtime_boundary_errors(framework_root=FRAMEWORK_ROOT):
+    """Require private, non-symlink markers at runtime and its seven scaffold roots."""
+    framework_root=Path(framework_root)
+    runtime=framework_root/'runtime'
+    errors=[]
+    if runtime.is_symlink() or not runtime.is_dir():
+        return ['missing or unsafe runtime root: '+str(runtime)]
+    for directory in [runtime,*(runtime/name for name in RUNTIME_SCAFFOLD)]:
+        marker=directory/'.apcf-dir.yaml'
+        if directory.is_symlink() or not directory.is_dir():
+            errors.append('missing or unsafe runtime scaffold: '+str(directory))
+            continue
+        if marker.is_symlink() or not marker.is_file():
+            errors.append('runtime scaffold marker missing: '+str(marker))
+            continue
+        try:
+            lines=marker.read_text(encoding='utf-8').splitlines()
+        except (OSError,UnicodeError):
+            errors.append('runtime scaffold marker unreadable: '+str(marker))
+            continue
+        meta=parse_meta(marker)
+        if (not isinstance(meta,dict) or type(meta.get('schema')) is not int or meta.get('schema')!=1 or
+                meta.get('visibility')!='private' or set(meta)!={'schema','visibility'} or
+                lines[1:]!=['schema: 1','visibility: private']):
+            errors.append('runtime scaffold marker must declare only schema 1 and private visibility: '+str(marker))
+    return errors
+
+def directory_tree_sha256(directory):
+    """Hash a frozen directory tree while excluding directory metadata markers."""
+    directory=Path(directory)
+    if directory.is_symlink() or not directory.is_dir():
+        raise ValueError('unsafe frozen directory: '+str(directory))
+    digest=hashlib.sha256()
+    entries=sorted(directory.rglob('*'),key=lambda item:item.relative_to(directory).as_posix())
+    for entry in entries:
+        if entry.is_symlink():
+            raise ValueError('symlink in frozen directory: '+str(entry))
+        if entry.name=='.apcf-dir.yaml': continue
+        relative=entry.relative_to(directory).as_posix().encode('utf-8')
+        if entry.is_dir(): digest.update(b'D\0'+relative+b'\0')
+        elif entry.is_file():
+            file_digest=hashlib.sha256()
+            with entry.open('rb') as stream:
+                for block in iter(lambda:stream.read(1024*1024),b''): file_digest.update(block)
+            digest.update(b'F\0'+relative+b'\0'+file_digest.digest())
+    return digest.hexdigest()
+
+def validate_frozen_directory_markers(directories,root=ROOT):
+    """Validate only directory markers that declare a frozen content identity."""
+    root=Path(root).resolve()
+    errors=[]
+    freeze_tokens=('freeze_id','hash_scope','sha256','kind','path')
+    for directory in directories:
+        directory=Path(directory)
+        marker=directory/'.apcf-dir.yaml'
+        if marker.is_symlink():
+            try: raw=marker.read_bytes()
+            except OSError: raw=b''
+            if any(token.encode('ascii') in raw for token in freeze_tokens):
+                errors.append('frozen directory marker is a symlink: '+str(marker))
+            continue
+        if not marker.is_file(): continue
+        try:
+            raw=marker.read_bytes()
+            lines=raw.decode('utf-8').splitlines()
+        except (OSError,UnicodeError):
+            try: raw=marker.read_bytes()
+            except OSError: raw=b''
+            if any(token.encode('ascii') in raw for token in freeze_tokens):
+                errors.append('frozen directory marker unreadable: '+str(marker))
+            continue
+        meta=parse_meta(marker)
+        declares_frozen=(isinstance(meta,dict) and bool(FROZEN_MARKER_TRIGGER_KEYS.intersection(meta))) or any(
+            token in raw.decode('utf-8','replace') for token in freeze_tokens
+        )
+        if not declares_frozen: continue
+        try:
+            expected_path=directory.resolve().relative_to(root).as_posix()
+        except ValueError:
+            errors.append('frozen directory escapes metadata root: '+str(directory))
+            continue
+        if directory.is_symlink() or not directory.is_dir():
+            errors.append('frozen directory missing or unsafe: '+expected_path)
+            continue
+        if not isinstance(meta,dict) or set(meta)!=FROZEN_MARKER_KEYS:
+            errors.append('frozen directory marker identity fields invalid: '+expected_path)
+            continue
+        if (type(meta.get('schema')) is not int or meta.get('schema')!=1 or
+                meta.get('visibility')!='private' or meta.get('kind')!='directory' or
+                meta.get('path')!=expected_path or not isinstance(meta.get('freeze_id'),str) or
+                not meta['freeze_id'].strip() or meta.get('hash_scope')!=FROZEN_HASH_SCOPE or
+                lines[1:]!=['schema: 1','visibility: private']):
+            errors.append('frozen directory marker identity mismatch: '+expected_path)
+            continue
+        claimed=meta.get('sha256')
+        if not isinstance(claimed,str) or not re.fullmatch(r'[0-9a-f]{64}',claimed):
+            errors.append('frozen directory marker SHA format invalid: '+expected_path)
+            continue
+        try: actual=directory_tree_sha256(directory)
+        except (OSError,ValueError) as ex:
+            errors.append(str(ex))
+            continue
+        if claimed!=actual:
+            errors.append('frozen directory SHA drift: '+expected_path)
+    return errors
 
 def main():
     e=[]
@@ -73,14 +234,13 @@ def main():
     for rid in sorted(set(seen)-{f'R{i:02d}' for i in range(1,32)}):
         e.append('unknown canonical Rule ID: '+rid)
     managed=[ROOT/'CURRENT.md',ROOT/'AGENTS.md',ROOT/'README.md',ROOT/'README.en.md',ROOT/'TEMPLATE_SPEC.md',ROOT/'CODEX_PROMPT.md',ROOT/'CODEX_DEPLOY.md',ROOT/'PILOT_TEST_PLAN.md',ROOT/'VALIDATION.md',ROOT/'.gitignore']
-    for pattern in ('*.md', '*.yaml', '*.py', '*.html'):
-        managed.extend(p for p in FRAMEWORK_ROOT.rglob(pattern) if not _private_testbed_payload(p))
-    for p in managed:
-        if p.name=='.apcf-dir.yaml' or not p.exists(): continue
-        if not (parse_meta(p) or parse_meta(p.with_name(p.name+'.apcf-meta.yaml'))): e.append('metadata missing: '+str(p.relative_to(ROOT)))
-    dirs=[FRAMEWORK_ROOT]+[x for x in FRAMEWORK_ROOT.rglob('*') if x.is_dir() and '__pycache__' not in x.parts and not _private_testbed_payload(x)]+[ROOT/'.codex',ROOT/'.codex/skills']
+    managed += managed_text_files()
+    e.extend(metadata_errors(managed))
+    e.extend(runtime_boundary_errors())
+    dirs=managed_directories()+[ROOT/'.codex',ROOT/'.codex/skills']
     for d in dirs:
         if d.exists() and not (d/'.apcf-dir.yaml').exists(): e.append('dir marker missing: '+str(d.relative_to(ROOT)))
+    e.extend(validate_frozen_directory_markers(dirs))
     if e:
         [print('FAIL:',x) for x in e]; raise SystemExit(2)
     print('PASS: framework lint passed; R01-R31 full bodies, examples, routing and derived indexes are consistent')

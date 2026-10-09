@@ -338,6 +338,7 @@ def collect_activity(turn_dir_raw: str | Path) -> dict:
     # already-dirty baseline path is not new content when its current bytes are
     # exactly the state captured for this Turn. Keep committed paths that are
     # new or whose state differs from the immutable baseline.
+    baseline_rows = {row["path"]: row for row in baseline["dirty_rows"]}
     committed_content = {
         rel for rel in committed
         if rel not in baseline_rows or file_state(rel) != baseline_rows[rel]
@@ -542,26 +543,100 @@ def semantic_review(turn_dir: Path, targets: list[str]) -> tuple[list[str], list
 
 def evidence_snapshot(turn_dir: Path) -> dict:
     names = ('workflow.json', 'semantic-review.json', 'content-review.json', 'checks.jsonl')
-    return {name: sha256_file(turn_dir / 'evidence' / name)
-            for name in names if (turn_dir / 'evidence' / name).is_file()}
+    snapshot = {name: sha256_file(turn_dir / 'evidence' / name)
+                for name in names if (turn_dir / 'evidence' / name).is_file()}
+    review_path = turn_dir / 'evidence/content-review.json'
+    if review_path.is_file():
+        try:
+            record = json.loads(review_path.read_text(encoding='utf-8'))
+            for row in record.get('targets', []):
+                rel = row.get('terms_review_path') if isinstance(row, dict) else None
+                if not isinstance(rel, str) or not rel.strip():
+                    continue
+                path = (turn_dir / rel).resolve()
+                if path.is_relative_to((turn_dir / 'evidence').resolve()) and path.is_file():
+                    key = 'terms-review:' + path.relative_to(turn_dir).as_posix()
+                    snapshot[key] = sha256_file(path)
+                    sidecar = path.with_name(path.name + '.apcf-meta.yaml')
+                    if sidecar.is_file():
+                        snapshot[key + '.apcf-meta.yaml'] = sha256_file(sidecar)
+        except (OSError, UnicodeError, json.JSONDecodeError, AttributeError, TypeError):
+            # The content-review validator will report malformed evidence; the
+            # snapshot remains deterministic for the same malformed bytes.
+            pass
+    return snapshot
+
+
+def _final_user_report(turn_dir: Path, target: str) -> str | None:
+    """Return a complete current TURN USER REPORT, if this target is that report."""
+    if (ROOT / target).resolve() != (turn_dir / 'TURN.md').resolve():
+        return None
+    from terminology_review import USER_REPORT_RE, extract_user_report, read_report_text
+    payload = read_report_text(ROOT / target)
+    markers = list(USER_REPORT_RE.finditer(payload))
+    if not markers:
+        return None
+    if len(markers) == 1 and payload[markers[0].end():].strip() == '尚未收口':
+        return None
+    return extract_user_report(payload)
+
+
+def _terms_review_path(turn_dir: Path, raw: str) -> Path:
+    path = (turn_dir / raw).resolve()
+    if not path.is_relative_to((turn_dir / 'evidence').resolve()):
+        raise ActivityError('terminology review must live inside current-Turn evidence/')
+    return path
 
 
 def record_content_review(turn_dir_raw, target: str, capabilities: list[str],
-                          evidence_paths: list[str], observations: list[dict], result='PASS', method='agent-review') -> dict:
+                          evidence_paths: list[str], observations: list[dict], result='PASS',
+                          method='agent-review', terms_review_path: str | None = None) -> dict:
     """Save a finite content review; concrete positions and evidence remain inspectable."""
     turn_dir = validate_turn_dir(turn_dir_raw)
     rel = _relative_target(target)
     if result not in {'PASS', 'FAIL', 'NOT_APPLICABLE'} or not observations:
         raise ActivityError('content review requires a result and concrete observations')
+    terminology_review_ref = None
+    try:
+        report = _final_user_report(turn_dir, rel)
+    except (OSError, UnicodeError, ValueError) as exc:
+        raise ActivityError('final USER REPORT cannot be reviewed: ' + str(exc)) from exc
+    if report is not None:
+        review_rel = terms_review_path or 'evidence/terms-review.json'
+        review_path = _terms_review_path(turn_dir, review_rel)
+        if not review_path.is_file():
+            if result == 'PASS':
+                raise ActivityError('final USER REPORT PASS requires evidence/terms-review.json or an explicit terms_review_path')
+        else:
+            try:
+                review = json.loads(review_path.read_text(encoding='utf-8'))
+                from terminology_review import private_sidecar_errors, validate as validate_terminology_review, write_private_sidecar
+                issues = validate_terminology_review(report, review)
+                if issues and result == 'PASS':
+                    raise ActivityError('final USER REPORT terminology review is incomplete: ' + '; '.join(issues))
+                write_private_sidecar(review_path)
+                sidecar_errors = private_sidecar_errors(review_path)
+                if sidecar_errors:
+                    raise ActivityError('final USER REPORT terminology metadata is invalid: ' + '; '.join(sidecar_errors))
+                terminology_review_ref = _reference(turn_dir, review_rel)
+            except (OSError, UnicodeError, json.JSONDecodeError, ValueError) as exc:
+                if isinstance(exc, ActivityError):
+                    raise
+                raise ActivityError('final USER REPORT terminology review is invalid: ' + str(exc)) from exc
     norms = {}
     from route_context import build_route, load_contract
     from argparse import Namespace
     sources, _, resolved_caps, _ = build_route(Namespace(phase=[], capability=capabilities, target=[], scope=None), load_contract())
     for source in sources:
         norms[posix_rel(source.path)] = sha256_file(source.path)
+    references = [_reference(turn_dir, p) for p in evidence_paths]
+    if terminology_review_ref and not any(ref.get('path') == terminology_review_ref['path'] for ref in references):
+        references.append(terminology_review_ref)
     row = {**file_state(rel), 'capabilities': resolved_caps, 'norms': norms,
            'method': method, 'result': result, 'observations': observations,
-           'evidence': [_reference(turn_dir, p) for p in evidence_paths]}
+           'evidence': references}
+    if terminology_review_ref:
+        row['terms_review_path'] = terminology_review_ref['path']
     if (ROOT / rel).resolve() == (turn_dir / 'TURN.md').resolve():
         row['normalized_turn_sha256'] = normalized_turn_sha256((ROOT / rel).read_bytes())
     path = turn_dir / 'evidence/content-review.json'
@@ -654,6 +729,27 @@ def content_review_errors(turn_dir: Path, target: str, capabilities: list[str]) 
                         or not obs.get('observed') or obs.get('result') != 'PASS'):
                     errors.append('content review lacks a valid position, criterion or observed PASS')
         errors.extend(_reference_errors(turn_dir, row.get('evidence')))
+        try:
+            report = _final_user_report(turn_dir, target)
+        except (OSError, UnicodeError, ValueError) as exc:
+            errors.append('final USER REPORT terminology scope is invalid: ' + str(exc))
+            report = None
+        if report is not None:
+            review_rel = row.get('terms_review_path')
+            if not isinstance(review_rel, str) or not review_rel.strip():
+                review_rel = 'evidence/terms-review.json'
+                errors.append('final USER REPORT terminology evidence is not bound to content review')
+            evidence_refs = row.get('evidence') if isinstance(row.get('evidence'), list) else []
+            if not any(isinstance(ref, dict) and ref.get('path') == review_rel for ref in evidence_refs):
+                errors.append('content review does not cite the current terminology evidence')
+            try:
+                review_path = _terms_review_path(turn_dir, review_rel)
+                review = json.loads(review_path.read_text(encoding='utf-8'))
+                from terminology_review import private_sidecar_errors, validate as validate_terminology_review
+                errors.extend('terminology review: ' + issue for issue in validate_terminology_review(report, review))
+                errors.extend('terminology review: ' + issue for issue in private_sidecar_errors(review_path))
+            except (OSError, UnicodeError, json.JSONDecodeError, ActivityError, ValueError) as exc:
+                errors.append('final USER REPORT terminology evidence missing or invalid: ' + str(exc))
     except (OSError, UnicodeError, json.JSONDecodeError, KeyError, TypeError, ActivityError) as exc:
         errors.append('content evidence missing or invalid: ' + str(exc))
     return errors

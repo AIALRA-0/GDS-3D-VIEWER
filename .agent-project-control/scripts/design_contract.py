@@ -4,7 +4,7 @@ import hashlib
 import json
 import re
 import zipfile
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 
 ROOT=Path(__file__).resolve().parents[2]
 DESIGN=ROOT/".agent-project-control/design"
@@ -12,6 +12,7 @@ RULES=DESIGN/"RULES.md"
 INDEX=DESIGN/"INDEX.md"
 LOCK=DESIGN/"BASELINES.lock.yaml"
 PROJECT_DESIGN=ROOT/".agent-project-control/DESIGN.md"
+COMPONENTS=DESIGN/"components"
 
 CATEGORIES=[
     ("structure-visual","结构与视觉层级",["D01","D02","D03","D04","D05","D06"]),
@@ -73,6 +74,128 @@ def rows():
         out.append((m.group(1),m.group(2).strip(),text[m.start():end].rstrip()))
     return out
 
+def _directory_visibility(marker_path):
+    if marker_path.is_symlink() or not marker_path.is_file():
+        return None
+    text=marker_path.read_text(encoding="utf-8")
+    first=text.splitlines()[0] if text.splitlines() else ""
+    header=re.match(r"# APCF-META\s+(\{.*\})",first)
+    visibility=re.search(r"(?m)^visibility:\s*(public|private)\s*$",text)
+    try:
+        header_visibility=json.loads(header.group(1)).get("visibility") if header else None
+    except (json.JSONDecodeError,AttributeError):
+        header_visibility=None
+    if not visibility or header_visibility != visibility.group(1):
+        return None
+    return visibility.group(1)
+
+def registered_components():
+    """Read and verify optional component registrations from the candidate tree."""
+    if COMPONENTS.is_symlink():
+        raise ValueError('component registration root must not be a symlink')
+    if not COMPONENTS.exists():
+        return []
+    if not COMPONENTS.is_dir():
+        raise ValueError('component registration root is not a directory')
+    if _directory_visibility(COMPONENTS/".apcf-dir.yaml") != "public":
+        raise ValueError('component registration root marker must be public and valid')
+
+    found=[]
+    for directory in sorted(COMPONENTS.iterdir(),key=lambda item:item.name.casefold()):
+        if directory.name == ".apcf-dir.yaml":
+            continue
+        if directory.is_symlink() or not directory.is_dir():
+            raise ValueError(f'component registration entry is not a safe directory: {directory.name}')
+        if _directory_visibility(directory/".apcf-dir.yaml") != "public":
+            raise ValueError(f'component registration directory marker must be public and valid: {directory.name}/.apcf-dir.yaml')
+        lock_path=directory/"COMPONENT.lock.json"
+        if lock_path.is_symlink() or not lock_path.is_file():
+            raise ValueError(f'component registration lock is missing or unsafe: {directory.name}/COMPONENT.lock.json')
+        try:
+            lock=json.loads(lock_path.read_text(encoding="utf-8"))
+        except (OSError,UnicodeError,json.JSONDecodeError) as ex:
+            raise ValueError(f'component registration lock is invalid: {directory.name}/COMPONENT.lock.json: {ex}') from ex
+        if not isinstance(lock,dict):
+            raise ValueError(f'component registration lock is not an object: {directory.name}/COMPONENT.lock.json')
+        component_id=lock.get("component")
+        if lock.get("schema") != 1 or component_id != directory.name:
+            raise ValueError(f'component registration identity mismatch: {directory.name}/COMPONENT.lock.json')
+        file_hashes=lock.get("files")
+        if not isinstance(file_hashes,dict) or "COMPONENT.md" not in file_hashes:
+            raise ValueError(f'component registration file map is invalid: {directory.name}/COMPONENT.lock.json')
+
+        expected=set()
+        for relative,expected_hash in file_hashes.items():
+            if not isinstance(relative,str) or not isinstance(expected_hash,str) or re.fullmatch(r"[0-9a-f]{64}",expected_hash) is None:
+                raise ValueError(f'component registration contains an invalid file record: {directory.name}/{relative}')
+            rel=PurePosixPath(relative)
+            if (
+                not relative
+                or "\\" in relative
+                or ":" in relative
+                or rel.is_absolute()
+                or any(part in {"", ".", ".."} for part in rel.parts)
+                or rel.as_posix() != relative
+                or relative == "COMPONENT.lock.json"
+            ):
+                raise ValueError(f'component registration contains an unsafe path: {directory.name}/{relative}')
+            path=directory.joinpath(*rel.parts)
+            if path.is_symlink() or not path.is_file():
+                raise ValueError(f'component registration file is missing or unsafe: {directory.name}/{relative}')
+            if digest(path) != expected_hash:
+                raise ValueError(f'component registration hash mismatch: {directory.name}/{relative}')
+            expected.add(relative)
+
+        actual=set()
+        for path in directory.rglob("*"):
+            if path.is_symlink():
+                raise ValueError(f'component registration contains a symlink: {directory.name}/{path.relative_to(directory).as_posix()}')
+            if path.is_file() and path != lock_path:
+                actual.add(path.relative_to(directory).as_posix())
+        if actual != expected:
+            missing=sorted(expected-actual)
+            unregistered=sorted(actual-expected)
+            details=[]
+            if missing: details.append('missing files: '+', '.join(missing))
+            if unregistered: details.append('unregistered files: '+', '.join(unregistered))
+            raise ValueError(f'component registration file set mismatch: {directory.name}: ' + '; '.join(details))
+
+        descriptor=directory/"COMPONENT.md"
+        descriptor_text=descriptor.read_text(encoding="utf-8")
+        metadata_line=descriptor_text.splitlines()[0] if descriptor_text.splitlines() else ""
+        metadata=re.match(r"<!-- APCF-META\s+(\{.*?\})\s+-->",metadata_line)
+        visibilities=[]
+        if metadata:
+            try:
+                visibilities.append(json.loads(metadata.group(1)).get("visibility"))
+            except (json.JSONDecodeError,AttributeError):
+                visibilities.append(None)
+        sidecar=descriptor.with_name(descriptor.name+".apcf-meta.yaml")
+        if sidecar.exists() or sidecar.is_symlink():
+            if sidecar.is_symlink() or not sidecar.is_file():
+                raise ValueError(f'component registration metadata sidecar is unsafe: {directory.name}/COMPONENT.md.apcf-meta.yaml')
+            sidecar_text=sidecar.read_text(encoding="utf-8")
+            sidecar_meta=re.match(r"# APCF-META\s+(\{.*\})",sidecar_text.splitlines()[0] if sidecar_text.splitlines() else "")
+            try:
+                sidecar_header=json.loads(sidecar_meta.group(1)) if sidecar_meta else {}
+            except json.JSONDecodeError:
+                sidecar_header={}
+            visibility_match=re.search(r"(?m)^visibility:\s*(public|private)\s*$",sidecar_text)
+            hash_match=re.search(r"(?m)^sha256:\s*([0-9a-f]{64})\s*$",sidecar_text)
+            sidecar_visibility=(visibility_match.group(1) if visibility_match else None)
+            if sidecar_header.get("visibility") != sidecar_visibility or not hash_match or hash_match.group(1) != digest(descriptor):
+                raise ValueError(f'component registration metadata sidecar is invalid: {directory.name}/COMPONENT.md.apcf-meta.yaml')
+            visibilities.append(sidecar_visibility)
+        if not visibilities or len(set(visibilities)) != 1 or visibilities[0] != "public":
+            raise ValueError(f'component registration descriptor is not public: {directory.name}/COMPONENT.md')
+        if re.search(r"auto_adopt\s*:\s*false",descriptor_text,re.I) is None:
+            raise ValueError(f'component registration must remain opt-in: {directory.name}/COMPONENT.md')
+        title_match=re.search(r"(?m)^#\s+(.+?)\s*$",descriptor_text)
+        if not title_match:
+            raise ValueError(f'component registration descriptor lacks a title: {directory.name}/COMPONENT.md')
+        found.append({"id":component_id,"title":title_match.group(1),"entry":f"components/{directory.name}/COMPONENT.md"})
+    return found
+
 def render_index():
     rs=rows(); titles={r:t for r,t,_ in rs}
     out=['<!-- APCF-META {"schema":1,"visibility":"public"} -->','# 1. 共享设计基线路由','',
@@ -98,8 +221,14 @@ def render_index():
             'python -B .agent-project-control/scripts/design_contract.py --rule D07',
             'python -B .agent-project-control/scripts/design_contract.py --category interaction-recovery',
             '```','']
-    # APCF-DESIGN-ATLAS-V05-R1: generated optional component route
-    out += ['', '- **design-atlas-v0.5-r1**：可选 UI 修订；289 项逐条案例、类型化画布、原生格式查看器与平衡约束；`auto_adopt: false`；入口 `components/design-atlas-v0.5-r1/COMPONENT.md`', '']
+    out += ['','## 1.8. 已注册可选组件','']
+    components=registered_components()
+    if components:
+        for component in components:
+            out.append(f'- **{component["id"]}**：可选 UI 组件（{component["title"]}）；`auto_adopt: false`；入口 `{component["entry"]}`')
+    else:
+        out.append('当前候选没有已注册的可选 UI 组件。')
+    out.append('')
     return '\n'.join(out)
 
 def validate():
@@ -114,7 +243,12 @@ def validate():
     for rid,_,block in rs:
         for token in REQUIRED:
             if token not in block: e.append(f'{rid} missing section: {token}')
-    if INDEX.read_text(encoding='utf-8')!=render_index(): e.append('design/INDEX.md drifted; run design_contract.py --sync')
+    try:
+        generated_index=render_index()
+    except (OSError,ValueError) as ex:
+        e.append('component registration invalid: '+str(ex))
+    else:
+        if INDEX.read_text(encoding='utf-8')!=generated_index: e.append('design/INDEX.md drifted; run design_contract.py --sync')
     try:
         if lock_value('rules_version')!=EXPECTED_RULES_VERSION: e.append(f'rules_version must be {EXPECTED_RULES_VERSION}')
         if digest(RULES)!=lock_value('canonical_rules_sha256'): e.append('RULES.md hash differs from BASELINES.lock.yaml')
@@ -150,7 +284,13 @@ def main():
     ap.add_argument('--category')
     a=ap.parse_args()
     if a.sync:
-        INDEX.write_text(render_index(),encoding='utf-8'); print('PASS: design index synchronized')
+        try:
+            generated_index=render_index()
+        except (OSError,ValueError) as ex:
+            raise SystemExit('FAIL: component registration invalid: '+str(ex)) from ex
+        with INDEX.open('w',encoding='utf-8',newline='\n') as stream:
+            stream.write(generated_index)
+        print('PASS: design index synchronized')
     if a.rule: print(select_rule(a.rule))
     if a.category:
         match=next((x for x in CATEGORIES if x[0]==a.category),None)
@@ -162,6 +302,6 @@ def main():
         if errors:
             for x in errors: print('FAIL:',x)
             raise SystemExit(2)
-        print('PASS: D01-D16, router, project adoption state and locked design Profile are consistent')
+        print('PASS: D01-D16, component registrations, router, project adoption state and locked design Profile are consistent')
 
 if __name__=='__main__': main()

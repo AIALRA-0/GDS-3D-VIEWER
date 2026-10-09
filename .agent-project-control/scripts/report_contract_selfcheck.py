@@ -3,6 +3,7 @@ import tempfile
 from pathlib import Path
 from report_contract import validate_report
 from common import FRAMEWORK_ROOT, dir_marker
+from test_ledger import TEST_FORMAT_MARKER, parse_tests, serialize_v2
 
 CHECKLIST = '''<!-- APCF-META {"schema":1,"visibility":"public"} -->
 # 1. 当前执行清单
@@ -87,6 +88,11 @@ def main():
         (tr / 'CHECKLIST.md').write_text(CHECKLIST, encoding='utf-8')
         (tr / 'TEST.md').write_text(TEST, encoding='utf-8')
         assert validate_report(VALID, tr) == [], validate_report(VALID, tr)
+        nested = VALID.replace('## 5. 完整讲解', '## 5. 完整讲解\n\n### 5.1. 实际机制\n\n### 5.2. 证据边界')
+        assert not validate_report(nested, tr), 'legitimate R20 subordinate headings must pass'
+        assert validate_report(nested.replace('### 5.1.', '### 7.1.'), tr), 'wrong parent heading must fail'
+        assert validate_report(nested.replace('### 5.2.', '### 5.3.'), tr), 'skipped subordinate heading must fail'
+        assert validate_report(nested.replace('### 5.2.', '### 5.1.'), tr), 'duplicate subordinate heading must fail'
         assert validate_report(VALID.replace('用户可以直接看到现在是否通过','用户看到当前状态 → 再看历史'),tr), 'arrow BP must fail'
         assert validate_report(BAD_GENERIC, tr), 'generic BP title should fail'
         assert validate_report(BAD_FLAT_NUMBER, tr), 'flat 7.1 numbering should fail'
@@ -96,6 +102,30 @@ def main():
         assert validate_report(bad_test,tr), 'incomplete test section should fail'
         assert validate_report(VALID.replace('## 9. 下一步推荐','## 8. 下一步推荐'),tr), 'wrong section order should fail'
         assert validate_report(VALID.replace('- **IT / TR**：IT-0001 / TR-0001','- **编号**：none'),tr), 'missing IT/TR should fail'
+        legacy_bytes = (tr/'TEST.md').read_bytes()
+        current_rows = [serialize_v2(row) for row in parse_tests(TEST)]
+        v2_test = '<!-- APCF-META {"schema":1,"visibility":"public"} -->\n# 1. 当前验收记录\n\n' + TEST_FORMAT_MARKER + '\n\n' + '\n'.join(current_rows) + '\n'
+        v2_report = VALID
+        for old, new in zip([line for line in TEST.splitlines() if line.startswith('- ')], current_rows):
+            v2_report = v2_report.replace(old, new)
+        (tr/'TEST.md').write_text(v2_test, encoding='utf-8')
+        assert not validate_report(v2_report, tr), validate_report(v2_report, tr)
+        nested_v2 = v2_report.replace('## 5. 完整讲解', '## 5. 完整讲解\n\n### 5.1. 实际机制\n\n### 5.2. 证据边界')
+        assert not validate_report(nested_v2, tr), 'v2 TEST with legitimate R20 hierarchy must pass'
+        marked_report = v2_report.replace('## 4. 验收记录\n\n', '## 4. 验收记录\n\n' + TEST_FORMAT_MARKER + '\n\n')
+        assert not validate_report(marked_report, tr), validate_report(marked_report, tr)
+        for label, bad in [
+            ('missing line', v2_report.replace(current_rows[-1]+'\n', '', 1)),
+            ('changed status', v2_report.replace('【PASS】【TEST-002】', '【FAIL】【TEST-002】', 1)),
+            ('changed actual', v2_report.replace('；实际：内容与预期一致', '；实际：不一致', 1)),
+            ('changed evidence', v2_report.replace('；证据：synthetic-result-content', '；证据：different', 1)),
+            ('reordered records', v2_report.replace('\n'.join(current_rows), '\n'.join(reversed(current_rows)), 1)),
+            ('additional record', v2_report.replace(current_rows[-1], current_rows[-1]+'\n'+current_rows[-1].replace('TEST-003','TEST-004'), 1)),
+        ]:
+            assert bad != v2_report, label + ' mutation did not run'
+            assert validate_report(bad, tr), label + ' must fail'
+        (tr/'TEST.md').write_bytes(legacy_bytes)
+        assert not validate_report(VALID, tr), 'historical v1 must remain readable'
     print('PASS: v0.2.3 report contract structural selfcheck')
 
 

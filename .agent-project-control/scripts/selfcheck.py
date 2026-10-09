@@ -13,6 +13,8 @@ import zipfile
 from common import ROOT,now_stamp,parse_meta
 from rule_sync import MODULES
 from contextlib import contextmanager
+from test_ledger import TEST_FORMAT_MARKER, parse_tests, serialize_v2, validate_text
+from selfcheck_runlog import make_run_id, store_run
 
 
 WRITING_INTERFACE = '.agent-project-control/interfaces/WRITING_STANDARD.md'
@@ -52,13 +54,73 @@ def disabled_style_bytes(original):
     assert original.count(marker) == 1
     return original.replace(marker, marker.replace(b'true', b'false'), 1)
 
-CASE = ROOT / ('.agent-project-control/runtime/testbed/selfcheck-' + now_stamp())
+RUN_ID = make_run_id()
+CASE = ROOT / '.agent-project-control/runtime/testbed' / RUN_ID
 META = '# APCF-META {"schema":1,"visibility":"private"}\nschema: 1\nvisibility: private\n'
 ROWS = []
 
 def mark(directory):
     directory.mkdir(parents=True, exist_ok=True)
     (directory / '.apcf-dir.yaml').write_text(META, encoding='utf-8')
+
+
+def fixture_test_rows(text):
+    """Keep explicit v1 fixture inputs while emitting current v2 records."""
+    assert not validate_text(text), validate_text(text)
+    return '\n'.join(serialize_v2(row) for row in parse_tests(text)) + '\n'
+
+
+def fixture_test_document(text):
+    rows = fixture_test_rows(text)
+    return ('<!-- APCF-META {"schema":1,"visibility":"public"} -->\n'
+            '# 1. 当前验收记录\n\n' + TEST_FORMAT_MARKER + '\n\n' + rows)
+
+
+def fixture_terms_review(report):
+    """Replay explicit terminology judgments for the controlled regression reports.
+
+    This is test evidence for an APCF maintainer, never a production review
+    generator. An unfamiliar token deliberately fails instead of granting an
+    automatic exemption to an arbitrary report.
+    """
+    from datetime import datetime, timezone
+    from terminology_review import initial_review, validate, glossary_lines
+    reviewer = 'Codex: reviewer of the finite APCF regression fixture'
+    timestamp = datetime.now(timezone.utc).isoformat()
+    audience = 'APCF framework maintainers exercising synthetic lifecycle regressions; they have read AGENTS and the canonical rules'
+    identities = {'IT': 'stable iteration objective', 'TR': 'current execution record',
+                  'CL': 'Checklist requirement identity', 'TEST': 'current acceptance record',
+                  'PA': 'one-layer parallel task', 'REG': 'regression record',
+                  'ADR': 'architecture decision record', 'MAT': 'material record',
+                  'RB': 'runbook record', 'APCF': 'this framework',
+                  'SHA': 'candidate file digest', 'ID': 'stable record identifier',
+                  'UI': 'the fixture user interface', 'CSS': 'fixture stylesheet source',
+                  'README': 'repository landing document',
+                  'BP': 'the single-layer unordered list used by this report fixture under R20 and Writing section 13'}
+    statuses = {'PASS', 'FAIL', 'BLOCKED', 'UNKNOWN'}
+    review = initial_review(report)
+    review.update(reviewer=reviewer, reviewed_at=timestamp, audience_context=audience,
+                  semantic_review_completed=True)
+    for item in review['items']:
+        term = item['term']
+        if term not in identities and term not in statuses:
+            raise AssertionError('Unreviewed terminology in controlled fixture: ' + term)
+        role = identities.get(term, 'literal acceptance status ' + term)
+        meaning = item['meanings'][0]
+        meaning.update(decision='LITERAL_FORMAT' if term in statuses else 'KNOWN_TO_AUDIENCE',
+                       reason=f'{term} denotes {role} in this inspected fixture; the declared maintainer audience already uses this exact framework identity',
+                       audience_context=audience, domain_context='APCF synthetic regression only',
+                       current_use=f'{term}: {role} on the recorded occurrence lines',
+                       context_relevance='This identity connects the observed fixture result to its lifecycle record',
+                       name_status='NOT_APPLICABLE', verified_full_name='',
+                       name_limit='This fixture preserves the local identity without asserting an English expansion',
+                       definition=role, source_or_basis='.agent-project-control/rules/INDEX.md and the controlled regression report occurrence lines',
+                       reviewer=reviewer, reviewed_at=timestamp)
+    review['attestations'] = {name: True for name in review['attestations']}
+    if not glossary_lines(report):
+        review['no_glossary_reason'] = 'This controlled report uses only the explicitly reviewed lifecycle identities already known to its APCF-maintainer audience'
+    assert not validate(report, review), validate(report, review)
+    return review
 
 def _childenv(scripts_dir, base=None):
     """Make fixture-local sibling modules importable for script-file children."""
@@ -78,7 +140,7 @@ def remove_readonly(func,path,exc):
 def run(name, *args, expected=0, case=None, full_output=False):
     scripts = CASE / '.agent-project-control/scripts'
     r = subprocess.run([sys.executable, '-B', str(scripts / name), *map(str, args)], cwd=CASE, capture_output=True, text=True, encoding='utf-8', env=_childenv(scripts))
-    ROWS.append({'script': name, 'arguments': [str(a).replace(str(ROOT), '<workspace>') for a in args], 'exit_code': r.returncode, 'stdout': r.stdout.replace(str(ROOT), '<workspace>'), 'stderr': r.stderr.replace(str(ROOT), '<workspace>')})
+    ROWS.append({'script': name, 'arguments': [str(a).replace(str(ROOT), '<workspace>') for a in args], 'exit_code': r.returncode, 'expected_exit_code': expected, 'stdout': r.stdout.replace(str(ROOT), '<workspace>'), 'stderr': r.stderr.replace(str(ROOT), '<workspace>')})
     if case is not None: ROWS[-1]['case'] = case
     if name == 'new_turn.py' and r.returncode == 0:
         check_bootstrap_output(CASE, r.stdout)
@@ -97,6 +159,8 @@ from route_context import load_contract, matching_capabilities, capability_closu
 from test_ledger import parse_tests
 from gate_check import _markdown_prose
 from standards_contract import validate as validate_standards
+from terminology_review import extract_user_report
+from selfcheck import fixture_terms_review
 tr = Path(sys.argv[1])
 root = Path(sys.argv[2])
 deferred = json.loads(sys.argv[3])
@@ -193,6 +257,9 @@ for rel in content_targets:
     observed = lines[line_number-1].strip()
     if not observed:
         raise SystemExit('content observation has no text: ' + rel)
+    if path.resolve() == (tr / 'TURN.md').resolve() and '## 0. 精确状态头' in path.read_text(encoding='utf-8'):
+        report = extract_user_report(path.read_text(encoding='utf-8'))
+        _private_json(tr / 'evidence/terms-review.json', fixture_terms_review(report))
     record_content_review(tr, rel, closure, [evidence_rel], [{
         'line': line_number, 'criterion': 'current candidate and applicable normative source inspected',
         'observed': observed[:240], 'result': 'PASS'
@@ -1128,7 +1195,6 @@ activity.record_semantic_review(tr, observations, ['evidence/selfcheck-semantic-
             assert report['activity']['git_head_changed'] and 'delivery' in report['required']['phases']
             assert 'src/server.py' in report['activity']['changed_paths']
             done(13, clean_before_audit=True, report=report)
-
         # A committed copy of pre-existing dirty bytes must remain outside this
         # Turn's editable content, while later edits and new committed files
         # remain observable and HEAD movement still requires delivery.
@@ -1204,8 +1270,8 @@ activity.record_semantic_review(tr, observations, ['evidence/selfcheck-semantic-
             '- 【进行中】【CL-PA-01】【未收口父轮中的并行创建】：在父TR仍处于IN_PROGRESS且验收未完成时，验证受管并行创建可以继续执行\n',
             encoding='utf-8')
         (tr / 'TEST.md').write_text(
-            public_meta + '# 1. Current fixture acceptance\n\n'
-            '- 【进行中】【TEST-PA-01】【对应 CL-PA-01】【未收口父轮中的并行创建】：在【当前合成Turn / 父TR仍为IN_PROGRESS / 完整收口尚未执行】下，执行【记录真实调查计划后创建受管PA】，必须观察到【PA归属父TR且父TR及当前验收仍保持未完成】；实际观察到【当前工作流计划已建立，PA创建尚待本项完整检查】，证据为【Step1D/21后续断言】\n',
+            fixture_test_document(public_meta + '# 1. Current fixture acceptance\n\n'
+            '- 【进行中】【TEST-PA-01】【对应 CL-PA-01】【未收口父轮中的并行创建】：在【当前合成Turn / 父TR仍为IN_PROGRESS / 完整收口尚未执行】下，执行【记录真实调查计划后创建受管PA】，必须观察到【PA归属父TR且父TR及当前验收仍保持未完成】；实际观察到【当前工作流计划已建立，PA创建尚待本项完整检查】，证据为【Step1D/21后续断言】\n'),
             encoding='utf-8')
         plan_source = r'''
 import sys,json,hashlib
@@ -1462,6 +1528,7 @@ def main():
     for p in (ROOT / '.agent-project-control/scripts').glob('*.py'):
         compile(p.read_bytes(), str(p), 'exec')
     run('lint_framework.py')
+    run('closeout_selfcheck.py')
     check_rule_surfaces()
     check_router_fixture()
     module = CASE / '.agent-project-control/rules/01-context-state.md'
@@ -1522,8 +1589,9 @@ def main():
     check_receipts(CASE, tr, ROWS.append)
     parallel_checklist = ('- 【已完成】【CL-01】【并行入口工作流】：当本轮需要受管并行执行时，因单独路由不能证明已有调查计划，必须记录真实候选检查和当前回归范围并以活动对象SHA保持一致确认通过\n')
     parallel_test = ('- 【PASS】【TEST-001】【对应 CL-01】【当前候选计划】：在【当前候选 / 隔离自检 / 实际路径可读】下，执行【读取并核对本轮候选状态】，必须观察到【当前计划绑定本轮回归且候选状态稳定】；实际观察到【当前计划绑定本轮回归且候选状态稳定】，证据为【synthetic-workflow-check】\n')
+    parallel_test = fixture_test_rows(parallel_test)
     (tr/'CHECKLIST.md').write_text('<!-- APCF-META {"schema":1,"visibility":"public"} -->\n# 1. 当前执行清单\n\n'+parallel_checklist,encoding='utf-8')
-    (tr/'TEST.md').write_text('<!-- APCF-META {"schema":1,"visibility":"public"} -->\n# 1. 当前验收记录\n\n'+parallel_test,encoding='utf-8')
+    (tr/'TEST.md').write_text(fixture_test_document('<!-- APCF-META {"schema":1,"visibility":"public"} -->\n# 1. 当前验收记录\n\n'+parallel_test),encoding='utf-8')
     record_fixture_evidence(CASE,tr)
     run('route_context.py', '--phase', 'scope', '--phase', 'verification', '--phase', 'finalization', '--turn-dir', tr)
     pa = Path(run('new_parallel.py', tr, '--title', 'synthetic-parallel', '--request-text', 'Synthetic child request'))
@@ -1546,15 +1614,16 @@ def main():
     run('finalize_turn.py', tr, expected=2)
     checklist_body='- 【已完成】【CL-01】【规则加载】：当新的执行轮次开始时，因旧上下文可能导致规则漂移，必须重新读取当前作用域适用规则，并以规则入口和当前范围已核对确认通过\n- 【已完成】【CL-02】【合成结果】：当本轮需要产生可验证结果时，因只运行命令不能证明结果正确，必须生成并检查结果，并以文件存在且内容正确确认通过\n'
     test_body='- 【PASS】【TEST-001】【对应 CL-01】【规则入口存在】：在【当前候选 / 合成环境 / 规则文件可读】下，执行【读取规则入口并核对作用域】，必须观察到【规则入口存在且作用域可确定】；实际观察到【规则入口存在且作用域已确定】，证据为【synthetic-rule】\n- 【PASS】【TEST-002】【对应 CL-02】【结果文件存在】：在【当前候选 / 合成环境 / 输出目录可写】下，执行【生成并读取结果文件】，必须观察到【结果文件存在】；实际观察到【结果文件存在】，证据为【synthetic-file】\n- 【PASS】【TEST-003】【对应 CL-02】【结果内容正确】：在【当前候选 / 合成环境 / 结果文件已生成】下，执行【比较结果内容与预期值】，必须观察到【内容与预期一致】；实际观察到【内容与预期一致】，证据为【synthetic-content】\n'
+    test_body = fixture_test_rows(test_body)
     (tr/'CHECKLIST.md').write_text('<!-- APCF-META {"schema":1,"visibility":"public"} -->\n# 1. 当前执行清单\n\n'+checklist_body,encoding='utf-8')
-    (tr/'TEST.md').write_text('<!-- APCF-META {"schema":1,"visibility":"public"} -->\n# 1. 当前验收记录\n\n'+test_body,encoding='utf-8')
+    (tr/'TEST.md').write_text(fixture_test_document('<!-- APCF-META {"schema":1,"visibility":"public"} -->\n# 1. 当前验收记录\n\n'+test_body),encoding='utf-8')
     run('test_ledger.py', tr/'TEST.md', '--checklist', tr/'CHECKLIST.md')
     good_test=(tr/'TEST.md').read_text(encoding='utf-8')
     bad_ledgers=[
         good_test.replace('【PASS】【TEST-002】','【FAIL】【TEST-002】',1),
         good_test.replace('【对应 CL-02】','【对应 CL-99】',1),
         good_test+good_test.splitlines()[-1]+'\n',
-        good_test.replace('证据为【synthetic-rule】','证据为【】',1),
+        good_test.replace('；证据：synthetic-rule','；证据：',1),
         good_test.replace('【对应 CL-02】','【对应 CL-01】'),
     ]
     for bad in bad_ledgers:
@@ -3016,9 +3085,9 @@ def check_core_entrypoints():
                                    'rendered_sha256': hashlib.sha256(rendered).hexdigest()}
                 (tr / 'evidence/remote-delivery-result.json').write_text(
                     json.dumps(delivery_record, sort_keys=True) + '\n', encoding='utf-8')
-        test = '\n'.join(rows) + '\n'
+        test = fixture_test_rows('\n'.join(rows))
         (tr / 'CHECKLIST.md').write_text(public + '# 1. 当前执行清单\n\n' + cl, encoding='utf-8')
-        (tr / 'TEST.md').write_text(public + '# 1. 当前验收记录\n\n' + test, encoding='utf-8')
+        (tr / 'TEST.md').write_text(fixture_test_document(public + '# 1. 当前验收记录\n\n' + test), encoding='utf-8')
         passing = 1 + int(delivery and delivered)
         pending = int(delivery and not delivered)
         test_summary = f'{len(rows)} 个 TEST-ID 当前 PASS {passing}，进行中 {pending}，FAIL 0，BLOCKED 0'
@@ -3094,6 +3163,7 @@ def check_core_entrypoints():
         call(33, 'new_parallel.py', pa, '--title', 'nested', '--request-text', 'Rejected nested PA', expected=1)
         assert not (pa / 'parallel').exists(); done(33)
         assert all((pa / n).exists() for n in ['REQUEST.md', 'CHECKLIST.md', 'TEST.md', 'TURN.md', 'evidence'])
+        assert (pa / 'TEST.md').read_text(encoding='utf-8').count(TEST_FORMAT_MARKER) == 1
         assert (pa / 'REQUEST.md').read_text(encoding='utf-8').endswith('Synthetic PA request\n')
         done(34)
 
@@ -3538,9 +3608,19 @@ print('PASS: actual Git index bytes govern candidate scan, split view and staged
 
 
 if __name__ == '__main__':
+    outcome = 'FAIL'
     try:
         main()
+        outcome = 'PASS'
+    except BaseException as exc:
+        import traceback
+        ROWS.append({'case': 'selfcheck/uncaught-failure', 'exit_code': 1,
+                     'exception_type': type(exc).__name__,
+                     'message': str(exc)[:2000],
+                     'traceback': [str(frame) for frame in traceback.extract_tb(exc.__traceback__)]})
+        raise
     finally:
-        out = ROOT / '.agent-project-control/runtime/runs/selfcheck.json'
-        out.write_text(json.dumps(ROWS, ensure_ascii=False, indent=2), encoding='utf-8')
-        out.with_name(out.name + '.apcf-meta.yaml').write_text(META, encoding='utf-8')
+        summary = store_run(ROOT / '.agent-project-control/runtime/runs', ROWS,
+                            outcome, run_id=RUN_ID)
+        print('selfcheck run:', summary['run_id'], 'outcome:', outcome,
+              'raw SHA-256:', summary['raw_sha256'])

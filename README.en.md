@@ -22,31 +22,23 @@ Figure 1 The complete workbench running the original synthetic demonstration
 
 ## 1 First successful preview
 
-1. Open the [live preview](https://gds3d.aialra.online) and click “加载示例” to try the synthetic layout
-2. Click “打开文件” or drag in a local `.gds`, `.gds2`, `.gdsii`, `.gltf` or `.glb` file; suffix matching is case-insensitive
-3. Choose layers or cells, hover for a quick tooltip, and click geometry to pin details in the inspector
-4. Choose 2D for orthographic viewing and Measure for two-point measurements; choose 3D for spatial viewing, then export review observations
+1. Open the [live preview](https://gds3d.aialra.online) and select “Load demo” to try the synthetic layout
+2. To inspect a local layout, select “Open file” or drag in a `.gds`, `.gds2`, `.gdsii`, `.gltf` or `.glb` file
+3. Filter the Layers or Cells panel, hover over geometry for a quick fact, then click it to pin the details
+4. To measure a GDS layout, select “Measure” and click two points on the 2D canvas, then select “3D view” to inspect the spatial layout
 
-Opening files requires no account or model key. Parsing happens in the current browser
-Chinese is the default. The `EN` / `ZH` control sits immediately after Load sample and switches the interface and future AI explanations while preserving geometry, layer visibility and notes
-The inspector groups Overview, Display, Source data and AI. Clicking geometry opens Overview; tabs keep the same AI configuration and ephemeral key
-Select a layer to set a manual name, or import a local `.lyp` / `.json` layer map. The Export layer mapping icon opens a dialog to choose JSON or LYP for current layers and saved names. Unnamed layers export numbered defaults; saved names absent from the current cell are retained
-Maps contain names only, without colors or physical thicknesses. Nested groups and leading-zero IDs work; conflicting names are rejected
-Stored GDS cell names populate an expandable hierarchy and searchable directory. Physical layer names such as metal1 still require a map rather than guessing from layer numbers
-Larger repeated designs automatically share source geometry to display the complete current top, retaining arrays, rotation, reflection, magnification and per-instance inspection. Capacity remains bounded; see [public limits](docs/PUBLIC-PREVIEW.md)
-Adjacent 2D/3D controls form one group; camera presets form another. Dropdown fields and popup lists share the theme, with arrow-key navigation, initial-letter search and ellipsized long names
-The cell locate icon opens all-occurrence tools in the selected top: highlight, show only, hide and restore. Descendant geometry and layer visibility are respected
-Instance filtering is transient and excluded from review exports; outlines bound visible geometry, so empty cells have no outline
-Orthographic 2D supports left-drag planar rotation, middle-button panning, scrolling and unsnapped two-point measurements. 3D also uses middle-button panning. Reviews/bookmarks retain projection, zoom and 2D rotation; ruler results are transient
-Source data exposes library metadata, searchable text labels, reference transformations and record coverage; see [format support and layer names](docs/GDS-RECORDS.md)
-Click layer swatches to edit colors immediately. Ten built-in palettes include Original pastel, Classic categorical, Clear contrast, Dark neon, Grayscale structure, Coastal blues, Earth tones, Retro terminal, Muted mist and Bright spectrum
-The Color palettes dialog supports create, copy, edit, delete, search and starred defaults. Only palette names, colors and the default selection persist in this browser
-The palette dialog imports/exports local JSON containing custom palettes and the default choice. Import merges palettes, updates matching IDs and refuses malformed or over-64 KB files without changing existing choices
-Zero layer spacing makes adjacent surfaces touch while retaining illustrative thickness, with no underlying gap; this is not a physical process stack
-Cells in one file share layer order and an illustrative thickness convention. Standalone cells retain thickness relative to geometry; missing layers reserve their positions. Automatic fitting still changes the overall magnification
-The Cells panel and Display tab offer a height toggle. Consistent heights support comparisons with the top cell; Compact heights restore flatter detail inspection. Switching preserves camera, colors and instance filters. Reviews/bookmarks retain the mode; older records default to consistent heights
-Frequent actions use icons with hover and keyboard-focus help; export choices retain text in a dedicated dialog
-After refresh, reopen the source file; review exports contain observations, view state, layer names and colors, excluding the source layout and keys
+Chinese is the default interface; `EN` / `ZH` switches the interface and language of future explanations, saving only this language preference in the browser
+
+Files are parsed in the current browser and are not uploaded; browsing the layout requires no account or model key. After refresh, reopen the source file
+
+### 1.1 Detailed workflows
+
+- [GDS records, layer names and maps](docs/GDS-RECORDS.md)
+- [2D/3D, hierarchy, measurement and review workflows](docs/VIEWER-REFERENCE-FEATURES.md)
+- [Supported formats and public-preview limits](docs/PUBLIC-PREVIEW.md)
+- [Optional object explanations and key handling](docs/AI-HARNESS.md)
+- [Palette, height and review interface examples](#2-product-showcase)
+- [Full capability and limitation matrix](#4-capabilities-and-limits)
 
 ## 2 Product showcase
 

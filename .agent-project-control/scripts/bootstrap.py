@@ -30,7 +30,7 @@ def _visibility(path: Path):
     return (meta or {}).get("visibility")
 
 
-def _ignore_framework(path, names):
+def _ignore_framework(path, names, profile=None):
     rel = Path(path).relative_to(FRAMEWORK_ROOT)
     if not rel.parts:
         return [name for name in names if name in OPERATIONAL]
@@ -44,6 +44,8 @@ def _ignore_framework(path, names):
             or _visibility(item) == "private"
         ):
             ignored.append(name)
+    if profile == "core" and rel.parts == ("design",) and "components" in names:
+        ignored.append("components")
     return ignored
 
 
@@ -91,6 +93,7 @@ def _normalize_design_adoption(text: str) -> str:
     return text
 
 
+
 def _validate_source_framework() -> None:
     config = FRAMEWORK_ROOT / "framework.yaml"
     if config.is_symlink() or not config.is_file():
@@ -98,23 +101,29 @@ def _validate_source_framework() -> None:
     _normalize_framework_metadata(config.read_text(encoding="utf-8"))
 
 
-def populate_target(target: Path) -> None:
+def populate_target(target: Path, profile: str | None = None) -> None:
     """Populate an empty, private staging directory with the generic control shell."""
+    if profile not in {None, "core"}:
+        raise SystemExit("FAIL: unsupported distribution profile: " + str(profile))
     _validate_source_framework()
     target = Path(target)
     if any(target.iterdir()):
         raise SystemExit("FAIL: internal staging target must be empty")
 
     shutil.copy2(ROOT / "AGENTS.md", target / "AGENTS.md")
-    shutil.copytree(FRAMEWORK_ROOT, target / ".agent-project-control", ignore=_ignore_framework)
+    shutil.copytree(
+        FRAMEWORK_ROOT,
+        target / ".agent-project-control",
+        ignore=lambda path, names: _ignore_framework(path, names, profile=profile),
+    )
 
     control = target / ".agent-project-control"
     for name in OPERATIONAL:
         directory = control / name
-        dir_marker(directory)
+        dir_marker(directory, "private" if name == "runtime" else "public")
         if name == "runtime":
             for child in RUNTIME_DIRS:
-                dir_marker(directory / child)
+                dir_marker(directory / child, "private")
         else:
             write_md(directory / "INDEX.md", INDEX_TITLES[name])
 
@@ -128,6 +137,7 @@ def populate_target(target: Path) -> None:
         _normalize_design_adoption(design.read_text(encoding="utf-8")),
         encoding="utf-8",
     )
+
 
     write_md(
         target / "CURRENT.md",

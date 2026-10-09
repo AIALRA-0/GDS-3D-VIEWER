@@ -57,4 +57,6 @@ python -B .agent-project-control/scripts/design_contract.py --category interacti
 ```
 
 
-- **design-atlas-v0.5-r1**：可选 UI 修订；289 项逐条案例、类型化画布、原生格式查看器与平衡约束；`auto_adopt: false`；入口 `components/design-atlas-v0.5-r1/COMPONENT.md`
+## 1.8. 已注册可选组件
+
+- **design-atlas-v0.5-r1**：可选 UI 组件（Design Atlas v0.5-r1 · 可选组件）；`auto_adopt: false`；入口 `components/design-atlas-v0.5-r1/COMPONENT.md`

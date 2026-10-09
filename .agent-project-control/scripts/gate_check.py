@@ -120,8 +120,15 @@ def _markdown_prose(text: str) -> list[tuple[int, str]]:
 
 def _content_findings(turn_dir: Path, targets: list[str]) -> list[dict]:
     from route_context import capability_closure, matching_capabilities, resolve_inside_repo
+    from terminology_review import has_user_report_candidate
     contract = load_contract()
     findings = []
+    current_turn_report = turn_dir / 'TURN.md'
+    if has_user_report_candidate(current_turn_report):
+        # A non-placeholder USER REPORT candidate stays in the existing
+        # Writing/Style content-review flow, including malformed reports that
+        # must be rejected instead of silently dropping out of Gate scope.
+        targets = list(targets) + [posix_rel(current_turn_report)]
     for target in sorted(set(targets)):
         path = ROOT / target
         if not path.is_file():

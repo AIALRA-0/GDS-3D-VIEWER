@@ -11,7 +11,7 @@ def main():
     code, _ = enforce_entrypoint(entrypoint='parallel', turn_dir_raw=tr)
     if code: raise SystemExit(code)
     rid=next_id('PA',FRAMEWORK_ROOT/'iterations'); s=now_stamp(); d=tr/'parallel'/f'{rid}_{s}_{slugify(a.title)}'; dir_marker(d); dir_marker(d/'evidence')
-    for fn,title,body in [('REQUEST.md','并行任务原始请求',a.request_text),('CHECKLIST.md','并行任务执行清单','- 【未开始】【范围】：只执行主智能体分配的边界'),('TEST.md','并行任务验收记录','当前尚未执行测试'),('TURN.md',rid+' 并行任务报告','- **Status**：IN_PROGRESS')]: write_md(d/fn,f'# 1. {title}\n\n{body}\n')
+    for fn,title,body in [('REQUEST.md','并行任务原始请求',a.request_text),('CHECKLIST.md','并行任务执行清单','- 【未开始】【范围】：只执行主智能体分配的边界'),('TEST.md','并行任务验收记录','<!-- APCF-TEST-FORMAT v2 -->\n\n当前尚未执行测试'),('TURN.md',rid+' 并行任务报告','- **Status**：IN_PROGRESS')]: write_md(d/fn,f'# 1. {title}\n\n{body}\n')
     print(d)
 if __name__=='__main__':
     try: main()

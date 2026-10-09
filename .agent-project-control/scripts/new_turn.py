@@ -35,6 +35,7 @@ def main():
     write_md(
         d/'TEST.md',
         '# 1. 当前验收记录\n\n'
+        '<!-- APCF-TEST-FORMAT v2 -->\n\n'
         '当前尚未建立 TEST-ID；执行前根据当前 Checklist 建立本轮验收表单；每个 TEST-ID 只记录当前候选的有效验收结果，一条 Checklist 可以由一个或多个 TEST 从不同验收维度共同证明\n'
     )
     write_md(

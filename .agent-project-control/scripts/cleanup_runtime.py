@@ -39,6 +39,20 @@ def main():
         now = time.time()
         targets = [p for p in runtime.rglob("*") if p.is_file() and p.name != ".apcf-dir.yaml"
                    and now - p.stat().st_mtime >= args.older_than_hours * 3600]
+    if args.apply:
+        from selfcheck_runlog import validate_runlog_references
+        protected, reference_errors = validate_runlog_references(runtime / 'runs')
+        legacy_log = runtime / 'runs/selfcheck.json'
+        if legacy_log.exists() or legacy_log.is_symlink():
+            protected.update(path.resolve() for path in
+                             (legacy_log, legacy_log.with_name(legacy_log.name + '.apcf-meta.yaml')))
+        if reference_errors:
+            raise SystemExit('FAIL: selfcheck evidence references are invalid; cleanup refused: '
+                             + '; '.join(reference_errors))
+        for target in targets:
+            resolved = target.resolve()
+            if any(path == resolved or path.is_relative_to(resolved) for path in protected):
+                raise SystemExit('FAIL: cleanup would remove referenced selfcheck evidence: ' + str(target))
     # Validate every absolute target and descendant before any deletion.
     for target in targets:
         resolved = target.resolve()
