@@ -1,0 +1,107 @@
+.agent-project-control/scripts/lint_framework.py
+  s_07756e806a3fa5::t_e977f7aca188cd 2-4,12-16,18-19,23-24,26,44-198,237-240,243
+docs/AGENT-WORKFLOW.md
+  s_07756e806a3fa5::t_3502a8dc44024b 10-11,22-23
+docs/agent-locks.md
+  s_07756e806a3fa5::t_3502a8dc44024b 5-7
+.agent-project-control/design/INDEX.md
+  s_07756e806a3fa5::t_f1e38e065a3c11 60-62
+.agent-project-control/generated/TREE.html
+  s_07756e806a3fa5::t_ba87277332484b 2
+.agent-project-control/generated/TREE.md
+  s_07756e806a3fa5::t_fa0153b9e02a51 60-66,90,93,101,121,126-127
+.agent-project-control/iterations/INDEX.md
+  s_07756e806a3fa5::t_e74f6a852f0105 7
+.agent-project-control/iterations/IT-0002_20261009T011641-0700_core-closeout-v2-readme/.apcf-dir.yaml
+  s_07756e806a3fa5::t_f4b7bb92c7391f 1-3
+.agent-project-control/iterations/IT-0002_20261009T011641-0700_core-closeout-v2-readme/ITERATION.md
+  s_07756e806a3fa5::t_0a8a43fd13b49f 1-6
+.agent-project-control/iterations/IT-0002_20261009T011641-0700_core-closeout-v2-readme/turns/.apcf-dir.yaml
+  s_07756e806a3fa5::t_a0c3dec7c12b15 1-3
+.agent-project-control/iterations/IT-0002_20261009T011641-0700_core-closeout-v2-readme/turns/TR-0002_20261009T011642-0700_core-closeout-v2-readme/.apcf-dir.yaml
+  s_07756e806a3fa5::t_8452b8777588ac 1-3
+.agent-project-control/iterations/IT-0002_20261009T011641-0700_core-closeout-v2-readme/turns/TR-0002_20261009T011642-0700_core-closeout-v2-readme/CHECKLIST.md
+  s_07756e806a3fa5::t_7cce2e17d444bb 1-7
+.agent-project-control/iterations/IT-0002_20261009T011641-0700_core-closeout-v2-readme/turns/TR-0002_20261009T011642-0700_core-closeout-v2-readme/TEST.md
+  s_07756e806a3fa5::t_87130075f7a0d7 1-11
+.agent-project-control/iterations/IT-0002_20261009T011641-0700_core-closeout-v2-readme/turns/TR-0002_20261009T011642-0700_core-closeout-v2-readme/TURN.md
+  s_07756e806a3fa5::t_a0a97e56064b85 1-9
+.agent-project-control/rules/01-context-state.md
+  s_07756e806a3fa5::t_162c552ab13ad8 363,365,367,369,373
+.agent-project-control/rules/03-verification-regression.md
+  s_07756e806a3fa5::t_a662489eb7d691 30,32-34,42-46,54,70-71
+.agent-project-control/runtime/.apcf-dir.yaml
+  s_07756e806a3fa5::t_889bbbe85eaa19 1,3
+.agent-project-control/runtime/cache/.apcf-dir.yaml
+  s_07756e806a3fa5::t_983c904489b2ca 1,3
+.agent-project-control/runtime/distribution/.apcf-dir.yaml
+  s_07756e806a3fa5::t_2847c50d40b752 1,3
+.agent-project-control/runtime/downloads/.apcf-dir.yaml
+  s_07756e806a3fa5::t_d5c31d3cc91a3f 1,3
+.agent-project-control/runtime/large/.apcf-dir.yaml
+  s_07756e806a3fa5::t_eea5d023b8ea9d 1,3
+.agent-project-control/runtime/runs/.apcf-dir.yaml
+  s_07756e806a3fa5::t_c447d51be93cff 1,3
+.agent-project-control/runtime/testbed/.apcf-dir.yaml
+  s_07756e806a3fa5::t_3193e93ac239a7 1,3
+.agent-project-control/runtime/tmp/.apcf-dir.yaml
+  s_07756e806a3fa5::t_bedd297e712155 1,3
+.agent-project-control/scripts/bootstrap.py
+  s_07756e806a3fa5::t_87ebdc7b2d80f1 33,47-48,96,104,106-107,114-118,123,126,141
+.agent-project-control/scripts/cleanup_runtime.py
+  s_07756e806a3fa5::t_d785bbaf1c7f47 42-55
+.agent-project-control/scripts/closeout_selfcheck.py
+  s_07756e806a3fa5::t_0d32113391c638 1-125
+.agent-project-control/scripts/core_distribution_selfcheck.py
+  s_07756e806a3fa5::t_f9155a669d47ca 1-242
+.agent-project-control/scripts/design_contract.py
+  s_07756e806a3fa5::t_5a1399c95edbe9 7,15,77-198,224-231,246-251,287-293,305
+.agent-project-control/scripts/gate_check.py
+  s_07756e806a3fa5::t_b83b6fa06640ce 123,126-131
+.agent-project-control/scripts/metadata_selfcheck.py
+  s_07756e806a3fa5::t_639788ba798099 1-334
+.agent-project-control/scripts/new_parallel.py
+  s_07756e806a3fa5::t_1d96d22c5c21b7 14
+.agent-project-control/scripts/new_turn.py
+  s_07756e806a3fa5::t_6082b91f91717c 38
+.agent-project-control/scripts/prepare_distribution.py
+  s_07756e806a3fa5::t_616cdee846b052 85-93,134-139,166-174
+.agent-project-control/scripts/publish_guard.py
+  s_07756e806a3fa5::t_7abe979c32ca3a 228-240
+.agent-project-control/scripts/report_contract.py
+  s_07756e806a3fa5::t_78a7b3a3ece733 4,14,37,144-158,161
+.agent-project-control/scripts/report_contract_selfcheck.py
+  s_07756e806a3fa5::t_4d0e871eccec54 6,91-95,105-128
+.agent-project-control/scripts/routing_activity.py
+  s_07756e806a3fa5::t_13da453109aa3a 341,546-588,592-593,599-625,632-634,637-639,732-752
+.agent-project-control/scripts/selfcheck.py
+  s_07756e806a3fa5::t_aed9d82c9e0f49 16-17,57-58,66-124,143,162-163,260-262,1273-1274,1531,1592,1594,1617,1619,1626,3088,3090,3166,3611,3614-3621,3623-3626
+.agent-project-control/scripts/selfcheck_runlog.py
+  s_07756e806a3fa5::t_253b670ba00399 1-223
+.agent-project-control/scripts/terminology_review.py
+  s_07756e806a3fa5::t_01db2b9f073785 1-516
+.agent-project-control/scripts/terminology_selfcheck.py
+  s_07756e806a3fa5::t_c366f57a70a08b 1-450
+.agent-project-control/scripts/test_ledger.py
+  s_07756e806a3fa5::t_216b548b9d01aa 25-138,145,161-162,179,184-185,187-188,200-201
+README.en.md
+  s_07756e806a3fa5::t_2aad245ae4f786 25-41
+README.md
+  s_07756e806a3fa5::t_187f2270f90a7c 25-41
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "9d93031f11f29496be605aca204f77c35c807a50",
+  "prompts": {},
+  "sessions": {
+    "s_07756e806a3fa5": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a11a40-20dc-7732-a5b7-49adf5fb1016",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "AIALRA-0 <aialra@163.com>"
+    }
+  }
+}
