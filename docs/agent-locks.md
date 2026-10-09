@@ -2,6 +2,9 @@
 
 | path | owner | purpose | start | eta | status |
 |------|-------|---------|-------|-----|--------|
+| apps/web/src/public/gds.ts; apps/web/tests/public/gds-performance.spec.ts | PA-0006 | full GDS parsing and hierarchy/source-geometry performance | 2026-10-09 America/Los_Angeles | current turn | active |
+| apps/web/src/public/Viewer.tsx; apps/web/src/public/renderer-helper.ts | PA-0007 | scene allocation and exact picking performance | 2026-10-09 America/Los_Angeles | current turn | active |
+| apps/web/src/public/types.ts; apps/web/src/public/parser.worker.ts; apps/web/src/public/Workbench.tsx; apps/web/src/public/translations.en.ts; other affected tests; current IT-0003/TR-0003; README and documentation | main | integrate full parsing, progress, regressions and public delivery | 2026-10-09 America/Los_Angeles | current turn | active |
 | .agent-project-control/rules/01-context-state.md; .agent-project-control/rules/03-verification-regression.md; .agent-project-control/scripts/; .agent-project-control/runtime/ scaffold markers | PA-0004 | adopt closeout v2 core while preserving native framework regressions | 2026-10-09 America/Los_Angeles | current turn | released |
 | README.md; README.en.md | PA-0005 | clarify first-use steps and validate bilingual rendered entry | 2026-10-09 America/Los_Angeles | current turn | released |
 | docs/AGENT-WORKFLOW.md; docs/agent-locks.md; current IT-0002/TR-0002 records; generated framework tree | main | integrate current core and README evidence without changing product source | 2026-10-09 America/Los_Angeles | current turn | released |

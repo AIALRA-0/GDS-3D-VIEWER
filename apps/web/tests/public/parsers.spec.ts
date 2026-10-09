@@ -130,7 +130,7 @@ test("missing cells retain real geometry and report incomplete preview", () => {
   expect(metadata.cells[0].name).toBe("EMPTY");
   expect(metadata.incomplete).toBe(true);
 });
-test("cyclic GDS references and excessive arrays are refused", () => {
+test("cyclic GDS references are refused and large valid arrays remain complete", () => {
   const data = file([
     cell("CYCLE"),
     rec(10, 0),
@@ -152,7 +152,17 @@ test("cyclic GDS references and excessive arrays are refused", () => {
     rec(17, 0),
     rec(7, 0),
   ]);
-  expect(() => parseGds(array, "big.gds")).toThrow(/阵列规模/);
+  const large = parseGds(array, "big.gds");
+  expect(large.instances).toBe(250_001);
+  expect(large.triangles).toBe(3_000_000);
+  expect(large.layers[0].polygons).toBe(250_000);
+  expect(large.incomplete).toBe(false);
+  const empty = file([
+    cell("CHILD"), polygon, rec(7, 0), cell("EMPTY"),
+    rec(11, 0), rec(18, 6, Buffer.from("CHILD")), rec(19, 2, short(0, 3)),
+    points(0, 0, 0, 0, 0, 30), rec(17, 0), rec(7, 0),
+  ]);
+  expect(() => parseGds(empty, "empty.gds")).toThrow(/阵列/);
 });
 test("GLB geometry decodes without URL loading; node cycles and accessor overflow are refused", () => {
   const vertex = Buffer.alloc(36);

@@ -268,7 +268,8 @@ export default function Workbench() {
       setBusy(false);
       return;
     }
-    if (file.size > LIMITS.fileBytes) {
+    const isGds = /\.(gds|gds2|gdsii)$/i.test(file.name);
+    if (!isGds && file.size > LIMITS.fileBytes) {
       setError("文件超过 32 MB，请在原版图工具中导出较小单元");
       setBusy(false);
       return;
@@ -288,15 +289,23 @@ export default function Workbench() {
       setError(message);
       setStatus("导入失败，原版图保留");
     };
-    timer.current = setTimeout(
+    timer.current = isGds ? null : setTimeout(
       () => fail("解析超过 45 秒，任务已终止，请尝试较小单元"),
       LIMITS.seconds * 1000,
     );
     task.onerror = () => fail("解析任务异常，原版图和记录已保留");
     task.onmessage = (
-      event: MessageEvent<{ layout?: Layout; error?: string }>,
+      event: MessageEvent<{ layout?: Layout; error?: string; progress?: import("./types").ParseProgress }>,
     ) => {
       if (id !== generation.current) return;
+      if (event.data.progress) {
+        const { stage, completed, total } = event.data.progress;
+        setStatus(stage === "records"
+          ? `正在读取 GDS 记录 · ${Math.floor(completed / (total || 1) * 100)}%`
+          : stage === "hierarchy" ? "正在展开单元层级"
+          : "正在构建完整几何");
+        return;
+      }
       if (event.data.error || !event.data.layout) {
         fail(event.data.error ?? "解析结果无效");
         return;
@@ -1318,7 +1327,7 @@ export default function Workbench() {
                     </button>
                   </div>
                   <p className="file-formats">
-                     {t("GDS / GDS2 / GDSII · glTF / GLB · 最大 32 MB")} </p>
+                     {t("GDS / GDS2 / GDSII · glTF / GLB")} </p>
                   <div className="privacy-caption">
                     <Icon name="shield" />
                      {t("文件在你的浏览器里解析，不上传服务器")} </div>
@@ -1333,7 +1342,7 @@ export default function Workbench() {
                 <div className="loading-state" role="status">
                   <span className="spinner" />
                   <strong>{t(status)}</strong>
-                  <span> {t("最多等待 45 秒，已有文件会保留")} </span>
+                  <span> {t("可随时取消，已有文件会保留")} </span>
                   <Button icon="close" label={t("取消导入")} onClick={cancel} />
                 </div>
               )}
@@ -1394,7 +1403,7 @@ export default function Workbench() {
         <div className="drop-overlay">
           <Icon name="upload" />
           <strong> {t("松开以打开文件")} </strong>
-          <span> {t("每次一个文件，最大 32 MB")} </span>
+          <span> {t("每次一个文件，GDS 在本机完整解析")} </span>
         </div>
       )}
       {instanceCell !== null && <Modal title={t("顶层实例定位")} onClose={() => setInstanceCell(null)}>
@@ -1450,7 +1459,7 @@ export default function Workbench() {
           <p>
              {t("三维模型只支持自包含、无纹理、无压缩扩展的静态三角形网格，外部缓冲区与纹理均拒绝加载")} </p>
           <p>
-             {t("最大 32 MB、150,000 个展开实例，复用几何最多显示 12,000,000 个三角形，解析超过 45 秒自动终止")} </p>
+             {t("GDS 不设文件大小、层级或几何数量上限，完整展开并复用单元几何，可随时取消；实际容量取决于浏览器内存和显卡；glTF / GLB 仍限制 32 MB 和 45 秒")} </p>
           <h3> {t("观察边界")} </h3>
           <p>
              {t("版图层高度用于展示，不代表工艺厚度；数量比较不等同于几何差异检查，结果不能代替版图规则检查或流片签核")} </p>

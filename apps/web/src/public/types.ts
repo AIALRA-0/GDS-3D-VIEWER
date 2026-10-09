@@ -65,6 +65,12 @@ export interface Layout {
     references: { cell: string; target: string; kind: "SREF" | "AREF"; xy: [number, number][]; columns: number; rows: number; angle: number; magnification: number; reflect: boolean; absolute: boolean; properties: { attribute: number; value: string }[] }[];
   };
 }
+export interface ParseProgress {
+  stage: "records" | "hierarchy" | "geometry";
+  completed: number;
+  total?: number;
+}
+// These budgets apply to self-contained glTF/GLB previews, not GDS streams.
 export const LIMITS = {
   fileBytes: 32 * 1024 * 1024,
   records: 1_000_000,

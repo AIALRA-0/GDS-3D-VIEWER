@@ -64,6 +64,13 @@
 .agent-project-control/iterations/IT-0002_20261009T011641-0700_core-closeout-v2-readme/turns/TR-0002_20261009T011642-0700_core-closeout-v2-readme/CHECKLIST.md
 .agent-project-control/iterations/IT-0002_20261009T011641-0700_core-closeout-v2-readme/turns/TR-0002_20261009T011642-0700_core-closeout-v2-readme/TEST.md
 .agent-project-control/iterations/IT-0002_20261009T011641-0700_core-closeout-v2-readme/turns/TR-0002_20261009T011642-0700_core-closeout-v2-readme/TURN.md
+.agent-project-control/iterations/IT-0003_20261009T022233-0700_full-gds-performance/.apcf-dir.yaml
+.agent-project-control/iterations/IT-0003_20261009T022233-0700_full-gds-performance/ITERATION.md
+.agent-project-control/iterations/IT-0003_20261009T022233-0700_full-gds-performance/turns/.apcf-dir.yaml
+.agent-project-control/iterations/IT-0003_20261009T022233-0700_full-gds-performance/turns/TR-0003_20261009T022233-0700_full-gds-performance/.apcf-dir.yaml
+.agent-project-control/iterations/IT-0003_20261009T022233-0700_full-gds-performance/turns/TR-0003_20261009T022233-0700_full-gds-performance/CHECKLIST.md
+.agent-project-control/iterations/IT-0003_20261009T022233-0700_full-gds-performance/turns/TR-0003_20261009T022233-0700_full-gds-performance/TEST.md
+.agent-project-control/iterations/IT-0003_20261009T022233-0700_full-gds-performance/turns/TR-0003_20261009T022233-0700_full-gds-performance/TURN.md
 .agent-project-control/materials/.apcf-dir.yaml
 .agent-project-control/materials/INDEX.md
 .agent-project-control/PROJECT.md
@@ -71,6 +78,9 @@
 .agent-project-control/regressions/INDEX.md
 .agent-project-control/regressions/REG-0001_20261008T174550-0700_committed-baseline-content/.apcf-dir.yaml
 .agent-project-control/regressions/REG-0001_20261008T174550-0700_committed-baseline-content/REGRESSION.md
+.agent-project-control/regressions/REG-0002_20261009T024722-0700_gds-full-capacity/.apcf-dir.yaml
+.agent-project-control/regressions/REG-0002_20261009T024722-0700_gds-full-capacity/REGRESSION.md
+.agent-project-control/regressions/REG-0002_20261009T024722-0700_gds-full-capacity/repro/.apcf-dir.yaml
 .agent-project-control/routing.toml
 .agent-project-control/rules/.apcf-dir.yaml
 .agent-project-control/rules/01-context-state.md
@@ -193,6 +203,7 @@ apps/web/src/public/Markdown.tsx
 apps/web/src/public/PalettePanel.tsx
 apps/web/src/public/palettes.ts
 apps/web/src/public/parser.worker.ts
+apps/web/src/public/renderer-helper.ts
 apps/web/src/public/SelectField.tsx
 apps/web/src/public/SourceData.tsx
 apps/web/src/public/tokens.json
@@ -206,7 +217,9 @@ apps/web/src/types/three-examples.d.ts
 apps/web/tests/e2e/smoke.spec.ts
 apps/web/tests/public/cell-instances-ui.spec.ts
 apps/web/tests/public/explanation.spec.ts
+apps/web/tests/public/gds-performance.spec.ts
 apps/web/tests/public/height-modes.spec.ts
+apps/web/tests/public/import-performance.spec.ts
 apps/web/tests/public/inspection.spec.ts
 apps/web/tests/public/instance-fixture.ts
 apps/web/tests/public/instancing.spec.ts
@@ -214,6 +227,7 @@ apps/web/tests/public/language-markdown.spec.ts
 apps/web/tests/public/metadata-fixture.ts
 apps/web/tests/public/palettes-controls.spec.ts
 apps/web/tests/public/parsers.spec.ts
+apps/web/tests/public/renderer-performance.spec.ts
 apps/web/tests/public/source-layers.spec.ts
 apps/web/tests/public/ui-refinements.spec.ts
 apps/web/tests/public/viewer-tools.spec.ts

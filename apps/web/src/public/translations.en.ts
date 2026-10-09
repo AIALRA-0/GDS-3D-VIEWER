@@ -1,4 +1,10 @@
 export default {
+  "正在读取 GDS 记录 · {{0}}%": "Reading GDS records · {{0}}%",
+  "正在展开单元层级": "Expanding cell hierarchy",
+  "正在构建完整几何": "Building complete geometry",
+  "可随时取消，已有文件会保留": "Cancel at any time; the previous file is retained",
+  "每次一个文件，GDS 在本机完整解析": "One file at a time; GDS is parsed fully in your browser",
+  "GDS 不设文件大小、层级或几何数量上限，完整展开并复用单元几何，可随时取消；实际容量取决于浏览器内存和显卡；glTF / GLB 仍限制 32 MB 和 45 秒": "GDS has no fixed file, hierarchy or geometry limits and reuses cell geometry for full display. Cancel at any time; actual capacity depends on browser memory and GPU. glTF / GLB retains its 32 MB and 45-second limits.",
   "基线或当前预览不完整，仅对比已解析部分": "Baseline or current preview is incomplete; only parsed content is compared.",
   "复用源三角形": "Stored source triangles",
   "复用几何显示超过 12,000,000 个三角形，请选择较小单元": "Instanced display exceeds 12,000,000 triangles; choose a smaller cell",

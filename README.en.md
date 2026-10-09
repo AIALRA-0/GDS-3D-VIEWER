@@ -216,7 +216,8 @@ Table 1 Public preview capabilities and boundaries
 | 2D and hierarchy | Orthographic 2D/3D switching, hierarchy tree, directory search and two-point ruler | No snapping or connectivity inference; bounded tree depth and row count |
 | Reviews | Notes, bookmarks, camera and layer state export/restore | Retain source files separately |
 | Statistics comparison | Baseline/current file and cell with layer, triangle and instance deltas | Size checks only, without geometric/electrical equivalence; incomplete previews are flagged |
-| Parsing | 32 MB per file, 45-second limit | Over-budget designs open their cell directory |
+| Full GDS parsing | No fixed file, hierarchy, instance or geometry limits; repeated cells reuse source geometry | Actual capacity depends on browser memory and GPU; cancellation retains the previous layout |
+| glTF / GLB parsing | 32 MB per file, 45-second limit | Self-contained static triangle models only |
 
 </div>
 

@@ -30,9 +30,15 @@ test("whole-layout reuse preserves all instances, mirrored geometry and bounded 
   const mirrored = layout.layers[0].batches!.findIndex(b => b.mirrored);
   const feature = instanceFeature(layout.layers[0], mirrored, 0, 0)!;
   feature.bounds.forEach((v, i) => expect(v).toBeCloseTo([0, 0, 20, 20][i], 8)); expect(feature.area).toBe(400); expect(feature.instance).toContain("ref-2");
-  expect(parse(repeatedFixture(100, 100)).layers).toEqual([]);
-  expect(() => parseGds(Uint8Array.from(repeatedFixture(100, 100)).buffer, "synthetic.gds", "TOP")).toThrow("12,000,000");
-  expect(parse(repeatedFixture(25, 41, 18)).warnings.join(" ")).toContain("实例路径超过显示预算");
+  const larger = parse(repeatedFixture(100, 100));
+  expect(larger.incomplete).toBe(false);
+  expect(larger.triangles).toBe(24_002_400);
+  expect(larger.layers[0].polygons).toBe(2_000_200);
+  expect(larger.rendering?.storedTriangles).toBe(4800);
+  expect(parseGds(Uint8Array.from(repeatedFixture(100, 100)).buffer, "synthetic.gds", "TOP").triangles).toBe(larger.triangles);
+  const deep = parse(repeatedFixture(25, 41, 18));
+  expect(deep.incomplete).toBe(false);
+  expect(deep.triangles).toBe(2_462_400);
 });
 
 test("full repeated layout supports 2D picking, selected-instance highlight and layer visibility without uploads", async ({ page }) => {

@@ -6,11 +6,11 @@ self.onmessage = (
   try {
     const { buffer, name, top } = event.data;
     const layout = /\.(gds|gds2|gdsii)$/i.test(name)
-      ? parseGds(buffer, name, top)
+      ? parseGds(buffer, name, top, (progress) => self.postMessage({ progress }))
       : parseGltf(buffer, name);
     self.postMessage(
       { layout },
-      { transfer: layout.layers.flatMap((layer) => [layer.positions.buffer, ...(layer.batches ?? []).flatMap(b => [b.positions.buffer, b.transforms.buffer])]) },
+      { transfer: [...new Set(layout.layers.flatMap((layer) => [layer.positions.buffer, ...(layer.batches ?? []).flatMap(b => [b.positions.buffer, b.transforms.buffer])]))] },
     );
   } catch (error) {
     self.postMessage({

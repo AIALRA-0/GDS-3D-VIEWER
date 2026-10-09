@@ -168,6 +168,10 @@ test("external resources, truncated files, huge files and invalid review are ref
       mimeType: "application/octet-stream",
       buffer: Buffer.alloc(33 * 1024 * 1024),
     });
+  await expect(page.getByRole("alert")).toContainText("不是有效的 GDS 文件头");
+  await page.getByTestId("public-file-input").setInputFiles({
+    name: "large.gltf", mimeType: "application/json", buffer: Buffer.alloc(33 * 1024 * 1024),
+  });
   await expect(page.getByRole("alert")).toContainText("32 MB");
   await page
     .getByTestId("review-file-input")
@@ -188,9 +192,12 @@ test("real repository GDS parses in the browser without the Python backend", asy
   await page
     .getByTestId("public-file-input")
     .setInputFiles(path.join(root, "fixtures/example/example.gds"));
-  await expect(page.locator(".global-status")).toContainText("已读取单元目录", {
-    timeout: 15000,
+  await expect(page.locator(".global-status")).toContainText("本地解析完成", {
+    timeout: 45000,
   });
+  await expect(page.locator(".main-foot")).toContainText("9,082,824");
+  await expect(page.locator(".incomplete-banner")).toHaveCount(0);
+  await page.getByRole("button", { name: "单元", exact: true }).click();
   await page.getByLabel("筛选单元").fill("sky130_fd_sc_hd__fill_1");
   await page.locator(".cell-row").first().click();
   await expect(page.locator(".viewer-host canvas")).toBeVisible({
