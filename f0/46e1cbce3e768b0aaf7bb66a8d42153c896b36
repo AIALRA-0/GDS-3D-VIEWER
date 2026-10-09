@@ -1,0 +1,29 @@
+.agent-project-control/iterations/IT-0002_20261009T011641-0700_core-closeout-v2-readme/ITERATION.md
+  s_07756e806a3fa5::t_62058b00bcc568 4
+.agent-project-control/iterations/IT-0002_20261009T011641-0700_core-closeout-v2-readme/turns/TR-0002_20261009T011642-0700_core-closeout-v2-readme/CHECKLIST.md
+  s_07756e806a3fa5::t_df5126b8f23161 7
+.agent-project-control/iterations/IT-0002_20261009T011641-0700_core-closeout-v2-readme/turns/TR-0002_20261009T011642-0700_core-closeout-v2-readme/TEST.md
+  s_07756e806a3fa5::t_c50fc56d9becd8 6-7,10-11
+.agent-project-control/iterations/IT-0002_20261009T011641-0700_core-closeout-v2-readme/turns/TR-0002_20261009T011642-0700_core-closeout-v2-readme/TURN.md
+  s_07756e806a3fa5::t_a32c0b453a1061 4,6,10-88
+.agent-project-control/materials/INDEX.md
+  s_07756e806a3fa5::t_e03b1908083268 6
+CURRENT.md
+  s_07756e806a3fa5::t_ef71b79e114f7a 4-6,12-21,25,27,29,33-40,44-47,51-56,60,62,64,66,68,70,74-76,80,84,88
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "f046e1cbce3e768b0aaf7bb66a8d42153c896b36",
+  "prompts": {},
+  "sessions": {
+    "s_07756e806a3fa5": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a11a40-20dc-7732-a5b7-49adf5fb1016",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "AIALRA-0 <aialra@163.com>"
+    }
+  }
+}
