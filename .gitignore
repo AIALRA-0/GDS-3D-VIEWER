@@ -1,3 +1,4 @@
+# APCF-META {"schema":1,"visibility":"public"}
 .DS_Store
 .env
 .env.*
@@ -30,3 +31,13 @@ pnpm-debug.log*
 .local-design-reference/
 .wrangler/
 .verification/
+
+# APCF private execution surfaces and rebuildable caches
+.agent-project-control/runtime/*/**
+!.agent-project-control/runtime/*/.apcf-dir.yaml
+.agent-project-control/iterations/**/REQUEST.md
+.agent-project-control/iterations/**/evidence/**
+.agent-project-control/iterations/**/parallel/**
+.agent-project-control/materials/MAT-*/**
+.codex/skills/*
+!.codex/skills/.apcf-dir.yaml

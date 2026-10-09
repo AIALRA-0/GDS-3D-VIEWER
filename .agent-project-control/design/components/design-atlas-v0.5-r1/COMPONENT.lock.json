@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "component": "design-atlas-v0.5-r1",
+  "formal_design_version": "v0.1",
+  "files": {
+    ".apcf-dir.yaml": "feb9672473cee0154eb7415097fea6a2f1bdce9ba3213d6b66cfda5c4731d00d",
+    "CASE-COVERAGE.json": "13690666e2bca645d9c59ea7cc50a61f3535e9c27e93fb1617b6895ed1e96fe2",
+    "CASE-COVERAGE.json.apcf-meta.yaml": "51c83e68a70f7a63fbe755e6ef0a1db75cdd841c0107e9c3dfab45976ad31bf9",
+    "COMPONENT.lock.json.apcf-meta.yaml": "feb9672473cee0154eb7415097fea6a2f1bdce9ba3213d6b66cfda5c4731d00d",
+    "COMPONENT.md": "8d0b5c8fa24903e3a733a6293d682fe90c41086ae1fe050099eb297754fb8fb4",
+    "COMPONENT.md.apcf-meta.yaml": "a2b3201c91c79409dff1db301cadc5a42d24d136947b0952bc0fe3aec9d78e0a",
+    "source.zip": "ab26d502b88b48792b33ba27986ae8774eacf130276640b386e63b0e7cb4c75b",
+    "source.zip.apcf-meta.yaml": "c8a0895e6d93ce0e0e1d65460fd89362055de553f4ea587750a335429fbba51d",
+    "UI-CONSTRAINTS.md": "5ee3e83a17aa350852f6a6348330ad60059bef919f2cd1feb65cd5d629ccb105",
+    "UI-CONSTRAINTS.md.apcf-meta.yaml": "1b3ad4e179acb89beb88c81daec9874bfb5cda2a162399164bcca4f2c89ad788",
+    "verify.py": "fe149707a957998c452ed9a0b358aadb0ed39f1638db41766a129e78b2e5d8c0",
+    "verify.py.apcf-meta.yaml": "442a4a2c6202e6d42a87f506ee49f0e00c0f1f3efed4a86fcf0addfc6c96f0f0",
+    "Workbench-v0.5-r1.html": "bd5a61f4c77d978c9bb25cbeaf099f0f26296ed6555526c1d1fba1e2c72dfb8b",
+    "Workbench-v0.5-r1.html.apcf-meta.yaml": "4d4d42797edb24f7dbe1f450db9fbe3cc33c57f26a2b73dc4745339006bf548e"
+  },
+  "integration_revision": "windows-apcf-compat-1"
+}

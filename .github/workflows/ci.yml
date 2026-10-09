@@ -30,6 +30,15 @@ jobs:
           cache: pip
           cache-dependency-path: apps/api/requirements.txt
 
+      - name: Verify iteration control contracts
+        env:
+          PYTHONDONTWRITEBYTECODE: "1"
+        run: |
+          python -B .agent-project-control/scripts/lint_framework.py
+          python -B .agent-project-control/scripts/standards_contract.py --check
+          python -B .agent-project-control/scripts/design_contract.py --check
+          python -B .agent-project-control/scripts/state_integrity.py --require-tracked
+
       - name: Install web dependencies
         run: npm install
 

@@ -1,3 +1,4 @@
+<!-- APCF-META {"schema":1,"visibility":"public"} -->
 <div align="center">
 
 <h1>GDS-3D-VIEWER</h1>
@@ -286,6 +287,8 @@ npm run build:legacy
 ## 7 发布与权利
 
 公开入口由 Cloudflare 代理，源站仅提供静态文件，不暴露上传接口、原有后端或共享会话
+项目已接入模板的完整迭代控制架构，当前状态和规范入口见 [迭代框架](docs/AGENT-WORKFLOW.md)，模板运行区与历史执行记录没有导入
+
 遇到 `ERR_QUIC_PROTOCOL_ERROR` 时，参照 [网络兼容排查](docs/NETWORK-TROUBLESHOOTING.md)，域名级关闭 HTTP/3 可覆盖同一域名下所有子站点
 主页正常访问仍会请求站点服务；可选讲解会向用户确认的模型服务发送摘要
 

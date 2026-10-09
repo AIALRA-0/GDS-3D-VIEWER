@@ -1,3 +1,4 @@
+<!-- APCF-META {"schema":1,"visibility":"public"} -->
 <div align="center">
 
 <h1>GDS-3D-VIEWER</h1>
@@ -295,3 +296,5 @@ Normal website requests still reach the site; optional explanations send confirm
 
 No project open-source license has been declared; public visibility alone does not grant unrestricted redistribution
 The build retains [third-party notices](apps/web/public-static/NOTICE.txt)
+
+The project uses the template’s full iteration control architecture. See [the workflow entry](docs/AGENT-WORKFLOW.md) for current state and rules; template runtime data and execution history are excluded.

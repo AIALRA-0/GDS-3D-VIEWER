@@ -2,6 +2,7 @@
 
 | path | owner | purpose | start | eta | status |
 |------|-------|---------|-------|-----|--------|
+| README.md; README.en.md; docs/coordination.md | main | template framework adoption, local network investigation and conservative design iteration | 2026-10-08 America/Los_Angeles | current turn | active |
 | README.md; README.en.md; docs/coordination.md | main | compact/consistent height toggle, current captures and network investigation | 2026-10-08 America/Los_Angeles | current turn | released |
 | README.md; README.en.md; docs/coordination.md | main | custom dropdowns, planar rotation, palette transfer and stable illustrative heights | 2026-10-08 America/Los_Angeles | current turn | released |
 | README.md; README.en.md; docs/coordination.md | main | unified UI audit, top-cell instance tools and current screenshots | 2026-10-08 America/Los_Angeles | current turn | released |

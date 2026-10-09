@@ -1,0 +1,6364 @@
+{
+  "component": "design-atlas-v0.5-r1",
+  "html_sha256": "bd5a61f4c77d978c9bb25cbeaf099f0f26296ed6555526c1d1fba1e2c72dfb8b",
+  "coverage": {
+    "expected": 289,
+    "registered": 289,
+    "missing": [],
+    "byLevel": {
+      "interactive": 252,
+      "semantic": 7,
+      "structural": 13,
+      "native-interaction": 17
+    }
+  },
+  "cases": [
+    {
+      "id": "foundation-01",
+      "group": "foundation",
+      "title": [
+        "设计令牌",
+        "Design tokens"
+      ],
+      "scenario": [
+        "修改一个设计令牌，观察同一预览中的三个元素共同变化。",
+        "Change one token and observe three preview elements update together."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "db6b3e18f73859f597a85e4a49c270e267fbd985c4ef495b6ed65ad95a6f0491",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "input:range",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "foundation-02",
+      "group": "foundation",
+      "title": [
+        "颜色与语义色",
+        "Color and semantic colors"
+      ],
+      "scenario": [
+        "正常、成功、警告和错误信息同时具备文字与颜色。",
+        "Normal, success, warning and error states use both words and colors."
+      ],
+      "level": "semantic",
+      "limits": null,
+      "has_action_handler": false,
+      "has_special_mount": false,
+      "render_source_sha256": "c0bd9f3553f0488b76192610eea40a542cad136eb0cae62d1cf2a43329acc136",
+      "initial_probe": {
+        "status": "RENDERED",
+        "scope": "static/semantic specimen; no interaction pass claimed"
+      }
+    },
+    {
+      "id": "foundation-03",
+      "group": "foundation",
+      "title": [
+        "排版层级",
+        "Typography"
+      ],
+      "scenario": [
+        "调整正文大小，标题与说明仍保留明确层级。",
+        "Change body size while headings and captions keep a clear hierarchy."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "a5bf8419b4a4c32a8b9c946872377bcd62e4a5b02bf7a921402df60180331271",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "input:range",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "foundation-04",
+      "group": "foundation",
+      "title": [
+        "间距系统",
+        "Spacing"
+      ],
+      "scenario": [
+        "用实际测量值调整组间留白，不把黄金比例当作美观保证。",
+        "Adjust measured spacing without treating the golden ratio as a guarantee of beauty."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "e276fea89f3c02316c335ee6de4662b858a3ed6de38ec09bb735cb9026692602",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "input:range",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "foundation-05",
+      "group": "foundation",
+      "title": [
+        "圆角与边框",
+        "Radius and borders"
+      ],
+      "scenario": [
+        "比较同一边框在矩形、适度圆角和胶囊形上的差异。",
+        "Compare the same border with square, modestly rounded and pill shapes."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "cb5dbf683f608bb8e1c8cc15571079b624bca20c403c1cee269f1d554e0d11cf",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "input:range",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "foundation-06",
+      "group": "foundation",
+      "title": [
+        "图标",
+        "Icons"
+      ],
+      "scenario": [
+        "相同 24×24 图标网格；纯图标不加常驻框，聚焦仍有轮廓。",
+        "One 24×24 icon grid: no permanent frames, but visible keyboard focus."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "d95bd0cc0ed954c40267aeff8b1293977cd75fc93dd8dbaf46e355b297d39952",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "search",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "foundation-07",
+      "group": "foundation",
+      "title": [
+        "阴影与层级",
+        "Elevation"
+      ],
+      "scenario": [
+        "层级由容器背景、边线和阴影共同表示；不依赖单一阴影。",
+        "Surface, outline and shadow combine to express elevation."
+      ],
+      "level": "structural",
+      "limits": null,
+      "has_action_handler": false,
+      "has_special_mount": false,
+      "render_source_sha256": "cc06e2aa18d81a7a42578d442d65fde7b0f49aab920e6ca1421b0d6639a15441",
+      "initial_probe": {
+        "status": "RENDERED",
+        "scope": "static/semantic specimen; no interaction pass claimed"
+      }
+    },
+    {
+      "id": "foundation-08",
+      "group": "foundation",
+      "title": [
+        "栅格",
+        "Grid"
+      ],
+      "scenario": [
+        "12 列栅格中展示 3/6/3 与 4/8 两种真实跨度。",
+        "A 12-column grid demonstrates 3/6/3 and 4/8 spans."
+      ],
+      "level": "structural",
+      "limits": null,
+      "has_action_handler": false,
+      "has_special_mount": false,
+      "render_source_sha256": "b6424df8dda5b695f45893d9ab039b7322992f1441615b0999093edc49f8f99b",
+      "initial_probe": {
+        "status": "RENDERED",
+        "scope": "static/semantic specimen; no interaction pass claimed"
+      }
+    },
+    {
+      "id": "foundation-09",
+      "group": "foundation",
+      "title": [
+        "断点",
+        "Breakpoints"
+      ],
+      "scenario": [
+        "改变模拟视口宽度，导航在三种断点状态间切换。",
+        "Change a simulated viewport to switch between three breakpoint states."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "76cc3008a9180731d2dd76922634a5c1613022529bbd0a62635e19e28577aa85",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "input:range",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "foundation-10",
+      "group": "foundation",
+      "title": [
+        "响应式容器",
+        "Responsive container"
+      ],
+      "scenario": [
+        "容器宽度改变时，卡片自动从一行变成多行。",
+        "Cards wrap as the containing surface changes width."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "1f396ed520c5b901daf050f86f4082bf0f86429ab0d622760ac9bc4a1501eeda",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "input:range",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "foundation-11",
+      "group": "foundation",
+      "title": [
+        "动效",
+        "Motion"
+      ],
+      "scenario": [
+        "同一移动交互分别展示普通与减少动效状态。",
+        "One movement demonstrates normal and reduced-motion states."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "2fa469303a0881fdabd578475352be56ff0c15e5cb248777f74fa5949bd9ede1",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "move",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "foundation-12",
+      "group": "foundation",
+      "title": [
+        "焦点样式",
+        "Focus indication"
+      ],
+      "scenario": [
+        "通过 Tab 顺序访问三个按钮；焦点不能只靠鼠标悬停。",
+        "Tab through three actions; focus is independent of pointer hover."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "a82b1e86e1381f9086a8dc09f2b665d3367ae571b4ee41e097a8e0fd235a519b",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "first",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "foundation-13",
+      "group": "foundation",
+      "title": [
+        "密度与尺寸",
+        "Density and sizing"
+      ],
+      "scenario": [
+        "密度改变作用于整个操作组，不混用同组按钮高度。",
+        "Density affects the entire action group, not individual button heights."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "a9d006f7bb782a8a4ad7bcbfdea4d312a338b1efa4f4ee19bc78b00dbef66d2a",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "select",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "foundation-14",
+      "group": "foundation",
+      "title": [
+        "主题",
+        "Themes"
+      ],
+      "scenario": [
+        "只切换此示例的表面主题，观察文字与背景同步变化。",
+        "Switch only this sample theme; text and surfaces change together."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "b5b7b4c071b1bc869db736456f4d05a6c61b10cfe2dbd649f30fc4b7bac7e6ee",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "theme",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "foundation-15",
+      "group": "foundation",
+      "title": [
+        "国际化",
+        "Localization"
+      ],
+      "scenario": [
+        "比较界面标签的两种语言；用户填写的名称不随之翻译。",
+        "Compare UI labels in two languages without translating the entered name."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "5267aa835ffea1814893d3daa574f59a2357bf8d6392c3aef8a66576be9acd3f",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "locale",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "foundation-16",
+      "group": "foundation",
+      "title": [
+        "高对比模式",
+        "High contrast"
+      ],
+      "scenario": [
+        "增强轮廓对比度，同时保留语义标签。",
+        "Increase border contrast while retaining semantic labels."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "56c7a19cd5b13afee2a3b7f46a8be4fa5e58ded8a11957fbe8b45b9a05f8cdb8",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "input:checkbox",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "foundation-17",
+      "group": "foundation",
+      "title": [
+        "暗黑模式",
+        "Dark mode"
+      ],
+      "scenario": [
+        "暗色表面使用三个层级，避免全部纯黑丢失边界。",
+        "Three dark surfaces preserve hierarchy instead of using uniform black."
+      ],
+      "level": "structural",
+      "limits": null,
+      "has_action_handler": false,
+      "has_special_mount": false,
+      "render_source_sha256": "eb0013b3846e84f797f466fd6fe39902e6dd6da3cf3d0a69b4a0606395fd2a00",
+      "initial_probe": {
+        "status": "RENDERED",
+        "scope": "static/semantic specimen; no interaction pass claimed"
+      }
+    },
+    {
+      "id": "actions-01",
+      "group": "actions",
+      "title": [
+        "主要按钮",
+        "Primary button"
+      ],
+      "scenario": [
+        "创建项目是唯一主操作，取消不竞争同一视觉权重。",
+        "Creating a project is the primary action; Cancel is quieter."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "ba1c9aa8636159fd6ecf929556f8d5f9c92664ddf17af64670ae167cbf229a57",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "create",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "actions-02",
+      "group": "actions",
+      "title": [
+        "次要按钮",
+        "Secondary button"
+      ],
+      "scenario": [
+        "并列的导入和导出均为次操作，不抢占主流程。",
+        "Import and Export are peer secondary actions."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "e7b69e9d566f6262801aa0a79cec9765f90356360e0ec95c79ec3b0e1b204a65",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "import",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "actions-03",
+      "group": "actions",
+      "title": [
+        "普通按钮",
+        "Standard action button"
+      ],
+      "scenario": [
+        "普通操作默认有可见边界，激活后显示与该动作对应的结果。",
+        "A standard text action has visible boundaries and a specific result."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "aa326cce3fe5982070666b0390f8c17bbbfa9cee26504ddd3eeb5887b86f4b02",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "verify",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "actions-04",
+      "group": "actions",
+      "title": [
+        "危险按钮",
+        "Destructive button"
+      ],
+      "scenario": [
+        "危险动作先说明对象与影响，再明确确认；不能只给一个垃圾桶。",
+        "A destructive action names the object and consequence before confirmation."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "e0dfddd8b444e7925bfe9f2880c2e63cd8210eb655d1a7e7ed06c808f9d4920b",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "delete",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "actions-05",
+      "group": "actions",
+      "title": [
+        "图标按钮",
+        "Icon button"
+      ],
+      "scenario": [
+        "搜索与设置采用图标；hover/focus 提供名称，点击打开二级内容。",
+        "Search and settings use icons with hover/focus names and secondary content."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "1ed4fa82f700bf49f7670c9c85c4867b5c64f4f73c228e7530a93dd42d3a6f79",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "search",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "actions-06",
+      "group": "actions",
+      "title": [
+        "分裂按钮",
+        "Split button"
+      ],
+      "scenario": [
+        "主区保存本地示例草稿，箭头展开真正的 JSON / CSV 文件导出。",
+        "The primary segment saves a local specimen draft; the arrow offers real JSON / CSV exports."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "77299c74278a28d7d017014af4b5fdfeefab9107992531a411a436b6515cfed3",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "save",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "actions-07",
+      "group": "actions",
+      "title": [
+        "下拉按钮",
+        "Menu button"
+      ],
+      "scenario": [
+        "导出格式由菜单选择，不为每种格式增加顶栏按钮。",
+        "Choose an export format in a menu rather than adding top-level buttons."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "08171869d28df5b51ba41c8fda65b8605ef1e7f97a7e680191374486fd922fe3",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "select",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "actions-08",
+      "group": "actions",
+      "title": [
+        "按钮组",
+        "Button group"
+      ],
+      "scenario": [
+        "编辑按钮组保持等高；对齐方式是相斥状态。",
+        "An edit group keeps equal heights; alignment is mutually exclusive."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "0f5996bf7f7900e37ef458971cd5511c2282054d2dc92e50f6bdad9d6b7e1c64",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "left",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "actions-09",
+      "group": "actions",
+      "title": [
+        "切换按钮",
+        "Toggle button"
+      ],
+      "scenario": [
+        "收藏是可逆切换，按下状态与结果一起更新。",
+        "A reversible favorite action updates its pressed state and result."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "cbb72245614fcc4c9b8c18af60de6aa16d01501b9b77e3085d3b2cc0639c7d2e",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "toggle",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "actions-10",
+      "group": "actions",
+      "title": [
+        "分段选择",
+        "Segmented control"
+      ],
+      "scenario": [
+        "网格、列表与紧凑视图共享一个分段控件。",
+        "Grid, list and compact layouts share one segmented control."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "d8c5104f22968d59d86c64db7fc985424e789d1792c0dd84b0560f4d640e4a4c",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "Grid",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "actions-11",
+      "group": "actions",
+      "title": [
+        "悬浮按钮",
+        "Floating action button"
+      ],
+      "scenario": [
+        "悬浮新增仅用于此示例的单一高频动作；不遮挡内容。",
+        "One floating action supports a frequent local task without covering content."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "e6cea388a07d321e6ce42dccf97d0fa8aab503a23c2be6f202b2cde2f5cd059b",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "new",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "actions-12",
+      "group": "actions",
+      "title": [
+        "加载按钮",
+        "Loading button"
+      ],
+      "scenario": [
+        "加载时保持宽度与按钮位置，禁止重复提交。",
+        "A loading action preserves width and prevents duplicate submissions."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "543152220c594fc49ce7aa2e947d993cc20e0f613e57b073ce939d65569c62bc",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "load",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "actions-13",
+      "group": "actions",
+      "title": [
+        "复制操作",
+        "Copy action"
+      ],
+      "scenario": [
+        "复制操作给出反馈；剪贴板不可用时明确提示，不伪称成功。",
+        "Copy reports success or clipboard unavailability, never a false success."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "cd2303e13f62da184546329b1518fc350771fb6002b95ce128be207e675b9a73",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "copy",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "actions-14",
+      "group": "actions",
+      "title": [
+        "链接按钮",
+        "Link button"
+      ],
+      "scenario": [
+        "链接执行页面内定位，保持真实链接语义。",
+        "A link performs in-page navigation with native link semantics."
+      ],
+      "level": "semantic",
+      "limits": null,
+      "has_action_handler": false,
+      "has_special_mount": false,
+      "render_source_sha256": "0d901e8d5c23101871d1dd2cdec262a7ecfc428bddc4a85a17ad8b7294fe5bed",
+      "initial_probe": {
+        "status": "RENDERED",
+        "scope": "static/semantic specimen; no interaction pass claimed"
+      }
+    },
+    {
+      "id": "actions-15",
+      "group": "actions",
+      "title": [
+        "工具栏",
+        "Toolbar"
+      ],
+      "scenario": [
+        "工作区工具栏优先使用熟悉的图标；详细参数放进设置。",
+        "A workspace toolbar uses familiar icons; detailed parameters live in settings."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "f5bec9e9e610f6049ecd11ab306142a8c818b74462eea42ef57aadb4c29f368e",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "save",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "actions-16",
+      "group": "actions",
+      "title": [
+        "上下文菜单",
+        "Context menu"
+      ],
+      "scenario": [
+        "对象菜单提供本地复制、重命名和可撤销移除；不把所有操作铺满卡片。",
+        "An object menu provides local copy, rename and undoable removal without crowding the card."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "61efdf099439de67bf3869c5d26f4051756ff03db1919dfacb649bee96aff04b",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "menu",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "navigation-01",
+      "group": "navigation",
+      "title": [
+        "顶部导航",
+        "Top navigation"
+      ],
+      "scenario": [
+        "顶栏主导航同时显示当前位置和对应页面内容。",
+        "Top navigation shows both current location and matching page content."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "96a9b01a30faad0144156177565abe626e95aec067d0579c70d004f1b14f81e8",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "Overview",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "navigation-02",
+      "group": "navigation",
+      "title": [
+        "侧边导航",
+        "Side navigation"
+      ],
+      "scenario": [
+        "侧边导航将工作区、收藏和归档分开，不把操作按钮混入导航。",
+        "Side navigation separates workspace, favorites and archive from actions."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "aee977309ae123beacdaec055793f43b36c7a3d31dbf78442b1741e70b1c16c8",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "Workspace",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "navigation-03",
+      "group": "navigation",
+      "title": [
+        "导航轨道",
+        "Navigation rail"
+      ],
+      "scenario": [
+        "图标轨道只保留熟悉入口，通过提示和选中状态维持方向感。",
+        "A compact icon rail relies on familiar symbols, tooltips and selection."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "3ab8c16aa8b54a82866c8ed787bafb11174ab8bebbc9e258072c27eb5abde2e3",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "Files",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "navigation-04",
+      "group": "navigation",
+      "title": [
+        "面包屑",
+        "Breadcrumbs"
+      ],
+      "scenario": [
+        "面包屑显示真实层级，可返回父级而不依赖浏览器后退。",
+        "Breadcrumbs show hierarchy and support returning to a parent."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "58fd26edbcaf0916846e21115302f825dd9407fd8d1f5c960bf13d13bbec4949",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "root",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "navigation-05",
+      "group": "navigation",
+      "title": [
+        "页面标签",
+        "Page tabs"
+      ],
+      "scenario": [
+        "页面标签共享一组内容区域，并支持方向键、Home、End。",
+        "Page tabs share one panel and support arrows, Home and End."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": true,
+      "render_source_sha256": "dc5cfd19bae1217ed08c99e7eb5957c30841e9e55cbb44a39cb527e22553e239",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "tab",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "navigation-06",
+      "group": "navigation",
+      "title": [
+        "侧栏标签",
+        "Sidebar tabs"
+      ],
+      "scenario": [
+        "侧栏在文件、搜索和历史之间切换，搜索内容不会丢失。",
+        "Sidebar tabs preserve a search draft across Files, Search and History."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": true,
+      "render_source_sha256": "b611a9622aa5a6b203e8613c91c21956ded9bb016c92ab27e2fa115f4b854a4c",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "tab",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "navigation-07",
+      "group": "navigation",
+      "title": [
+        "分页",
+        "Pagination"
+      ],
+      "scenario": [
+        "分页只切换数据片段，上一页和下一页的禁用状态准确。",
+        "Pagination changes the data slice and disables boundary actions."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "65e5d4450b4e37a7ce700fe5be325694f57f7c609c947aed460447db67597506",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "next",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "navigation-08",
+      "group": "navigation",
+      "title": [
+        "步骤导航",
+        "Steps"
+      ],
+      "scenario": [
+        "步骤导航把当前位置、已完成步骤与未来步骤区分开。",
+        "Step navigation distinguishes current, completed and future steps."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "aa424c41458bcae9258a21e633d13c7b5382aef7d28ae5aa4d0e599a7056fa8a",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "next",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "navigation-09",
+      "group": "navigation",
+      "title": [
+        "锚点导航",
+        "Anchor navigation"
+      ],
+      "scenario": [
+        "页内锚点在一个可滚动区域中定位具体小节。",
+        "In-page anchors locate sections inside a scrollable surface."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "0c56429442f265b4b2b0af733df0261dfd22e70325f0810a1d09d28de9975131",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "jump",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "navigation-10",
+      "group": "navigation",
+      "title": [
+        "目录",
+        "Table of contents"
+      ],
+      "scenario": [
+        "目录由实际文档小节构成，选中时显示对应摘要。",
+        "A table of contents is tied to real document sections and summaries."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "6162fbc240b6c3cde90547de4b86f43715fb08ccca724274ad9f9cb7185787ea",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "toc",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "navigation-11",
+      "group": "navigation",
+      "title": [
+        "命令面板",
+        "Command palette"
+      ],
+      "scenario": [
+        "命令面板按关键词过滤，选择后给出明确目标。",
+        "A command palette filters by keyword and identifies the chosen command."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "e16106b15a38707fd07929217f2bc31df9217822e5bf7da1fbebe33c86a04a49",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "palette",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "navigation-12",
+      "group": "navigation",
+      "title": [
+        "搜索建议",
+        "Search suggestions"
+      ],
+      "scenario": [
+        "搜索建议来自本地数据，输入与候选内容保持一致。",
+        "Search suggestions come from local data and track the query."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "5773558a0b4cd9d4e82422284dd3c477661eff27b1e7c4193e0b7854964beb84",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "input:text",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "navigation-13",
+      "group": "navigation",
+      "title": [
+        "树形导航",
+        "Tree navigation"
+      ],
+      "scenario": [
+        "多层树通过原生折叠结构展开，叶子对应真实文件名称。",
+        "A multilevel tree uses native disclosures and named file leaves."
+      ],
+      "level": "interactive",
+      "limits": [
+        "此例使用原生 disclosure 树形导航，不冒充已完成 ARIA tree 全键盘合同。",
+        "Uses native disclosure navigation; does not claim a complete ARIA tree keyboard contract."
+      ],
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "a31e3085679367b4e9dfe64ac34c1afdfbba8bf5b6353fdfd4a2833a1cd5c066",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "file",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "navigation-14",
+      "group": "navigation",
+      "title": [
+        "大菜单",
+        "Mega menu"
+      ],
+      "scenario": [
+        "大菜单按任务分区，避免一长列无分类的链接。",
+        "A mega menu groups links by task rather than one long list."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "04484a64f811e3fffb399b819243d16b5c47add51e7b78019f345be90064fdf0",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "mega",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "navigation-15",
+      "group": "navigation",
+      "title": [
+        "移动底栏",
+        "Bottom navigation"
+      ],
+      "scenario": [
+        "手机底栏保留三个稳定目的地，图标下方附短标签。",
+        "A mobile bottom bar keeps three stable destinations with short labels."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "16caa8f3450824c75573d1a2b5b7dfc75facdee92ca2fa8af3b2e73dd87b92f8",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "dest",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "navigation-16",
+      "group": "navigation",
+      "title": [
+        "路由守卫",
+        "Navigation guard"
+      ],
+      "scenario": [
+        "存在未保存内容时导航先确认，取消离开必须保留草稿。",
+        "Navigation with unsaved content asks for confirmation and preserves the draft on Cancel."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "c148d9004d93a282c3921569070558788698506249929effd44353433dafc8fe",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "leave",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "input-01",
+      "group": "input",
+      "title": [
+        "文本输入",
+        "Text field"
+      ],
+      "scenario": [
+        "项目标题输入显示字符上限与即时计数。",
+        "A project title field shows its limit and live character count."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "6335d2b9d72d8eb75277c5f9605280ac1c1b9b2571481db920eb5624f88647de",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "input:text",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "input-02",
+      "group": "input",
+      "title": [
+        "文本区域",
+        "Textarea"
+      ],
+      "scenario": [
+        "多行备注保留换行，并显示行数而非改写正文。",
+        "A multiline note preserves line breaks and reports the line count."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "df59f874ea8780b157504272c447fe5607f644c35334258d9477300c7711ddc5",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "input:text",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "input-03",
+      "group": "input",
+      "title": [
+        "密码输入",
+        "Password field"
+      ],
+      "scenario": [
+        "密码字段默认隐藏，可逆显隐不会改变输入值。",
+        "A password starts hidden; toggling visibility does not alter its value."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "c1fff02bdc6d027b943388e5bd048b72268e8de1a3266897005e4b5e9e7bcaef",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "reveal",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "input-04",
+      "group": "input",
+      "title": [
+        "数字输入",
+        "Number input"
+      ],
+      "scenario": [
+        "数量输入限制在 1–20，越界时不提交。",
+        "A quantity is limited to 1–20 and rejects out-of-range submission."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "293da59cd5c778e04c3849f15e6ed88ef33375e40b130a05b8fbff5ab5c1330d",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "apply",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "input-05",
+      "group": "input",
+      "title": [
+        "日期选择",
+        "Date picker"
+      ],
+      "scenario": [
+        "日期输入使用真正的日期值，提交时展示 ISO 日期。",
+        "A date field uses a real date value and reports ISO format."
+      ],
+      "level": "interactive",
+      "limits": [
+        "日历弹出外观由浏览器提供；文本下拉示例使用统一的自定义选择控件。",
+        "Calendar popup appearance is browser-provided; text select cases use the shared styled control."
+      ],
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "56d809e0263fa6da7121f61faa2474b9f8e1946b26669722029dfd804a95bef8",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "date",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "input-06",
+      "group": "input",
+      "title": [
+        "时间选择",
+        "Time picker"
+      ],
+      "scenario": [
+        "时间值与显示文案分离，按 24 小时格式提交。",
+        "The time value is separate from display copy and uses a 24-hour value."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "7700b3061a362df3b598d6a4d61998b048a9b5e5cb89f7381b6b8a4df00e3645",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "time",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "input-07",
+      "group": "input",
+      "title": [
+        "日期范围",
+        "Date range"
+      ],
+      "scenario": [
+        "范围结束日期不能早于开始日期。",
+        "An end date must not precede the start date."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "4d19c68065841ef0a6fcb31bf99898b88292ab11c8ab4ed16ff4ede2576d20bb",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "range",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "input-08",
+      "group": "input",
+      "title": [
+        "单选按钮",
+        "Radio"
+      ],
+      "scenario": [
+        "单选使用同一原生组，选项互斥。",
+        "Native radios share one name and are mutually exclusive."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "c45bc3ba4b237d9f47dfa7849f0cf79c9826e6b823937e9342f9caf2114f0ac9",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "input:radio",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "input-09",
+      "group": "input",
+      "title": [
+        "复选框",
+        "Checkbox"
+      ],
+      "scenario": [
+        "多个复选项互相独立，摘要准确反映当前选择。",
+        "Independent checkboxes produce an accurate selection summary."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "f3c19b2e6163e21980003ae9d96b889ab84b40ec34df77bf8af26eccec1fc167",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "input:checkbox",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "input-10",
+      "group": "input",
+      "title": [
+        "开关",
+        "Switch"
+      ],
+      "scenario": [
+        "开关表示立即生效的布尔配置，不作为提交按钮。",
+        "A switch represents an immediate boolean setting, not form submission."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "d7ef6d5dfc7b9c7120a3ab35786a74bf6f6cf9da9add4af319f9121448f0c889",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "toggle",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "input-11",
+      "group": "input",
+      "title": [
+        "原生选择框",
+        "Select"
+      ],
+      "scenario": [
+        "选择器具有一致浮层样式与方向键操作，不依赖系统菜单皮肤。",
+        "A select has consistent popup styling and arrow-key support."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "0349dfb2e8c0c85261cfc666916f43a22d2c1317ebb6789c9e9df7b4d1ab5d8d",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "select",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "input-12",
+      "group": "input",
+      "title": [
+        "组合框",
+        "Combobox"
+      ],
+      "scenario": [
+        "可输入组合框按前缀过滤，并用键盘选择候选。",
+        "An editable combobox filters by prefix and supports keyboard selection."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": true,
+      "render_source_sha256": "311479ca7fdba10d8921cbf7d539abc2aa79fbd1ae44c9d1d76556c411af840e",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "input:text",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "input-13",
+      "group": "input",
+      "title": [
+        "自动补全",
+        "Autocomplete"
+      ],
+      "scenario": [
+        "自动补全允许接受建议，也允许保留自己的值。",
+        "Autocomplete allows accepting a suggestion or keeping a custom value."
+      ],
+      "level": "interactive",
+      "limits": [
+        "此例专门演示原生 datalist，候选弹出外观由浏览器决定。",
+        "This explicitly demonstrates native datalist; its suggestion popup is browser-provided."
+      ],
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "ac9835e771dfb7331d962c4e161f880b7f0a03a994f6264611362f510650ae9c",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "owner",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "input-14",
+      "group": "input",
+      "title": [
+        "多选",
+        "Multi-select"
+      ],
+      "scenario": [
+        "多选将已选项保留为可移除标签。",
+        "A multi-select retains selections as removable chips."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "d562b0777a049429532fa2c87d7c1d59fe51230da634288b8ba7763a9011f4d0",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "input:checkbox",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "input-15",
+      "group": "input",
+      "title": [
+        "级联选择",
+        "Cascader"
+      ],
+      "scenario": [
+        "级联选择根据上级值重建合法下级，避免残留无效组合。",
+        "A cascader rebuilds valid child values when its parent changes."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "b23c1392f4e820f86c33d273e71adf89fcc7ae1fbf9553a3df33b73123511b52",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "select",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "input-16",
+      "group": "input",
+      "title": [
+        "树形选择",
+        "Tree select"
+      ],
+      "scenario": [
+        "树形选择在层级中选取叶子，结果保留完整路径。",
+        "Tree selection picks a leaf and retains the full path."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "3d1d299ddcc865178ed7e4069ecca7a2480ff0e62cb3607be3c54d180fcd4400",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "input:checkbox",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "input-17",
+      "group": "input",
+      "title": [
+        "滑块",
+        "Slider"
+      ],
+      "scenario": [
+        "滑块输出当前精确值，而不是只提供拖动位置。",
+        "A slider exposes its exact value, not only thumb position."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "84c84f0a6082cfeb88533de003fc53b29a65bd2fb03480a7f820b2a62230d212",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "input:range",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "input-18",
+      "group": "input",
+      "title": [
+        "范围滑块",
+        "Range slider"
+      ],
+      "scenario": [
+        "双端范围始终满足下限不大于上限，并显示有效区间。",
+        "A two-ended range enforces lower ≤ upper and displays the interval."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "e5c0e759448f2ba7ed708acf5cd822bdb3eb79d172081fe598635f2ad9635202",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "input:range",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "input-19",
+      "group": "input",
+      "title": [
+        "文件上传",
+        "File upload"
+      ],
+      "scenario": [
+        "选中文件后显示真实名称、大小和 MIME 类型，不上传。",
+        "Choosing a file shows its actual name, size and MIME type without upload."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "582abdf535251cf4e51f2f752274de68bd74c6dfce4c362a918a652fbb97e089",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "native-file",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "input-20",
+      "group": "input",
+      "title": [
+        "拖放上传",
+        "Dropzone"
+      ],
+      "scenario": [
+        "拖放区与按钮选择等价，拖入文件后才显示真实选择结果。",
+        "Drop and picker paths are equivalent and report actual selected files."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": true,
+      "render_source_sha256": "f785af429833ff942aa8e12e83d9ee9437a6e5809eca05052245054501818393",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "native-file",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "input-21",
+      "group": "input",
+      "title": [
+        "颜色选择",
+        "Color picker"
+      ],
+      "scenario": [
+        "颜色选择同步更新色块和十六进制值。",
+        "A color picker updates both the swatch and hexadecimal value."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "3e726190ddbf767011bc4a1a7a82de230d3a70ca256b7dca6470c375441ece4e",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "input:color",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "input-22",
+      "group": "input",
+      "title": [
+        "评分",
+        "Rating"
+      ],
+      "scenario": [
+        "评分用明确的 1–5 按钮和选中值，支持键盘直接访问。",
+        "Rating uses explicit 1–5 controls with a selected value and keyboard access."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "43884e73d0bcf32810048558e11dfeaf032778cb42cdbc8a0285ff94bfce3e02",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "rate",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "input-23",
+      "group": "input",
+      "title": [
+        "标签编辑",
+        "Tag editor"
+      ],
+      "scenario": [
+        "标签输入支持新增、去重和移除，不接受空标签。",
+        "Tag editing adds, deduplicates and removes non-empty values."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "3948bb2729d9685fba9c9897fdb7f20085168ba6df4b765443c39558cbf511d2",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "add",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "input-24",
+      "group": "input",
+      "title": [
+        "动态字段",
+        "Dynamic form fields"
+      ],
+      "scenario": [
+        "动态表单行有独立身份，删除一行不改变其他行的值。",
+        "Dynamic rows have independent identities; deleting one preserves the others."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "fe87931fe28429fc3fa44611ce84afd45a207bfd3fdf570aaab78160ca398f7d",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "remove",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "input-25",
+      "group": "input",
+      "title": [
+        "富文本输入",
+        "Rich text input"
+      ],
+      "scenario": [
+        "富文本示例支持选区加粗与导出纯文本，不执行粘贴的脚本。",
+        "A rich-text specimen supports bold selection and plain-text export without executing pasted scripts."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": true,
+      "render_source_sha256": "9a863c7f1116a146a74100b7164e81f6dcc304e358bbe06959efd93d44fe1191",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "bold",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "input-26",
+      "group": "input",
+      "title": [
+        "表单验证",
+        "Validation"
+      ],
+      "scenario": [
+        "提交无效邮箱时关联错误说明并聚焦字段，修正后可再次提交。",
+        "Invalid email submission links its error and focuses the field; correction is recoverable."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "48f43d2343114a4e41b4f1f108f823eb097310df59743997048b875b26b9a696",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "submit",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "data-01",
+      "group": "data",
+      "title": [
+        "普通表格",
+        "Table"
+      ],
+      "scenario": [
+        "普通表格展示明确表头、六条真实合成记录和统一行距。",
+        "A basic table shows explicit headings, six synthetic records and consistent row spacing."
+      ],
+      "level": "structural",
+      "limits": null,
+      "has_action_handler": false,
+      "has_special_mount": false,
+      "render_source_sha256": "04e070360762f2f6d32f631507a6880fc9c199466896aece18d5802503cee644",
+      "initial_probe": {
+        "status": "RENDERED",
+        "scope": "static/semantic specimen; no interaction pass claimed"
+      }
+    },
+    {
+      "id": "data-02",
+      "group": "data",
+      "title": [
+        "排序表格",
+        "Sortable table"
+      ],
+      "scenario": [
+        "点击延迟表头会按数字排序，而不是按字符串排序。",
+        "The latency header sorts numerically, not lexicographically."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "57a9c9753b3dcb2be3ede993e7ef577a722b3beb1e8d9c97aa9e4f1f76787e3c",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "sort",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "data-03",
+      "group": "data",
+      "title": [
+        "筛选表格",
+        "Filterable table"
+      ],
+      "scenario": [
+        "筛选结果会随状态选择变化，并显示匹配数量。",
+        "A status filter updates matching rows and their count."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "ce97189d5b465bc7bb5adcb3d4ca568e727bac66f230b6b5ea219f862890a9a7",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "select",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "data-04",
+      "group": "data",
+      "title": [
+        "分页表格",
+        "Paginated table"
+      ],
+      "scenario": [
+        "分页在保留表头的同时切换数据，页码与禁用状态同步。",
+        "Pagination retains headers while changing the row slice and boundary states."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "f0b5b8d4931ffafe1128cdac77326fa03d813e52e9cbde00d7aed63200bad879",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "next",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "data-05",
+      "group": "data",
+      "title": [
+        "批量操作",
+        "Bulk actions"
+      ],
+      "scenario": [
+        "批量操作只影响勾选行；零选择时不能执行。",
+        "Bulk actions affect only checked rows and are disabled with no selection."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "ab89d6e2031e073962f5e947b1fb8c9f328efa594440dda7958a042cff7e57d2",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "input:checkbox",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "data-06",
+      "group": "data",
+      "title": [
+        "列可见性",
+        "Column visibility"
+      ],
+      "scenario": [
+        "列选择改变实际表格列，不仅改变按钮外观。",
+        "Column visibility changes actual columns, not just button appearance."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "54a4387ef02313a3f2ec4be43004b9dfc58bb61752319b0883d0081c0cb1b2dd",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "input:checkbox",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "data-07",
+      "group": "data",
+      "title": [
+        "冻结列",
+        "Pinned columns"
+      ],
+      "scenario": [
+        "横向滚动时第一列固定，其他字段在其后移动。",
+        "The first column stays pinned while other columns scroll horizontally."
+      ],
+      "level": "native-interaction",
+      "limits": null,
+      "has_action_handler": false,
+      "has_special_mount": false,
+      "render_source_sha256": "914aa7e9c3d462b0ee38b41a00937ecccf9d592864087dbe10380153c3ffdd05",
+      "initial_probe": {
+        "status": "SPECIALIST_CHECK",
+        "scope": "requires targeted gesture/media/assistive-technology check; not a generic action pass"
+      }
+    },
+    {
+      "id": "data-08",
+      "group": "data",
+      "title": [
+        "列调整",
+        "Column resize"
+      ],
+      "scenario": [
+        "拖动分隔器或用方向键改变首列宽度。",
+        "Drag the separator or use arrow keys to resize the first column."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": false,
+      "has_special_mount": true,
+      "render_source_sha256": "effa2cda222b759dee3944ef31bfc607fc983ef53eeb05b8e9f24d71f9817e07",
+      "initial_probe": {
+        "status": "SPECIALIST_CHECK",
+        "scope": "requires targeted gesture/media/assistive-technology check; not a generic action pass"
+      }
+    },
+    {
+      "id": "data-09",
+      "group": "data",
+      "title": [
+        "可编辑单元格",
+        "Editable cells"
+      ],
+      "scenario": [
+        "单元格直接编辑后需保存；结果来自输入值而非固定提示。",
+        "Editable cells must be saved; the result reflects actual input values."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "a6553dd3038fa7cb96df7f0f6eb39e6a7891d0c53b595b0668fee90b0abb2ed1",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "save",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "data-10",
+      "group": "data",
+      "title": [
+        "虚拟表格",
+        "Virtualized table"
+      ],
+      "scenario": [
+        "1,000 行只渲染当前窗口，滚动后显示正确行号与内容。",
+        "A 1,000-row table renders only the visible window and updates row indices on scroll."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": false,
+      "has_special_mount": true,
+      "render_source_sha256": "e24ffbd4cd372d1be3aa744eb7ce5e3da0e79bdac6ed9587505578a72e3aecc7",
+      "initial_probe": {
+        "status": "SPECIALIST_CHECK",
+        "scope": "requires targeted gesture/media/assistive-technology check; not a generic action pass"
+      }
+    },
+    {
+      "id": "data-11",
+      "group": "data",
+      "title": [
+        "树形网格",
+        "Tree grid"
+      ],
+      "scenario": [
+        "树形网格展示分层行与列，方向键移动单元格，首行可展开。",
+        "A treegrid has hierarchical rows and columns; arrows navigate cells and the first row expands."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": true,
+      "render_source_sha256": "ece888dded37e128a2656dc83a6c327bd65a0a71f496102df885b09e3b1beb59",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "expand",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "data-12",
+      "group": "data",
+      "title": [
+        "主从视图",
+        "Master detail"
+      ],
+      "scenario": [
+        "主列表选择对象后，详情字段必须同步改变。",
+        "Selecting a master-list object updates its detail fields."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "d482a9154b9be954a8302732433b169fcd1718daad7ab33c941664e362c639b3",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "select",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "data-13",
+      "group": "data",
+      "title": [
+        "密度切换",
+        "Density switch"
+      ],
+      "scenario": [
+        "密度开关统一改变所有数据行，不改动字体到不可读大小。",
+        "A density switch changes all row paddings without making text unreadably small."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "251815b45b1ea5548a0fd82cb93080b1492f5d1881a287ea5b394f0ff953dc26",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "comfortable",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "data-14",
+      "group": "data",
+      "title": [
+        "行展开",
+        "Expandable rows"
+      ],
+      "scenario": [
+        "每一条可展开行拥有自己的补充内容。",
+        "Each expandable row reveals details belonging to that record."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "cfea4e453f29d3528181f5c11c593d0e8a3e3537368dbdf5c2b0ddc80466c53f",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "expand",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "data-15",
+      "group": "data",
+      "title": [
+        "字段说明",
+        "Descriptions"
+      ],
+      "scenario": [
+        "描述清单使用术语—值配对，不伪装成数据网格。",
+        "Descriptions use term–value pairs rather than pretending to be a data grid."
+      ],
+      "level": "semantic",
+      "limits": null,
+      "has_action_handler": false,
+      "has_special_mount": false,
+      "render_source_sha256": "f8ffef873b7b28c05b7c641e8acadc3f5de37700517139e1c4e81e00d00755c7",
+      "initial_probe": {
+        "status": "RENDERED",
+        "scope": "static/semantic specimen; no interaction pass claimed"
+      }
+    },
+    {
+      "id": "data-16",
+      "group": "data",
+      "title": [
+        "属性列表",
+        "Property list"
+      ],
+      "scenario": [
+        "属性面板包含具体值与编辑入口，点击进入二级表单。",
+        "A property list shows concrete values and opens a secondary edit form."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "501343a345409880cf84710b5d7a40cfff929ac632f83762ba71a188010567b6",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "edit",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "data-17",
+      "group": "data",
+      "title": [
+        "统计卡片",
+        "Statistics"
+      ],
+      "scenario": [
+        "指标卡显示基数、单位与比较基准，悬停可读取精确数据。",
+        "Metric cards include units, baselines and precise hover values."
+      ],
+      "level": "native-interaction",
+      "limits": null,
+      "has_action_handler": false,
+      "has_special_mount": false,
+      "render_source_sha256": "5e578bbdff877c81bb69f70d9ca6d14d888f7e7d248727820b0b02bee60eecaf",
+      "initial_probe": {
+        "status": "SPECIALIST_CHECK",
+        "scope": "requires targeted gesture/media/assistive-technology check; not a generic action pass"
+      }
+    },
+    {
+      "id": "data-18",
+      "group": "data",
+      "title": [
+        "摘要列表",
+        "Summary list"
+      ],
+      "scenario": [
+        "摘要列表把对象、数量与下一步放在同一行，适合快速浏览。",
+        "A summary list pairs objects, counts and next steps for quick scanning."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "54827449579e8380f2c3f3edc83f6a2206bfb7f28ac108e9006dcc03280c5620",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "queue",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "display-01",
+      "group": "display",
+      "title": [
+        "卡片",
+        "Card"
+      ],
+      "scenario": [
+        "单卡片包含标题、摘要、状态和明确的详情入口。",
+        "A content card includes title, summary, status and a clear details action."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "52b3513bf46405e2a4c94d5495c2ed9cc3118518716ac3aeaabe73d3515adce3",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "read",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "display-02",
+      "group": "display",
+      "title": [
+        "列表",
+        "List"
+      ],
+      "scenario": [
+        "列表项保留标题、次要信息和尾部动作的对齐。",
+        "List items align primary text, secondary information and trailing actions."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "cf2f06ff7317c0efa33e8f9ad0b26038761bc0ce22068a17887f5692975a9007",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "preview",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "display-03",
+      "group": "display",
+      "title": [
+        "图文条目",
+        "Media object"
+      ],
+      "scenario": [
+        "图文条目让缩略图与标题、说明构成一个整体。",
+        "A media object pairs a thumbnail with title and supporting copy."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "345e7b6923eed8e75106debb9e26261032d9d13f04e948e0fc8e41b34bc86376",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "view",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "display-04",
+      "group": "display",
+      "title": [
+        "头像",
+        "Avatar"
+      ],
+      "scenario": [
+        "头像以尺寸和文字替代图像，仍有可访问名称。",
+        "Initial avatars use size and text while retaining accessible names."
+      ],
+      "level": "semantic",
+      "limits": null,
+      "has_action_handler": false,
+      "has_special_mount": false,
+      "render_source_sha256": "5f6f6ef2e1203e4768fa16e313a1cba93bb0be349997068d41903fa955dfc08d",
+      "initial_probe": {
+        "status": "RENDERED",
+        "scope": "static/semantic specimen; no interaction pass claimed"
+      }
+    },
+    {
+      "id": "display-05",
+      "group": "display",
+      "title": [
+        "徽标",
+        "Badge"
+      ],
+      "scenario": [
+        "通知徽标同步显示真实计数，清除后归零。",
+        "A notification badge updates an actual count and clears to zero."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "782e02ee897d77074559a40149a71838bd1d0458e0a715cc68e1c6a0f3a5f6b6",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "add",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "display-06",
+      "group": "display",
+      "title": [
+        "状态标签",
+        "Status tag"
+      ],
+      "scenario": [
+        "状态标签带明确文字，不用颜色作为唯一差异。",
+        "Status tags carry text, not color alone."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "27b7ef5771caf2e1f61131be62776a02467b6655cc3f09f3d8f38021c6588378",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "select",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "display-07",
+      "group": "display",
+      "title": [
+        "提示文本",
+        "Helper text"
+      ],
+      "scenario": [
+        "帮助文字与输入关联，输入时不消失。",
+        "Helper text is associated with its input and remains visible while editing."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "fbddc23c914f0a72d162287b893bdeec5b8132757fc92b7ba24b07bfdcad1fd6",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "input:text",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "display-08",
+      "group": "display",
+      "title": [
+        "引用",
+        "Quote"
+      ],
+      "scenario": [
+        "引文与作者说明独立排版，避免将强调文本误认作交互。",
+        "A quote and attribution are distinct and not mistaken for controls."
+      ],
+      "level": "structural",
+      "limits": null,
+      "has_action_handler": false,
+      "has_special_mount": false,
+      "render_source_sha256": "7e7c38656655815b62fabaa7ebc67b403c9a400cf6d72b32854e0bd0bbb02b61",
+      "initial_probe": {
+        "status": "RENDERED",
+        "scope": "static/semantic specimen; no interaction pass claimed"
+      }
+    },
+    {
+      "id": "display-09",
+      "group": "display",
+      "title": [
+        "代码块",
+        "Code block"
+      ],
+      "scenario": [
+        "代码块保留缩进与换行，下载内容与显示内容一致。",
+        "A code block preserves indentation and downloads the displayed text."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "6b408f8d0cb1bdf643929f0b94133dd3215f860c442169ed7a3967004844bfc4",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "download",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "display-10",
+      "group": "display",
+      "title": [
+        "语法高亮",
+        "Syntax highlighting"
+      ],
+      "scenario": [
+        "语法着色区分关键字、字符串与注释，但文本仍可直接阅读。",
+        "Syntax highlighting distinguishes keywords, strings and comments without hiding text."
+      ],
+      "level": "structural",
+      "limits": null,
+      "has_action_handler": false,
+      "has_special_mount": false,
+      "render_source_sha256": "5bdde228a2d5f79525ddedd876af097ee47bb3bcb569193227893d17ed910f47",
+      "initial_probe": {
+        "status": "RENDERED",
+        "scope": "static/semantic specimen; no interaction pass claimed"
+      }
+    },
+    {
+      "id": "display-11",
+      "group": "display",
+      "title": [
+        "图片",
+        "Image"
+      ],
+      "scenario": [
+        "真实 PNG 资源按容器缩放，并提供有意义的替代文字。",
+        "A real PNG scales to its container and has meaningful alternative text."
+      ],
+      "level": "semantic",
+      "limits": null,
+      "has_action_handler": false,
+      "has_special_mount": false,
+      "render_source_sha256": "869c0a2083685dfdd3626a8355b920818a1f7b98d044c418126cb3311ae885bf",
+      "initial_probe": {
+        "status": "RENDERED",
+        "scope": "static/semantic specimen; no interaction pass claimed"
+      }
+    },
+    {
+      "id": "display-12",
+      "group": "display",
+      "title": [
+        "图片预览",
+        "Image preview"
+      ],
+      "scenario": [
+        "缩略图打开单独的大图预览，关闭后回到原焦点。",
+        "A thumbnail opens an enlarged preview and returns focus on close."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "187c316ed5eaea16c92a330048bf396ac54f25eeb77c09540d047e311c5e02b5",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "image",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "display-13",
+      "group": "display",
+      "title": [
+        "画廊",
+        "Gallery"
+      ],
+      "scenario": [
+        "画廊展示不同素材，选择后显示对应标题和大图。",
+        "A gallery uses distinct assets and updates the selected image and title."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "246438ab29403338f2f8d823b043f9f1b23fd0e636e9478c2a4d064e698bbae4",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "pick",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "display-14",
+      "group": "display",
+      "title": [
+        "轮播",
+        "Carousel"
+      ],
+      "scenario": [
+        "轮播每张内容不同，前后操作和页码同步。",
+        "Carousel slides have distinct content with synchronized controls and page indicator."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "c6f695b8fd760215fdcde52f718e6600c26aeb6e434bf7cee769b343d69c315f",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "prev",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "display-15",
+      "group": "display",
+      "title": [
+        "折叠区",
+        "Disclosure"
+      ],
+      "scenario": [
+        "折叠区保留摘要，展开后才呈现详细限制。",
+        "A disclosure keeps its summary visible and reveals detailed limits on demand."
+      ],
+      "level": "native-interaction",
+      "limits": null,
+      "has_action_handler": false,
+      "has_special_mount": false,
+      "render_source_sha256": "6065ec1e67d61a25f6cffaea0d8e7a32c0cebf28e99bb06b1d768b3836eb8ec0",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "native-disclosure",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "display-16",
+      "group": "display",
+      "title": [
+        "手风琴",
+        "Accordion"
+      ],
+      "scenario": [
+        "手风琴一次只展开一个独立问题，避免过长页面。",
+        "An accordion opens one distinct question at a time."
+      ],
+      "level": "native-interaction",
+      "limits": null,
+      "has_action_handler": false,
+      "has_special_mount": true,
+      "render_source_sha256": "8984b4328fc4fca68b2abd42a85daa396980877cb4bb807b81a289788b1fcaf2",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "native-disclosure",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "display-17",
+      "group": "display",
+      "title": [
+        "时间线",
+        "Timeline"
+      ],
+      "scenario": [
+        "时间线展示有先后关系的事件与各自时间，不伪造当前执行证据。",
+        "A timeline shows ordered fixture events with timestamps, not current execution evidence."
+      ],
+      "level": "structural",
+      "limits": null,
+      "has_action_handler": false,
+      "has_special_mount": false,
+      "render_source_sha256": "1703d6596ce1997d71e046b40ea64af392735425251a5f799dbee538ca4a28a9",
+      "initial_probe": {
+        "status": "RENDERED",
+        "scope": "static/semantic specimen; no interaction pass claimed"
+      }
+    },
+    {
+      "id": "display-18",
+      "group": "display",
+      "title": [
+        "日历",
+        "Calendar"
+      ],
+      "scenario": [
+        "月历按真实月份天数生成，选中日期和翻月都有效。",
+        "A calendar uses actual month lengths, date selection and month navigation."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "33198ccaa533f25504a4eefde9f5fad97043dcf5a482dce929e6eb8f75523bef",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "prev",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "display-19",
+      "group": "display",
+      "title": [
+        "描述清单",
+        "Description list"
+      ],
+      "scenario": [
+        "对象描述用原生 dl/dt/dd 表达，长值仍能换行。",
+        "Native dl/dt/dd expresses object descriptions and wraps long values."
+      ],
+      "level": "semantic",
+      "limits": null,
+      "has_action_handler": false,
+      "has_special_mount": false,
+      "render_source_sha256": "8390858e9ca77f80e4b3bd698dc4ed8810be4c40a542c91310087e9d4fa32cff",
+      "initial_probe": {
+        "status": "RENDERED",
+        "scope": "static/semantic specimen; no interaction pass claimed"
+      }
+    },
+    {
+      "id": "display-20",
+      "group": "display",
+      "title": [
+        "二维码",
+        "QR code"
+      ],
+      "scenario": [
+        "二维码真实编码固定样例字符串；下方提供同等文本。",
+        "A real QR code encodes a fixed sample string with a text equivalent below."
+      ],
+      "level": "structural",
+      "limits": null,
+      "has_action_handler": false,
+      "has_special_mount": false,
+      "render_source_sha256": "3e80349f84739c9d476fe500890e85d2633072eeb09d26d4586a4677d6a0b00e",
+      "initial_probe": {
+        "status": "RENDERED",
+        "scope": "static/semantic specimen; no interaction pass claimed"
+      }
+    },
+    {
+      "id": "display-21",
+      "group": "display",
+      "title": [
+        "空状态",
+        "Empty state"
+      ],
+      "scenario": [
+        "空状态说明缺少什么，点击后真正创建本地案例内容。",
+        "An empty state explains what is missing and creates local case content when activated."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "b9074547705edb66ff72fce06d531e654a60675080bc837bf9dc6904fdd8d78d",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "create",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "feedback-01",
+      "group": "feedback",
+      "title": [
+        "行内提示",
+        "Inline notice"
+      ],
+      "scenario": [
+        "行内提示紧邻相关配置，不替代字段标签。",
+        "An inline notice sits near its setting without replacing the field label."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "8416517b8f578cea072809eda2a8a6e3c5fab13cd0ccf0fcd4c01cccf0ecb79d",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "select",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "feedback-02",
+      "group": "feedback",
+      "title": [
+        "状态提示",
+        "Status message"
+      ],
+      "scenario": [
+        "后台状态通过 live region 播报，结果不是仅靠颜色显示。",
+        "A live region announces operation status with explicit text."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "e1dd9d1ec5ed04030cc4ee89f5f79d21056b69bddff4058aac71b6e5fe701887",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "refresh",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "feedback-03",
+      "group": "feedback",
+      "title": [
+        "警告",
+        "Alert"
+      ],
+      "scenario": [
+        "警告说明具体风险与恢复动作，允许用户继续处理。",
+        "A warning explains a specific risk and a recovery action."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "b5d30729cbae63a7620c6165f414785a7f4244b5bed5736f9c4d9df54db79c77",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "archive",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "feedback-04",
+      "group": "feedback",
+      "title": [
+        "验证错误",
+        "Validation error"
+      ],
+      "scenario": [
+        "错误消息指出字段和修复方式，保留用户已输入内容。",
+        "A validation error identifies the field and remedy while preserving input."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "59432f735d4076225cf7a5ce76380dfdb9f2a8e611d5a1223aec6dba3c31a10a",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "validate",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "feedback-05",
+      "group": "feedback",
+      "title": [
+        "成功反馈",
+        "Success feedback"
+      ],
+      "scenario": [
+        "成功反馈说明完成对象，并允许继续查看结果。",
+        "Success feedback identifies what completed and offers a next step."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "70b97a2c443e040aab4cf2cac485ba0ea045cb1a7a7e2eb92cd80870df5299ba",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "view",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "feedback-06",
+      "group": "feedback",
+      "title": [
+        "通知",
+        "Notification"
+      ],
+      "scenario": [
+        "通知可逐条标记已读，不影响其他通知。",
+        "Notifications can be marked read independently."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "55364199c1f606183a9419b60e42ab975c869586ea32b9293fe67ad6246a6fca",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "read",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "feedback-07",
+      "group": "feedback",
+      "title": [
+        "轻提示",
+        "Toast"
+      ],
+      "scenario": [
+        "短暂提示确认一个已完成的轻量操作，不遮挡固定工具栏。",
+        "A toast confirms a completed lightweight action without covering fixed tools."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "5be8e447991bc9624ba926f17015f5698546dae93988546bb69b8949e36ef51c",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "toast",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "feedback-08",
+      "group": "feedback",
+      "title": [
+        "全局横幅",
+        "Banner"
+      ],
+      "scenario": [
+        "全局横幅传达跨页面信息，关闭只影响展示状态。",
+        "A banner communicates cross-page information; dismissing only changes display."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "42befa904d71d12ff23e5100d25b4ba947d9e25d6b751d75ea99c3d9169adaca",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "dismiss",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "feedback-09",
+      "group": "feedback",
+      "title": [
+        "进度条",
+        "Progress bar"
+      ],
+      "scenario": [
+        "进度有明确数值与完成上限；点击推进与重置。",
+        "A progress bar has a value and upper limit, with advance and reset controls."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "286aaebc5b53c6bdeccda580d016b3290f185fd1d5873a1d8bc5b1b9df15f6a2",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "advance",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "feedback-10",
+      "group": "feedback",
+      "title": [
+        "环形进度",
+        "Circular progress"
+      ],
+      "scenario": [
+        "环形进度同时显示数字与可访问进度值。",
+        "Circular progress provides both visible and accessible numeric values."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "c71c4c29904cf6ddd97bf33ba288bf57868c787019fa4ca67cf5b542363b907b",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "progress",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "feedback-11",
+      "group": "feedback",
+      "title": [
+        "加载指示",
+        "Spinner"
+      ],
+      "scenario": [
+        "不确定进度用加载指示而不是伪造百分比。",
+        "Indeterminate loading uses a spinner, not a fabricated percentage."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "4ce230dbcb3b226983c16a655403bd8fc5307e87b149b73bbaca308e05a0a7da",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "stop",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "feedback-12",
+      "group": "feedback",
+      "title": [
+        "骨架屏",
+        "Skeleton"
+      ],
+      "scenario": [
+        "只有“骨架屏”这个案例使用占位形状，加载后替换为真实内容。",
+        "Only this skeleton-specific case uses placeholders and replaces them with real content."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "445fb98fb3440da1a694e1c92bccec92b81c88eab6439a81976f0710f88a4d04",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "load",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "feedback-13",
+      "group": "feedback",
+      "title": [
+        "加载占位",
+        "Loading placeholder"
+      ],
+      "scenario": [
+        "加载占位保留区域尺寸，完成后内容不会挤压周边元素。",
+        "A loading placeholder reserves space so the finished content does not crowd nearby elements."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "246ff2b699ff609bb3c98fc45e14c4164769d7ad01b7578ec694322e81d87c89",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "done",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "feedback-14",
+      "group": "feedback",
+      "title": [
+        "错误页",
+        "Error state"
+      ],
+      "scenario": [
+        "错误状态包含可重试动作，重试后显示对应结果。",
+        "An error state includes a retry action that reveals the result."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "bdd52337f94b170516f9dc7003e7f3f360659e3f0f8719f188de4554bef4ac01",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "retry",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "feedback-15",
+      "group": "feedback",
+      "title": [
+        "无数据状态",
+        "No results"
+      ],
+      "scenario": [
+        "无匹配结果和完全无数据是不同状态，清除筛选可恢复结果。",
+        "No matches differs from no data; clearing filters restores results."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "a35605c737d98aa4aa3f6bca7960685644451dec5d97ddc2bb7e7aae69ff3a92",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "clear",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "feedback-16",
+      "group": "feedback",
+      "title": [
+        "确认反馈",
+        "Confirmation"
+      ],
+      "scenario": [
+        "确认反馈说明将保存的目标，取消保持不变。",
+        "A confirmation names the save target; Cancel leaves it unchanged."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "c1de960b0fb0f60812e2246df38b30f082a533d2c0edb7ae3f6b3347e1d46045",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "confirm",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "feedback-17",
+      "group": "feedback",
+      "title": [
+        "撤销反馈",
+        "Undo feedback"
+      ],
+      "scenario": [
+        "撤销只恢复本次动作的对象，不影响其他案例。",
+        "Undo restores only the object changed by this action."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "92f255d2eac69872724fc04ccbd36541bfdbd7d4dff2fc819ddb05630caf3f43",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "remove",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "feedback-18",
+      "group": "feedback",
+      "title": [
+        "离线提示",
+        "Offline banner"
+      ],
+      "scenario": [
+        "离线状态明确提示使用缓存，并支持恢复在线状态的模拟。",
+        "An offline state explains cached content and supports simulated reconnection."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "43d7090a6595677e99b29d38c3c12b586a2c704dcec18bfc4aa8bde3b6a78245",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "toggle",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "feedback-19",
+      "group": "feedback",
+      "title": [
+        "保存状态",
+        "Save status"
+      ],
+      "scenario": [
+        "编辑后状态变为未保存，保存按钮操作后才恢复已保存。",
+        "Editing marks the value unsaved; only Save restores the saved state."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "80dcf68f8e6899e892e2c363eb296e3d4935af2b1cf598cc8a1806e5cfdd3a7b",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "save",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "overlays-01",
+      "group": "overlays",
+      "title": [
+        "下拉菜单",
+        "Dropdown"
+      ],
+      "scenario": [
+        "下拉操作菜单锚定触发按钮，支持键盘上下移动。",
+        "A dropdown action menu is anchored to its trigger and supports arrow-key navigation."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "74057890e0d14be557ddc06a3549582961bd0ff5d381bb3ffe7610ca3061514b",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "menu",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "overlays-02",
+      "group": "overlays",
+      "title": [
+        "浮层",
+        "Popover"
+      ],
+      "scenario": [
+        "非模态浮层承载轻量参数，点击外部可关闭。",
+        "A non-modal popover holds lightweight parameters and dismisses on outside click."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "435d4ede97f5b27cee17bf74e4972d30d1fed85755404b5a8e0150133edce9fe",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "popover",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "overlays-03",
+      "group": "overlays",
+      "title": [
+        "提示气泡",
+        "Tooltip"
+      ],
+      "scenario": [
+        "提示由 hover 或焦点触发，可用 Esc 关闭；不包含交互控件。",
+        "A tooltip opens on hover or focus, dismisses with Escape, and contains no controls."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "62257bc3b8ee1699de83b2d29a0b315f2af7e703bdf21b28a54e4c4b9741e42a",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "export",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "overlays-04",
+      "group": "overlays",
+      "title": [
+        "模态框",
+        "Modal dialog"
+      ],
+      "scenario": [
+        "模态框在短暂编辑任务中限制焦点，关闭后恢复触发焦点。",
+        "A modal contains focus for a short edit task and restores its trigger on close."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "b48bb0ab63c993a038aeb463f50924222b7ad69cc39c2a8f9edbb461a7635b1a",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "dialog",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "overlays-05",
+      "group": "overlays",
+      "title": [
+        "警告对话框",
+        "Alert dialog"
+      ],
+      "scenario": [
+        "警告对话框明确操作后果，并把取消作为安全出口。",
+        "An alert dialog explains consequences and provides a safe cancel path."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "4cb50199cb4b134ac695f6d29446fa822fb468fc74791dd448f80e7022e006ac",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "alert",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "overlays-06",
+      "group": "overlays",
+      "title": [
+        "确认框",
+        "Confirm dialog"
+      ],
+      "scenario": [
+        "确认框摘要展示提交对象，而不要求用户猜“确定”是什么意思。",
+        "A confirmation summarizes the target rather than relying on an ambiguous OK."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "2769305e99d5ea77b65f0624e6589285c68fd89bd1ba22780fc330a3556224dd",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "confirm",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "overlays-07",
+      "group": "overlays",
+      "title": [
+        "侧滑抽屉",
+        "Drawer"
+      ],
+      "scenario": [
+        "抽屉从侧边提供对象详情，保持原页面上下文。",
+        "A side drawer provides object details while preserving page context."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "e70bfd44840dba67552e38800980d303ea3ee9e0ae3fc3edc25d10d4c0300c2a",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "drawer",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "overlays-08",
+      "group": "overlays",
+      "title": [
+        "底部弹层",
+        "Bottom sheet"
+      ],
+      "scenario": [
+        "底部弹层用于移动端短任务，内容不过度占据高度。",
+        "A bottom sheet supports a short mobile task without occupying excessive height."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "6e6bfbb4416bc33b6b1922254c7fa2737a30b1e32f749c31752473de1451209d",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "sheet",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "overlays-09",
+      "group": "overlays",
+      "title": [
+        "上下文菜单",
+        "Context menu"
+      ],
+      "scenario": [
+        "对象的更多操作使用轻量菜单，不中断主页面。",
+        "Object overflow actions use a lightweight menu without blocking the page."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "b47ccdbba48c9b06613bc90b19a4fe069957404cf863b200553b90d5adc89f35",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "menu",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "overlays-10",
+      "group": "overlays",
+      "title": [
+        "右键菜单",
+        "Right-click menu"
+      ],
+      "scenario": [
+        "右键与 Shift+F10 都能打开同一上下文菜单。",
+        "Right-click and Shift+F10 open the same context menu."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": false,
+      "has_special_mount": true,
+      "render_source_sha256": "8e09677bc6fd048e98eebdef894739aaa26f94b0a697c16b543eae358b2d55f0",
+      "initial_probe": {
+        "status": "SPECIALIST_CHECK",
+        "scope": "requires targeted gesture/media/assistive-technology check; not a generic action pass"
+      }
+    },
+    {
+      "id": "overlays-11",
+      "group": "overlays",
+      "title": [
+        "悬浮预览",
+        "Hover preview"
+      ],
+      "scenario": [
+        "悬浮预览显示真实缩略图和文件信息，可通过点击或聚焦访问。",
+        "A hover preview shows an actual thumbnail and metadata, with click/focus access."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": true,
+      "render_source_sha256": "321e99163ede9dd67e0bc2e8227cc28f38d07d336f2f1d66a318c0e6933ec54d",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "preview",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "overlays-12",
+      "group": "overlays",
+      "title": [
+        "命令面板",
+        "Command dialog"
+      ],
+      "scenario": [
+        "命令对话框提供可搜索目标并执行本地选择。",
+        "A command dialog searches targets and performs a local selection."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "031f5e5bf7b9db63bc6727f0f71fd08235113fc675f122840d906ae2d8a45872",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "command",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "overlays-13",
+      "group": "overlays",
+      "title": [
+        "全屏对话框",
+        "Full-screen dialog"
+      ],
+      "scenario": [
+        "全屏对话框用于需要空间的检查，保留明显退出入口。",
+        "A large dialog provides space for inspection with a clear exit."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "248683788b6178b97019ed544a2d599deb321736e408ebdae84a18d0576e880b",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "full",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "overlays-14",
+      "group": "overlays",
+      "title": [
+        "引导浮层",
+        "Coachmark"
+      ],
+      "scenario": [
+        "引导提示明确指向当前控件，且允许立即关闭。",
+        "A coachmark points to a specific control and can be dismissed immediately."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "824ff183d9b0952af2cdaf5cb9ed70fe6236883db68b9789747957703b07e94c",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "settings",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "overlays-15",
+      "group": "overlays",
+      "title": [
+        "气泡菜单",
+        "Floating menu"
+      ],
+      "scenario": [
+        "浮动菜单靠近编辑对象，只显示当前相关动作。",
+        "A floating menu stays near its editing target with contextual actions only."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "4dc07b7a85894c85c66f4671f0ee9369eac562222d26f9a8205ab2b269fab6cb",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "float",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "overlays-16",
+      "group": "overlays",
+      "title": [
+        "游览指引",
+        "Product tour"
+      ],
+      "scenario": [
+        "三步产品引导依次说明搜索、预览和导出，可随时退出。",
+        "A three-step tour explains search, preview and export and can be exited anytime."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "8ce8e93fb8e10466b54b7c8e80545aafc57ad1ce1cdc18d1ba1f2f3a0b12d627",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "search",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "layout-01",
+      "group": "layout",
+      "title": [
+        "页面框架",
+        "App shell"
+      ],
+      "scenario": [
+        "应用骨架分清全局导航、页内导航和内容操作。",
+        "An app shell separates global navigation, local navigation and content actions."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "627fd4d957607b974b3aa8323ecdde007f584a04f34dd5a9a84a381144b4b68f",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "search",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "layout-02",
+      "group": "layout",
+      "title": [
+        "页头",
+        "Page header"
+      ],
+      "scenario": [
+        "页头保留标题、状态与少量高频操作，详情放入二级界面。",
+        "A page header retains title, status and a few frequent actions; details stay secondary."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "2dac961feddce3e8bdfcd650dfdcb8f317741651efe2bddf3550ab29900c22b4",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "edit",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "layout-03",
+      "group": "layout",
+      "title": [
+        "页脚",
+        "Footer"
+      ],
+      "scenario": [
+        "页脚同时容纳范围说明与分页，两端对齐且不会贴住表格。",
+        "A footer aligns a range summary with pagination and keeps a gap from the table."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "9da591b5cf5bbdb08266f3663c7532d973179d8dedcc2cc83893ff552832423d",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "next",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "layout-04",
+      "group": "layout",
+      "title": [
+        "多栏布局",
+        "Multi-column"
+      ],
+      "scenario": [
+        "三栏各自有内容职责；窄屏时按顺序堆叠。",
+        "Three columns have distinct responsibilities and stack on narrow screens."
+      ],
+      "level": "structural",
+      "limits": null,
+      "has_action_handler": false,
+      "has_special_mount": false,
+      "render_source_sha256": "81186d44452634da275b936473f411597f023c2a33e04e3702ffd031327e2b2d",
+      "initial_probe": {
+        "status": "RENDERED",
+        "scope": "static/semantic specimen; no interaction pass claimed"
+      }
+    },
+    {
+      "id": "layout-05",
+      "group": "layout",
+      "title": [
+        "侧栏",
+        "Sidebar"
+      ],
+      "scenario": [
+        "侧栏只承载局部目录，不与主体内容竞争宽度。",
+        "A sidebar holds a local outline without competing with the main content."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "dceaa5f7c88232fa4946712366fbcddcf9f9ab8c81b68d7fbbe1199360a6c724",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "intro",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "layout-06",
+      "group": "layout",
+      "title": [
+        "可交换侧栏",
+        "Swappable sidebar"
+      ],
+      "scenario": [
+        "交换物理位置不会交换“资源”和“检查器”的逻辑内容。",
+        "Swapping physical positions preserves Explorer and Inspector identities."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "fc753871f2dbd37898c09ad0cdfff5b58be2f66636165f17d78f7f92372816d9",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "swap",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "layout-07",
+      "group": "layout",
+      "title": [
+        "分栏",
+        "Split pane"
+      ],
+      "scenario": [
+        "分栏比例是可调整参数，两个区域都有最小可用宽度。",
+        "A split pane has an adjustable ratio with minimum usable widths."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "efdcc24b6fee74b9c2fb595b6a5a9e04cea5af5dd9bd277946bf6c5a9d93337f",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "input:range",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "layout-08",
+      "group": "layout",
+      "title": [
+        "分隔器",
+        "Splitter"
+      ],
+      "scenario": [
+        "真实分隔器支持拖拽与方向键，不以装饰线替代交互。",
+        "A real splitter supports drag and arrow keys rather than acting as decoration."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": false,
+      "has_special_mount": true,
+      "render_source_sha256": "385f4c8609b5efdc9a8c344a40e8d2a0f3087ff367b4fe762b8ab2c6c1e3c024",
+      "initial_probe": {
+        "status": "SPECIALIST_CHECK",
+        "scope": "requires targeted gesture/media/assistive-technology check; not a generic action pass"
+      }
+    },
+    {
+      "id": "layout-09",
+      "group": "layout",
+      "title": [
+        "停靠面板",
+        "Dockable panel"
+      ],
+      "scenario": [
+        "面板可停靠两侧或以浮层查看；状态与面板内容不分离。",
+        "A panel can dock on either side or open as a floating view while retaining content."
+      ],
+      "level": "interactive",
+      "limits": [
+        "此例演示停靠状态切换，不声明实现完整 IDE 拖拽停靠系统。",
+        "Demonstrates docking-state changes, not a complete IDE drag-docking system."
+      ],
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "252e5389d1a23c06f1392734851250e0db2665343873e8a262cd48140a5ece2e",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "left",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "layout-10",
+      "group": "layout",
+      "title": [
+        "可折叠侧栏",
+        "Collapsible sidebar"
+      ],
+      "scenario": [
+        "折叠侧栏后保留可恢复入口，而不是永久隐藏导航。",
+        "Collapsing a sidebar retains a visible restoration control."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "67da9c931ebc58b2084033e155db76fd787f9972d10aab7f333ea4e0155cb9ed",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "toggle",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "layout-11",
+      "group": "layout",
+      "title": [
+        "多页签工作区",
+        "Multi-document workspace"
+      ],
+      "scenario": [
+        "多文档工作区可新增、切换和关闭标签，关闭后选取相邻项。",
+        "A multi-document workspace adds, switches and closes tabs, choosing a neighbor on close."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "c34f2d2919414b6ad383f7e82d2d9302aa2aee97b033bdf23b5cbbc5106f760d",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "open",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "layout-12",
+      "group": "layout",
+      "title": [
+        "卡片网格",
+        "Card grid"
+      ],
+      "scenario": [
+        "卡片网格内部布局一致，标题长度变化不造成按钮错位。",
+        "Cards share a consistent internal layout so varying titles do not misalign actions."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "578ca1861609e80422ef5aebe064e499e77b36c4fc01312f99dd4d132d06cedc",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "view",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "layout-13",
+      "group": "layout",
+      "title": [
+        "瀑布流",
+        "Masonry"
+      ],
+      "scenario": [
+        "瀑布流使用不同长度的真实内容，不用空白块模拟。",
+        "A masonry layout uses content of differing lengths rather than empty blocks."
+      ],
+      "level": "structural",
+      "limits": null,
+      "has_action_handler": false,
+      "has_special_mount": false,
+      "render_source_sha256": "a7fce560c84384ba0b0578f359d3c91b672564924fe8b525762d0947465318e2",
+      "initial_probe": {
+        "status": "RENDERED",
+        "scope": "static/semantic specimen; no interaction pass claimed"
+      }
+    },
+    {
+      "id": "layout-14",
+      "group": "layout",
+      "title": [
+        "虚拟滚动",
+        "Virtual list"
+      ],
+      "scenario": [
+        "长列表按滚动窗口渲染，避免同时创建全部条目节点。",
+        "A long list renders the scroll window rather than all item nodes."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": false,
+      "has_special_mount": true,
+      "render_source_sha256": "cb5b1d03d0572afa7a3dc64cd385d3fa2b8eba7fba1ca066366a67c3a7bb27f6",
+      "initial_probe": {
+        "status": "SPECIALIST_CHECK",
+        "scope": "requires targeted gesture/media/assistive-technology check; not a generic action pass"
+      }
+    },
+    {
+      "id": "layout-15",
+      "group": "layout",
+      "title": [
+        "响应式抽屉",
+        "Responsive drawer"
+      ],
+      "scenario": [
+        "窄屏细节以抽屉打开，避免常驻侧栏挤压主体。",
+        "On narrow screens, details open on demand instead of shrinking the main content."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "87f6893f590fa48bdfe016e2872155d892d8651177d678b9f53278c12befcd92",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "drawer",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "layout-16",
+      "group": "layout",
+      "title": [
+        "分步表单布局",
+        "Wizard layout"
+      ],
+      "scenario": [
+        "分步表单将进度导航、字段和提交区各自分组并留白。",
+        "A wizard layout separates progress, fields and submission actions with spacing."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "9a291e268dd9d99f53912fe76b66645d1220f002fa7d2378ff7a5bdef3e5d9f1",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "continue",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "layout-17",
+      "group": "layout",
+      "title": [
+        "详情页面",
+        "Detail page"
+      ],
+      "scenario": [
+        "详情页整合身份、状态、元数据与相关对象，而不只显示一张表。",
+        "A detail page combines identity, status, metadata and related objects."
+      ],
+      "level": "structural",
+      "limits": null,
+      "has_action_handler": false,
+      "has_special_mount": false,
+      "render_source_sha256": "65785c60d7f2855483c627ac7acdd4fd52c9728d6dfe92e08c2e08e6378fff01",
+      "initial_probe": {
+        "status": "RENDERED",
+        "scope": "static/semantic specimen; no interaction pass claimed"
+      }
+    },
+    {
+      "id": "layout-18",
+      "group": "layout",
+      "title": [
+        "仪表盘",
+        "Dashboard"
+      ],
+      "scenario": [
+        "仪表盘将统计与趋势放在一起，时间范围切换有真实数值变化。",
+        "A dashboard pairs metrics with trends and changes actual values with the period."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "6a255376ed30aa15054bad044f238b00097341012b025863fe00a275494067a4",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "select",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "visual-01",
+      "group": "visual",
+      "title": [
+        "柱形图",
+        "Bar chart"
+      ],
+      "scenario": [
+        "柱形图按星期比较完成数量，每根柱子都可读取精确值。",
+        "A bar chart compares weekday completions; every bar exposes an exact value."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "f31cb36e0f7d358b36dd961636ecf35cf63eccf727b4a49e6d993354c63f13c7",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "change",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "visual-02",
+      "group": "visual",
+      "title": [
+        "折线图",
+        "Line chart"
+      ],
+      "scenario": [
+        "折线图比较五次发布的时延，数据点可通过键盘聚焦。",
+        "A line chart compares latency across five releases with focusable data points."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "f31cb36e0f7d358b36dd961636ecf35cf63eccf727b4a49e6d993354c63f13c7",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "change",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "visual-03",
+      "group": "visual",
+      "title": [
+        "面积图",
+        "Area chart"
+      ],
+      "scenario": [
+        "面积图表达连续区间的会话数量，并保留每个采样点。",
+        "An area chart shows session counts over intervals while retaining every sample point."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "f31cb36e0f7d358b36dd961636ecf35cf63eccf727b4a49e6d993354c63f13c7",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "change",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "visual-04",
+      "group": "visual",
+      "title": [
+        "饼图",
+        "Pie chart"
+      ],
+      "scenario": [
+        "饼图每个扇区的数值与比例一致，图例同时显示名称。",
+        "Pie sectors match their values and proportions, with labeled legend entries."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "f31cb36e0f7d358b36dd961636ecf35cf63eccf727b4a49e6d993354c63f13c7",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "change",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "visual-05",
+      "group": "visual",
+      "title": [
+        "环形图",
+        "Donut chart"
+      ],
+      "scenario": [
+        "环形图显示总量与组成，中心数字等于各项求和。",
+        "A donut shows composition and a total equal to the sum of its segments."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "f31cb36e0f7d358b36dd961636ecf35cf63eccf727b4a49e6d993354c63f13c7",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "change",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "visual-06",
+      "group": "visual",
+      "title": [
+        "散点图",
+        "Scatter plot"
+      ],
+      "scenario": [
+        "散点图显示 X/Y 数值对；悬停显示两轴的值而非单一总数。",
+        "Scatter points reveal both X and Y values rather than a single total."
+      ],
+      "level": "native-interaction",
+      "limits": null,
+      "has_action_handler": false,
+      "has_special_mount": false,
+      "render_source_sha256": "13ab26f870b0b9f35d900032f78b7a94783a60814e8de18c69330a49055e5b0d",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "native-disclosure",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "visual-07",
+      "group": "visual",
+      "title": [
+        "热力图",
+        "Heatmap"
+      ],
+      "scenario": [
+        "热力图每个格子都有周、日和数量，颜色不是唯一信息来源。",
+        "Every heatmap cell exposes week, day and count; color is not the only information."
+      ],
+      "level": "native-interaction",
+      "limits": null,
+      "has_action_handler": false,
+      "has_special_mount": false,
+      "render_source_sha256": "741541b8b328f5216dc82ea307119f3fdd5ae5207141c075f9354bfbb6b25a32",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "native-disclosure",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "visual-08",
+      "group": "visual",
+      "title": [
+        "树图",
+        "Treemap"
+      ],
+      "scenario": [
+        "树图用面积表示存储占比，标签与精确比例同时可见。",
+        "Treemap area represents storage share, with labels and exact percentages."
+      ],
+      "level": "native-interaction",
+      "limits": null,
+      "has_action_handler": false,
+      "has_special_mount": false,
+      "render_source_sha256": "3f2ee7a6b4f1bbd7a7ae66466f85d28c95adb88dbb51917b7c1fffec7e2f892d",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "native-disclosure",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "visual-09",
+      "group": "visual",
+      "title": [
+        "漏斗图",
+        "Funnel"
+      ],
+      "scenario": [
+        "漏斗宽度对应每步转化比例，读数不依赖形状猜测。",
+        "Funnel widths correspond to conversion percentages with exact readings."
+      ],
+      "level": "native-interaction",
+      "limits": null,
+      "has_action_handler": false,
+      "has_special_mount": false,
+      "render_source_sha256": "d19a02059f4780a3b98eb859b78a42bdcd4bede4694779c14ff74d6d6a8237c2",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "native-disclosure",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "visual-10",
+      "group": "visual",
+      "title": [
+        "甘特图",
+        "Gantt"
+      ],
+      "scenario": [
+        "甘特条表示真实起止日，悬停显示持续时间。",
+        "Gantt bars encode start/end days and expose durations on hover."
+      ],
+      "level": "native-interaction",
+      "limits": null,
+      "has_action_handler": false,
+      "has_special_mount": false,
+      "render_source_sha256": "0c09daa77a1dab26b4782584ac9c18b48c029e6b4fbebb2ba1fca1e4f1db92ea",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "native-disclosure",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "visual-11",
+      "group": "visual",
+      "title": [
+        "时间序列",
+        "Time series"
+      ],
+      "scenario": [
+        "时间序列的采样顺序与时间标签一致。",
+        "Time-series samples follow their time labels in order."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "f31cb36e0f7d358b36dd961636ecf35cf63eccf727b4a49e6d993354c63f13c7",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "change",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "visual-12",
+      "group": "visual",
+      "title": [
+        "迷你趋势图",
+        "Sparkline"
+      ],
+      "scenario": [
+        "迷你趋势图作为指标补充，仍能检查各采样值。",
+        "A sparkline complements a metric while retaining inspectable sample values."
+      ],
+      "level": "native-interaction",
+      "limits": null,
+      "has_action_handler": false,
+      "has_special_mount": false,
+      "render_source_sha256": "6adf48359067ff928d0362c22813659d176bf2f45b13e59535ffaa28ad0d9af1",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "native-disclosure",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "visual-13",
+      "group": "visual",
+      "title": [
+        "数据地图",
+        "Data map"
+      ],
+      "scenario": [
+        "区域数据图使用明确标注的合成区域，不冒充真实地图。",
+        "A regional data map uses explicitly synthetic zones, not a real geographic map."
+      ],
+      "level": "native-interaction",
+      "limits": null,
+      "has_action_handler": false,
+      "has_special_mount": false,
+      "render_source_sha256": "2b0f6d989feabe0fbfe1ff33043e6b18504ecd6542505bdae893f5728813727f",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "native-disclosure",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "visual-14",
+      "group": "visual",
+      "title": [
+        "网络拓扑",
+        "Network diagram"
+      ],
+      "scenario": [
+        "网络拓扑中的每个节点显示自身延迟，而不是通用提示。",
+        "Each network node exposes its own latency, not a generic tooltip."
+      ],
+      "level": "native-interaction",
+      "limits": null,
+      "has_action_handler": false,
+      "has_special_mount": false,
+      "render_source_sha256": "e0ff5e8dfc1eca3d91456fc20ba17a0549fb2ad33413998e6f0ff73b6daecd25",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "native-disclosure",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "visual-15",
+      "group": "visual",
+      "title": [
+        "桑基图",
+        "Sankey"
+      ],
+      "scenario": [
+        "桑基连线显示具体流量，并在分支保持数量守恒。",
+        "Sankey links expose flow quantities and conserve counts at branches."
+      ],
+      "level": "native-interaction",
+      "limits": null,
+      "has_action_handler": false,
+      "has_special_mount": false,
+      "render_source_sha256": "b53a0d66397a26ae88b9f43db9bea4d833f4641d65adb114edbc0f38dd39a6ee",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "native-disclosure",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "visual-16",
+      "group": "visual",
+      "title": [
+        "坐标画布",
+        "Coordinate canvas"
+      ],
+      "scenario": [
+        "坐标画布中的点有明确正负坐标，点击可选择一个数据点。",
+        "Points have signed coordinates and can be selected by clicking."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": false,
+      "has_special_mount": true,
+      "render_source_sha256": "bb673f59882724f524b29e789f955bbe416bffb646a83adaa068796d19d6d93b",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "native-disclosure",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "visual-17",
+      "group": "visual",
+      "title": [
+        "图例",
+        "Legend"
+      ],
+      "scenario": [
+        "图例控制对应数据系列的显示；可同时对照 A、B，取消勾选只隐藏对应系列。",
+        "A legend controls each matching series independently; A and B can be compared together."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "5883d2922bc4edab7f0a9420b38a3e777ffe6351e004a76e524bb8bcfee85268",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "input:checkbox",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "visual-18",
+      "group": "visual",
+      "title": [
+        "交互筛选",
+        "Cross-filter"
+      ],
+      "scenario": [
+        "点击图表分类后，下方明细表筛选到对应分类。",
+        "Selecting a chart category filters the detail table to that category."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": true,
+      "render_source_sha256": "42a0acecc07efa89263c63ea43fd375018070366f9557c833dc256202f268606",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "clear",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "visual-19",
+      "group": "visual",
+      "title": [
+        "图表工具提示",
+        "Chart tooltip"
+      ],
+      "scenario": [
+        "工具提示包含日期、系列与精确数值，且同样支持焦点触发。",
+        "Chart tooltips contain period, series and exact value and also work on focus."
+      ],
+      "level": "native-interaction",
+      "limits": null,
+      "has_action_handler": false,
+      "has_special_mount": false,
+      "render_source_sha256": "ec0b73139926b17e59c8fc0358b3e82a16a204c600488fd423b54fac6225e9f3",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "native-disclosure",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "workflow-01",
+      "group": "workflow",
+      "title": [
+        "多步向导",
+        "Wizard"
+      ],
+      "scenario": [
+        "多步向导验证必填值，前后切换保留已填内容。",
+        "A multi-step wizard validates required fields and preserves values while navigating."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "43564e1b79ad4647a375c45c6530fc7c1bc621b995ba6041111162bddcd4d332",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "next",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "workflow-02",
+      "group": "workflow",
+      "title": [
+        "看板",
+        "Kanban"
+      ],
+      "scenario": [
+        "看板支持按钮与拖放两条等价的状态迁移路径。",
+        "A kanban supports equivalent button and drag/drop paths for moving tasks."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": true,
+      "render_source_sha256": "163569a16938236452697107042160514785288f453b334839f327cb942ae91c",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "move-right",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "workflow-03",
+      "group": "workflow",
+      "title": [
+        "状态机",
+        "State machine"
+      ],
+      "scenario": [
+        "状态机只允许合法迁移，未审核时无法直接批准。",
+        "A state machine allows valid transitions only; Draft cannot jump directly to Approved."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "3def18512be5dc63a6a85199e651e59bd9532d91f00fd2eb3bfaf19ab453c966",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "submit",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "workflow-04",
+      "group": "workflow",
+      "title": [
+        "任务清单",
+        "Task list"
+      ],
+      "scenario": [
+        "任务清单显示已完成数量，切换任一项同步更新汇总。",
+        "A task list updates its completed count when any task changes."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "68dca9bac37e6f9984bea7fda03f4c59c11a071eea340a310ddb5b564a4d08fd",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "input:checkbox",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "workflow-05",
+      "group": "workflow",
+      "title": [
+        "流程图",
+        "Flowchart"
+      ],
+      "scenario": [
+        "流图节点有名称与方向，编辑入口打开真正可操作的画布。",
+        "Flowchart nodes have names and direction, with an entry to an actual editable canvas."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "b2ce167c4e15e3e9a91ec351876f2bc113615d276b3424293209a443e44fc067",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "flow",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "workflow-06",
+      "group": "workflow",
+      "title": [
+        "审批流",
+        "Approval workflow"
+      ],
+      "scenario": [
+        "审批流的同意与驳回产生不同结果，反馈不能混淆。",
+        "Approve and Reject lead to distinct outcomes in an approval flow."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "35b65766561301453d05486ab10fea57da0cbec4f2c8da252fb84fa2a55abc70",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "approve",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "workflow-07",
+      "group": "workflow",
+      "title": [
+        "评论线程",
+        "Comment thread"
+      ],
+      "scenario": [
+        "评论线程显示作者和回复层级，新增评论保留输入内容。",
+        "A comment thread shows authors and reply hierarchy and retains added text."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "c3e7a744a4cd1c1f8f5b5feadb7416a2e37e150240ef35ca7fb31bd8e0442d7b",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "reply",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "workflow-08",
+      "group": "workflow",
+      "title": [
+        "版本历史",
+        "Version history"
+      ],
+      "scenario": [
+        "版本历史显示每版实际内容，恢复只改变当前案例值。",
+        "Version history reveals actual revision content; Restore affects only this case."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "b90419bf3ff53532596f8c3255bda6dc2dad66178e787eee8f85ea718fc283b9",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "version",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "workflow-09",
+      "group": "workflow",
+      "title": [
+        "变更对比",
+        "Diff viewer"
+      ],
+      "scenario": [
+        "变更对比保留前后两份内容，并明确新增与删除。",
+        "A diff retains both versions and clearly identifies additions and removals."
+      ],
+      "level": "structural",
+      "limits": null,
+      "has_action_handler": false,
+      "has_special_mount": false,
+      "render_source_sha256": "e0ad54bee698b8ff99faaec98b83c5e80e11a268d3bfc1146f02a7124a86dbb8",
+      "initial_probe": {
+        "status": "RENDERED",
+        "scope": "static/semantic specimen; no interaction pass claimed"
+      }
+    },
+    {
+      "id": "workflow-10",
+      "group": "workflow",
+      "title": [
+        "活动记录",
+        "Activity log"
+      ],
+      "scenario": [
+        "活动记录记录实际点击生成的本地事件，而不是固定成功提示。",
+        "An activity log records local events created by actual clicks, not fixed success copy."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "dbc7a9f0ffd0b81c116122a5d9cdb8b498be8cee52f519ce42cefecedc3618c8",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "event",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "workflow-11",
+      "group": "workflow",
+      "title": [
+        "命令撤销",
+        "Undo stack"
+      ],
+      "scenario": [
+        "撤销栈支持多次修改与重做，新修改会清空重做分支。",
+        "An undo stack supports multiple edits and redo; new edits clear the redo branch."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "1606b1fe2cc9e21fc1ac341048693ddd1bb4d0b17e1fd34f34361a9882d517fc",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "inc",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "workflow-12",
+      "group": "workflow",
+      "title": [
+        "批处理任务",
+        "Batch jobs"
+      ],
+      "scenario": [
+        "批处理逐项更新状态，失败与完成不能合并成一个总成功。",
+        "Batch jobs track each item separately rather than collapsing failure and completion into one success."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "4c8de66c6d7f194155ff36551f97649428e68a7e28bb2049379803eff12d750d",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "next",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "workflow-13",
+      "group": "workflow",
+      "title": [
+        "进度跟踪",
+        "Progress tracking"
+      ],
+      "scenario": [
+        "进度跟踪显示每个工作包的状态，而不只显示单一总百分比。",
+        "Progress tracking shows each work package, not only one overall percentage."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "3866582a4a700986084173276ae5167793b52125e04561123d87290b90cfd71e",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "spec",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "workflow-14",
+      "group": "workflow",
+      "title": [
+        "任务依赖",
+        "Dependencies"
+      ],
+      "scenario": [
+        "依赖未完成时下游任务不可开始，并说明阻塞原因。",
+        "A dependent task cannot start before its prerequisite completes, with a visible reason."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "4d56200765c7ea2c693822359199988f191b80cf84745baf563269597a4728cb",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "a",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "workflow-15",
+      "group": "workflow",
+      "title": [
+        "预约日历",
+        "Scheduling calendar"
+      ],
+      "scenario": [
+        "预约日程只修改本案例，时间槽重复时拒绝覆盖。",
+        "A scheduling specimen edits only local data and rejects duplicate time slots."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "b0a6ce09740a583e5382c6f57556b89d06bf700376cdd8dfeca7e4fd756e594a",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "select",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "workflow-16",
+      "group": "workflow",
+      "title": [
+        "操作审计",
+        "Audit trail"
+      ],
+      "scenario": [
+        "审计事件明确动作、对象、结果和来源是本地样例。",
+        "An audit event records action, object, result and its local-fixture origin."
+      ],
+      "level": "structural",
+      "limits": null,
+      "has_action_handler": false,
+      "has_special_mount": false,
+      "render_source_sha256": "f47eed50360ad45fe5929155b771f894a9c11f2346155b88c6d926e713a91503",
+      "initial_probe": {
+        "status": "RENDERED",
+        "scope": "static/semantic specimen; no interaction pass claimed"
+      }
+    },
+    {
+      "id": "workflow-17",
+      "group": "workflow",
+      "title": [
+        "冲突解决",
+        "Conflict resolution"
+      ],
+      "scenario": [
+        "冲突解决保留本地与远端候选，选择后展示明确合并结果。",
+        "Conflict resolution retains local and remote candidates and shows the chosen result."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "baadcd55e12d3fa0a63e38bbe82d2b0aa19254964d4b9b927e571b145f808493",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "local",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "workflow-18",
+      "group": "workflow",
+      "title": [
+        "任务重试",
+        "Retry flow"
+      ],
+      "scenario": [
+        "重试有次数与独立结果，首次失败后第二次才成功。",
+        "Retries have attempt counts and distinct outcomes: first fails, second succeeds."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "9e41344ba545fef5e43c1b4d1f82ddca524bbac932836ee94ee6b730f36f4626",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "retry",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "enterprise-01",
+      "group": "enterprise",
+      "title": [
+        "高级搜索",
+        "Advanced search"
+      ],
+      "scenario": [
+        "高级搜索组合关键词、负责人和状态，返回实际匹配记录。",
+        "Advanced search combines keyword, owner and status to return actual matches."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "75fd07662c9b7040ab9e2c266d785cb1c1be5d6d9890b69ecfec6651cf253322",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "select",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "enterprise-02",
+      "group": "enterprise",
+      "title": [
+        "筛选构建器",
+        "Filter builder"
+      ],
+      "scenario": [
+        "筛选构建器把字段、运算符和值分开，应用后真正过滤数据。",
+        "A filter builder separates field, operator and value and really filters records."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "6794e5eee9affffb82741fade4444c8a97592e5c5d16bc68b9c9eae36354de77",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "select",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "enterprise-03",
+      "group": "enterprise",
+      "title": [
+        "规则构建器",
+        "Rule builder"
+      ],
+      "scenario": [
+        "规则构建将条件与结果分离，可用输入值测试规则。",
+        "A rule builder separates condition and outcome and can test an input value."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "c0211d79648863d52e69487ece226b483785b67eb15ec8a49f581b990d17a60f",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "test",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "enterprise-04",
+      "group": "enterprise",
+      "title": [
+        "查询构建器",
+        "Query builder"
+      ],
+      "scenario": [
+        "查询构建器生成 SQL 文本但不连接数据库，也不执行输入。",
+        "A query builder generates SQL text without connecting to or executing against a database."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "c99acf080d5588894a1ca7dfcfba663898b5db959a9a7562b7e060d3b38a45e5",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "select",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "enterprise-05",
+      "group": "enterprise",
+      "title": [
+        "权限矩阵",
+        "Permission matrix"
+      ],
+      "scenario": [
+        "权限矩阵逐项编辑，并明确这只是 UI 状态，不是访问控制系统。",
+        "A permission matrix edits individual cells and is clearly UI state, not an access-control system."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "cea109865bbe2829d643066eb9ba08ef0a5ada6d5d906c6e0faf8c867bf62a03",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "input:checkbox",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "enterprise-06",
+      "group": "enterprise",
+      "title": [
+        "批量编辑",
+        "Bulk edit"
+      ],
+      "scenario": [
+        "批量编辑先预览差异，再确认应用到选中行。",
+        "Bulk editing previews changes before applying them to selected rows."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "cbf02a041174d50667a8334c27faa4934be41b29b49f993c2fcd130fa7f12f61",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "select",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "enterprise-07",
+      "group": "enterprise",
+      "title": [
+        "行内编辑",
+        "Inline edit"
+      ],
+      "scenario": [
+        "行内编辑有保存与取消，取消不会改变已提交值。",
+        "Inline editing supports Save and Cancel; Cancel preserves the committed value."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "425294c83f7d20a9fe8977234ceb377fc649bacfad70a175e5022469a8373e03",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "edit",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "enterprise-08",
+      "group": "enterprise",
+      "title": [
+        "多角色视图",
+        "Role-based views"
+      ],
+      "scenario": [
+        "切换角色后可见能力对应变化，并保留权限解释。",
+        "Role changes update visible capabilities and retain permission explanations."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "ebae452237be90056548e42d686852ed42a79a3a3a08ae2fd4868704193f8c30",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "select",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "enterprise-09",
+      "group": "enterprise",
+      "title": [
+        "复杂树表",
+        "Hierarchical grid"
+      ],
+      "scenario": [
+        "层次数据按部门展开，并显示对应小计，避免复制同一平表。",
+        "Hierarchical data expands by department and shows matching subtotals."
+      ],
+      "level": "native-interaction",
+      "limits": null,
+      "has_action_handler": false,
+      "has_special_mount": false,
+      "render_source_sha256": "9f461ea6870b6d2a366431cabcbff811511837404be18655ef261862c1574fb5",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "native-disclosure",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "enterprise-10",
+      "group": "enterprise",
+      "title": [
+        "导入映射",
+        "Import mapping"
+      ],
+      "scenario": [
+        "导入映射将来源列对应到目标字段，重复目标映射会被拒绝。",
+        "Import mapping maps source columns to target fields and rejects duplicate targets."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "2f490f7fb70bbf61a543ed1804a0e88723beca6ce1eae4397b4d4b57fc977d28",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "select",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "enterprise-11",
+      "group": "enterprise",
+      "title": [
+        "数据透视",
+        "Pivot table"
+      ],
+      "scenario": [
+        "数据透视按所选维度计算聚合值，不展示固定假汇总。",
+        "A pivot table computes aggregates for the selected dimension."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "5d8406cdaf906532a24f4221f64fe4af406f3621784ef467fc28dbe69d9c5f6e",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "select",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "enterprise-12",
+      "group": "enterprise",
+      "title": [
+        "对象详情页",
+        "Object page"
+      ],
+      "scenario": [
+        "对象页的概要、关系与活动各自拥有真实内容。",
+        "An object page provides distinct overview, relationships and activity content."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "1e96eacee4a7516fe585c0b0b52b1a3bc0753f0955efdf22e6fc94b8968c72d5",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "overview",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "enterprise-13",
+      "group": "enterprise",
+      "title": [
+        "分析列表",
+        "Analytical list"
+      ],
+      "scenario": [
+        "分析列表把聚合图与明细筛选关联到同一状态。",
+        "An analytical list keeps the aggregate chart and detail filter in one state."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "15e951e4427dec6e6b614164d70ddc0c39c8711c99c4f95c6817ad2438f9f7bb",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "select",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "enterprise-14",
+      "group": "enterprise",
+      "title": [
+        "工作流设计器",
+        "Workflow designer"
+      ],
+      "scenario": [
+        "工作流设计器直接使用本轮真实画布引擎，而非静态节点截图。",
+        "The workflow designer uses the actual canvas engine, not a static node screenshot."
+      ],
+      "level": "interactive",
+      "limits": [
+        "画布编辑真实可用；运行按钮是本地模拟，不调用模型或 Dify/ComfyUI 服务。",
+        "Canvas edits are real; Run is local simulation and does not call a model or Dify/ComfyUI service."
+      ],
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "a3ad9f37b0cd8ad96d023263011e4535f8621ba90dfdb8ce024006984bdeea3a",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "flow",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "enterprise-15",
+      "group": "enterprise",
+      "title": [
+        "富文本编辑器",
+        "Rich text editor"
+      ],
+      "scenario": [
+        "文档编辑器支持标题、正文和即时预览，内容不会因界面语言而被翻译。",
+        "A document editor has a title, body and live preview; UI language does not translate content."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "2b1f51c3fc398dc8337910e6deaaa747d55b4e1bd3cf66f59c6d661274822728",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "input:text",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "enterprise-16",
+      "group": "enterprise",
+      "title": [
+        "代码编辑器",
+        "Code editor"
+      ],
+      "scenario": [
+        "代码编辑器显示源码与行数，整理空白不执行代码。",
+        "A code editor shows source and line count; whitespace cleanup does not execute code."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "5c5d5d87d8cb4dc3be900e0bc611ca577503186090903fd7d174ee0f79b10325",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "format",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "enterprise-17",
+      "group": "enterprise",
+      "title": [
+        "JSON 编辑器",
+        "JSON editor"
+      ],
+      "scenario": [
+        "JSON 编辑器严格解析输入，错误时不替换原文本。",
+        "A JSON editor parses strictly and retains original text on error."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "3835e33e65875c0e6b6b7067ba5b534295f90af30869947d945883f56937ecad",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "validate",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "enterprise-18",
+      "group": "enterprise",
+      "title": [
+        "图谱编辑",
+        "Graph editor"
+      ],
+      "scenario": [
+        "依赖图可以新增、删改、连线和撤销，使用独立样例状态。",
+        "A dependency graph supports real add/edit/delete/connect/undo with independent case state."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "76e9678f1e0e7732e2d12b7b374cc4b5202eca37cbdd24292996ed117a2df313",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "graph",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "enterprise-19",
+      "group": "enterprise",
+      "title": [
+        "交互白板",
+        "Collaborative canvas"
+      ],
+      "scenario": [
+        "协作画布显示两个明确标注的本地模拟光标，不能冒充真实在线用户。",
+        "A collaborative-canvas specimen labels two simulated cursors, not real online users."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": false,
+      "has_special_mount": true,
+      "render_source_sha256": "0720a21afc6dc766e632df51896a8f7851b3d22bc68a2cc05e0f906534616bac",
+      "initial_probe": {
+        "status": "SPECIALIST_CHECK",
+        "scope": "requires targeted gesture/media/assistive-technology check; not a generic action pass"
+      }
+    },
+    {
+      "id": "enterprise-20",
+      "group": "enterprise",
+      "title": [
+        "资源调度",
+        "Resource planner"
+      ],
+      "scenario": [
+        "资源计划按资源与时间检查槽位冲突，分配后更新对应单元格。",
+        "Check resource/time conflicts and update the exact assigned cell."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "aacbfce42ecdc79f4d758f0b9c41e6cbc39ec02d941d1ef4425a45c6e00c074b",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "select",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "enterprise-21",
+      "group": "enterprise",
+      "title": [
+        "对比视图",
+        "Compare view"
+      ],
+      "scenario": [
+        "对比视图逐字段比对，可隐藏完全相同的字段。",
+        "A comparison view contrasts fields and can hide unchanged rows."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "6ee79fdcc27541203e788ddefba5e26b517f0687bde9ec4c89d428bf22f8ad89",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "input:checkbox",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "media-01",
+      "group": "media",
+      "title": [
+        "文件树",
+        "File tree"
+      ],
+      "scenario": [
+        "文件树包含不同格式，叶子选择会报告准确路径。",
+        "A file tree contains different formats and reports the selected full path."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "564df1afa8d9d65f05c1bcb840ef404026bfe401c196346ed6b2747dafe1c152",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "file",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "media-02",
+      "group": "media",
+      "title": [
+        "路径导航",
+        "Path navigation"
+      ],
+      "scenario": [
+        "路径导航可返回父文件夹，列表内容随路径同步变化。",
+        "Path navigation returns to parent folders and updates the file list."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "794d6c929227edc28bfe73db864d523550239047d2f5d5afb41746c7cb60cc38",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "root",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "media-03",
+      "group": "media",
+      "title": [
+        "文件卡片",
+        "File card"
+      ],
+      "scenario": [
+        "文件卡片显示真实格式与尺寸，不把所有文件显示为文档。",
+        "A file card identifies its actual format and dimensions, not a generic document."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "31c6f3dd3014626106b2aa2129e4215255a3fb93fd5e76021d71501c09114e57",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "preview",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "media-04",
+      "group": "media",
+      "title": [
+        "上传队列",
+        "Upload queue"
+      ],
+      "scenario": [
+        "多文件队列显示每个真实选择文件的状态，可移除单项。",
+        "A multi-file queue tracks each chosen file and can remove individual entries."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "b734c271739139815d8f52969944b8004f7685e4e026bb0753c9a60c8dce082f",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "native-file",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "media-05",
+      "group": "media",
+      "title": [
+        "上传进度",
+        "Upload progress"
+      ],
+      "scenario": [
+        "本地文件读取进度来自 FileReader，不伪造网络上传进度。",
+        "Local file-read progress comes from FileReader, not a fabricated network upload."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "452b568f5ead341ac2241d2cb989b25f5927f3777794c2f92560acbbeb590a84",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "native-file",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "media-06",
+      "group": "media",
+      "title": [
+        "媒体播放器",
+        "Media player"
+      ],
+      "scenario": [
+        "媒体播放器在真实的合成视频与音频资源间切换。",
+        "A media player switches between actual bundled synthetic video and audio."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "a86274f6034fa18bfaf59a0bf4c45d91e8cbbbac1a9b9afafd40549f4af95857",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "video",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "media-07",
+      "group": "media",
+      "title": [
+        "音频播放器",
+        "Audio player"
+      ],
+      "scenario": [
+        "音频播放速率与原生控件协同，显示当前倍率。",
+        "Audio playback rate works with native controls and displays its current multiplier."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "59182b1fcd3a2fbca1a8b9095174bbdeb7e898fe05a8a5676f25c48783db5d89",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "input:range",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "media-08",
+      "group": "media",
+      "title": [
+        "视频控制",
+        "Video controls"
+      ],
+      "scenario": [
+        "视频按钮实际控制播放、暂停与静音；不以固定图标假装播放器。",
+        "Video buttons really control play, pause and mute rather than simulating a player with icons."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "522083fc64b4e0b00043c8af9a9a5563eb3334dec1058974a5e8c2a1afc0aa48",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "play",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "media-09",
+      "group": "media",
+      "title": [
+        "图片标注",
+        "Image annotation"
+      ],
+      "scenario": [
+        "图像批注按真实点击位置记录归一化坐标。",
+        "Image annotation records normalized coordinates from actual clicks."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": true,
+      "render_source_sha256": "ee3f31cc2608ee9c30a89e7cd39af394c6c72a1d97b1789ebe51b26a59832d43",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "clear",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "media-10",
+      "group": "media",
+      "title": [
+        "文件预览",
+        "File preview"
+      ],
+      "scenario": [
+        "预览入口根据格式使用 JSON 文本、CSV 表格或位图查看器。",
+        "A preview entry selects JSON text, a CSV table or a bitmap viewer by format."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "1fea35a3d5cc5a473e2f0d1eb54c0e20f8fb151e563503f051516e88e979e146",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "json",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "media-11",
+      "group": "media",
+      "title": [
+        "文档查看器",
+        "Document viewer"
+      ],
+      "scenario": [
+        "分页面板展示三页不同的文档内容，页码对应当前页。",
+        "A paged document specimen shows distinct content on three pages with a matching page number."
+      ],
+      "level": "interactive",
+      "limits": [
+        "这是逻辑分页文档样例，不是 PDF 解析器。",
+        "This is a logical document-pagination specimen, not a PDF parser."
+      ],
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "2b431585172b811730c714d94339ab9bb6faf48123236ec29657bf7f3d2a211e",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "next",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "media-12",
+      "group": "media",
+      "title": [
+        "缩略图",
+        "Thumbnail"
+      ],
+      "scenario": [
+        "缩略图选择状态对应下方预览，不重复显示同一占位图。",
+        "Thumbnail selection matches the preview and uses distinct assets."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "484556e06f829671cdd6253b458ccf7e14bed7f1a680705020737bccc77602c0",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "thumb",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "media-13",
+      "group": "media",
+      "title": [
+        "拖放区域",
+        "Drop target"
+      ],
+      "scenario": [
+        "拖放目标只接受文件，并显示文件信息；普通文字拖入不会冒充文件。",
+        "A drop target accepts files and reports their details, not arbitrary dragged text."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": false,
+      "has_special_mount": true,
+      "render_source_sha256": "3c0a64109a8d3e20ef2f22b54bd2d906bf445e8fd464a69c2be45be7db73be57",
+      "initial_probe": {
+        "status": "SPECIALIST_CHECK",
+        "scope": "requires targeted gesture/media/assistive-technology check; not a generic action pass"
+      }
+    },
+    {
+      "id": "media-14",
+      "group": "media",
+      "title": [
+        "附件列表",
+        "Attachments"
+      ],
+      "scenario": [
+        "附件列表能导出匹配格式的内容，并能移除指定附件。",
+        "Attachments export matching native content and can remove a specific attachment."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "2208b59c92f80fe820e554deeae680fe34cd5d2891acfb00029448c37dfc29c1",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "export",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "media-15",
+      "group": "media",
+      "title": [
+        "文件版本",
+        "File versions"
+      ],
+      "scenario": [
+        "文件版本展示实际大小和内容，选中版本可另存为独立文件。",
+        "File versions show actual content and size and can export the selected revision separately."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "c77f1d0c641299698abeabcc23984b09fce1273467922d6671200de77e9b5d98",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "select",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "media-16",
+      "group": "media",
+      "title": [
+        "导出设置",
+        "Export options"
+      ],
+      "scenario": [
+        "导出选项决定文件格式与列头，产物和选项相匹配。",
+        "Export options determine the format and headers, and the produced file matches them."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "cbb147f6e9d2d1ae448267794e5b5bb4c802c485bed50a08847a604a19a5bc58",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "select",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "collab-01",
+      "group": "collab",
+      "title": [
+        "用户菜单",
+        "Account menu"
+      ],
+      "scenario": [
+        "账户入口显示模拟身份，菜单操作不会退出真实账户。",
+        "An account menu shows a simulated identity and never signs out a real account."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "68fbae5cb0c92efd99629496f11cfd14f9161b002eed62e2ca358fa117a73d3a",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "menu",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "collab-02",
+      "group": "collab",
+      "title": [
+        "登录表单",
+        "Sign-in form"
+      ],
+      "scenario": [
+        "登录表单只校验样例字段，不认证、不发送、不存储真实密码。",
+        "A sign-in form validates fixture fields without authentication, transmission or real password storage."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "b97ba31dac675039e1e922a8ded6d67bdc2f2605d327c7ab8042873df25a95e9",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "validate",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "collab-03",
+      "group": "collab",
+      "title": [
+        "多因素验证",
+        "MFA"
+      ],
+      "scenario": [
+        "MFA 样例验证六位输入格式；固定样例码不是安全认证。",
+        "An MFA specimen validates six digits; its fixed demo code is not authentication."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "4262cb6d39aa2297f470c7ee4ac33f62ec7157864fdca241f0b9193fc4abb6c4",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "check",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "collab-04",
+      "group": "collab",
+      "title": [
+        "邀请协作者",
+        "Invite collaborators"
+      ],
+      "scenario": [
+        "邀请表单显示接收人和角色，提交仅添加本地预览条目。",
+        "An invitation form shows recipient and role and adds only a local preview entry."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "adcbdccaa88eb1f256e342d894dc046e88fe7982717a2475e33c71721bc7ebc1",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "select",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "collab-05",
+      "group": "collab",
+      "title": [
+        "在线状态",
+        "Presence"
+      ],
+      "scenario": [
+        "在线状态使用文字与状态点，且明确这是模拟存在感。",
+        "Presence combines text and status dots and is explicitly simulated."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "d3cadd43bdb0217c271945a603e9b6ab70d19889eb600d1b224e7c7c3faa7480",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "select",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "collab-06",
+      "group": "collab",
+      "title": [
+        "头像组",
+        "Avatar group"
+      ],
+      "scenario": [
+        "头像组折叠超额成员，点击数量能看到完整名单。",
+        "An avatar group collapses overflow members and reveals the full roster through its count."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "de52ae5ce27de68a2bcabc99eb5b38280b36bf2f5b3f9fbbd98493e53637da3a",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "roster",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "collab-07",
+      "group": "collab",
+      "title": [
+        "消息提醒",
+        "Mention notice"
+      ],
+      "scenario": [
+        "提及提醒说明谁提及了什么内容，并提供定位入口。",
+        "A mention notice explains who mentioned what and offers a location action."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "8a5545d7ceaa704ea76a92cda93a21f7bb70bb7a7fdac5859095e963250e888a",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "thread",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "collab-08",
+      "group": "collab",
+      "title": [
+        "评论",
+        "Comments"
+      ],
+      "scenario": [
+        "评论可新增和删除自己的本地条目，不影响其他人的示例内容。",
+        "Comments can add or remove your local entries without changing fixture comments by others."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "6852c2a9d9485a17d113e49a55f2b6a8aab884a027706097bd96eefef09b9ac1",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "add",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "collab-09",
+      "group": "collab",
+      "title": [
+        "批注",
+        "Annotations"
+      ],
+      "scenario": [
+        "批注关联到一个明确文本片段，弹层展示该片段与备注。",
+        "An annotation attaches to a specific text fragment and shows it alongside the note."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "4ec4ce8b686f4d526050290666b044f7d08ea81cd29ee749f4cf76aec7177732",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "annotation",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "collab-10",
+      "group": "collab",
+      "title": [
+        "冲突提示",
+        "Conflict notice"
+      ],
+      "scenario": [
+        "冲突提示保留两份值并说明变更来源，不能静默覆盖。",
+        "A conflict notice retains both values and identifies their source instead of overwriting silently."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "bfdf04c50d7ab88f42ae443fbf6d9a82615b81193627e2651ae0112a304910c7",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "local",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "collab-11",
+      "group": "collab",
+      "title": [
+        "角色管理",
+        "Role management"
+      ],
+      "scenario": [
+        "角色管理逐人编辑并明确权限来源是本地模拟。",
+        "Role management edits each participant separately and is clearly a local simulation."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "2fb15b907555d68668a4608b3b3e502360288bd6935a824f737a726882eca68d",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "select",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "collab-12",
+      "group": "collab",
+      "title": [
+        "共享设置",
+        "Sharing controls"
+      ],
+      "scenario": [
+        "分享范围与到期时间在二级设置中明确呈现，不自动创建公开链接。",
+        "Sharing scope and expiry are explicit and never create a public link automatically."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "a75f89bcad7210848c967658e6670e445263142470e293c3e372b7b07e1d6c73",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "sharing",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "collab-13",
+      "group": "collab",
+      "title": [
+        "审计事件",
+        "Audit event"
+      ],
+      "scenario": [
+        "审核事件同时保留对象、操作者、前值和后值。",
+        "An audit event retains object, actor, previous value and new value."
+      ],
+      "level": "native-interaction",
+      "limits": null,
+      "has_action_handler": false,
+      "has_special_mount": false,
+      "render_source_sha256": "6476336495274de6ee76ec46779bbc201bf6004a80a258d40a02c3c26dd9a0b3",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "native-disclosure",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "collab-14",
+      "group": "collab",
+      "title": [
+        "协作光标",
+        "Collaborative cursor"
+      ],
+      "scenario": [
+        "协作光标显示姓名和坐标；演示位置变化，不声称真实同步。",
+        "A collaborative cursor shows a label and coordinates; movement is simulated, not synchronized."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "c386ace660a27e8c55b315c1595bf9b1b78cbaa62e7f9a2698507ca4fe6fb771",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "move",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "collab-15",
+      "group": "collab",
+      "title": [
+        "通知中心",
+        "Notification center"
+      ],
+      "scenario": [
+        "通知中心保留已读状态，再次打开仍显示准确计数。",
+        "A notification center retains read state and shows an accurate count when reopened."
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "b1abbc9d7eb53527178382159e2caac575e3eb480bfe6239dbbd83e50b0750b5",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "notifications",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "access-01",
+      "group": "access",
+      "title": [
+        "键盘焦点",
+        "Keyboard focus"
+      ],
+      "scenario": [
+        "用 Tab 检查真实焦点，而非画一圈假焦点",
+        "Use Tab to inspect actual keyboard focus, not a decorative ring"
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": true,
+      "render_source_sha256": "8609e84c7b93ab24156848f773b5af77619346a642da43709beb2ba593b48e0b",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "first",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "access-02",
+      "group": "access",
+      "title": [
+        "焦点陷阱",
+        "Focus trap"
+      ],
+      "scenario": [
+        "模态框里的焦点循环与关闭后的焦点返回",
+        "Modal focus cycling and return to the invoking control"
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "8c90b5151043037fe0b6a35b88ee4da3caf532b740c4593c93b248f07958d20d",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "open",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "access-03",
+      "group": "access",
+      "title": [
+        "跳过导航",
+        "Skip link"
+      ],
+      "scenario": [
+        "跳过重复导航，直接聚焦正文入口",
+        "Skip repeated navigation and focus the content entry"
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": true,
+      "render_source_sha256": "8bd06ffb47ffd7542aaec3e0ef3274ddf482895a1e61e565fdf9e920248e2425",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "home",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "access-04",
+      "group": "access",
+      "title": [
+        "状态播报",
+        "Live region"
+      ],
+      "scenario": [
+        "计数变化通过 polite live region 播报",
+        "Announce count changes through a polite live region"
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "1f76e09a6d17827e5f0bab51cd46e0694628cc2ebf6d060d755abff6009493a2",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "add",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "access-05",
+      "group": "access",
+      "title": [
+        "ARIA 标签",
+        "Accessible name"
+      ],
+      "scenario": [
+        "同样的无框图标，具有明确的可访问名称",
+        "Frameless icons with explicit accessible names"
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "bf3103c3d687dee0515762aa7a9e9449c8a565c36f948fa806283d96117b973f",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "search",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "access-06",
+      "group": "access",
+      "title": [
+        "高对比度",
+        "High contrast"
+      ],
+      "scenario": [
+        "提高样例边界与文字对比，不改变用户数据",
+        "Increase specimen contrast without changing user data"
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "cdeb1232a3031dd557e8c7ebf73f03037f4c067f2d5e2f3b54425caf8e1c5917",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "input:checkbox",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "access-07",
+      "group": "access",
+      "title": [
+        "字体放大",
+        "Text resize"
+      ],
+      "scenario": [
+        "放大文本至 200%，观察换行和控件高度",
+        "Resize text to 200% and inspect wrapping and control growth"
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "cdcce75bfcc129232cd6774c2e427c387c18f7f718a1c27d3f3cc72d7dc45253",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "input:range",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "access-08",
+      "group": "access",
+      "title": [
+        "减少动效",
+        "Reduced motion"
+      ],
+      "scenario": [
+        "减少动效时保留状态变化的文字结果",
+        "Preserve textual state changes when reduced motion is enabled"
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "b45938c5d937507781ef8edcfcc8a771d8120d643bf0b5a6d756e7cffcfcebaf",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "move",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "access-09",
+      "group": "access",
+      "title": [
+        "触屏目标",
+        "Touch target"
+      ],
+      "scenario": [
+        "比较触控命中区，而不缩小图标本身",
+        "Compare touch hit areas without shrinking the icon"
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "8451dbd4e2d80473d56a6e770195c63861678cfec545597c9e02c0c1329d5703",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "compact",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "access-10",
+      "group": "access",
+      "title": [
+        "屏幕阅读器语义",
+        "Screen reader semantics"
+      ],
+      "scenario": [
+        "语义来自真实元素，不是截图外观",
+        "Semantics come from real elements, not a screenshot"
+      ],
+      "level": "semantic",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "268b52b84ae48da2b69c4ba5b2693964fbb6275b1efffc42477c29d999b9fe76",
+      "initial_probe": {
+        "status": "RENDERED",
+        "scope": "static/semantic specimen; no interaction pass claimed"
+      }
+    },
+    {
+      "id": "access-11",
+      "group": "access",
+      "title": [
+        "键盘导航",
+        "Keyboard navigation"
+      ],
+      "scenario": [
+        "工具栏方向键移动焦点，与 Tab 进入退出分离",
+        "Arrow keys move toolbar focus; Tab enters and leaves"
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": true,
+      "render_source_sha256": "feb651fb35637935587030f4a9ac8407751e06260721aafcc0f781daba484eb1",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "align",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "access-12",
+      "group": "access",
+      "title": [
+        "错误提示关联",
+        "Error association"
+      ],
+      "scenario": [
+        "错误文字通过 aria-describedby 关联到原输入",
+        "Associate an error with its original input using aria-describedby"
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "7d9eb4c4a11c4425d9e813c3d8362e30bd39f2c9748857dee3b963187158f1b7",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "validate",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "access-13",
+      "group": "access",
+      "title": [
+        "移动导航",
+        "Mobile navigation"
+      ],
+      "scenario": [
+        "小屏导航按需打开，关闭后回到触发器",
+        "Open navigation on demand and return focus when closed"
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "86838aec2753ce0c844e54c33b85232fc9987c3293a263ee2d6a7a4d8a858091",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "open",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "access-14",
+      "group": "access",
+      "title": [
+        "平板布局",
+        "Tablet layout"
+      ],
+      "scenario": [
+        "平板横竖屏使用真实重新排版，而不是缩小截图",
+        "Reflow tablet orientation instead of shrinking a screenshot"
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "8e48c77a128822345851a545cd5f2c0c99054ec5dc1347f331b2dec608066714",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "toggle",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "access-15",
+      "group": "access",
+      "title": [
+        "离线回退",
+        "Offline fallback"
+      ],
+      "scenario": [
+        "模拟离线回退保留最近缓存并明确时间",
+        "Simulated offline fallback retains a timestamped local fixture"
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "c0af45f473dc713916b5189f6f3f1b07f85cf4597959a33c66172d8188a9ed23",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "input:checkbox",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "access-16",
+      "group": "access",
+      "title": [
+        "RTL 排版",
+        "Right-to-left layout"
+      ],
+      "scenario": [
+        "RTL 使用方向属性，但代码和数值保持自己的方向",
+        "Use dir for RTL while code and numbers retain their own direction"
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "27602ae6260be22b1406852ee2c31be18209ff4fb84021a3f83a0bba7ff8e0a5",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "input:checkbox",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "ai-01",
+      "group": "ai",
+      "title": [
+        "聊天消息",
+        "Chat message"
+      ],
+      "scenario": [
+        "聊天记录分角色显示，发送后追加本地固定回复",
+        "Show message roles and append a deterministic local reply"
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "f62856198b9cef2ca98cacca4b8add5108dabe6edc5970c678e9217f8c93ae21",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "send",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "ai-02",
+      "group": "ai",
+      "title": [
+        "流式输出",
+        "Streaming response"
+      ],
+      "scenario": [
+        "流式文字可停止，输出来源明确标记为固定文本",
+        "Stop streamed fixture text and label its deterministic source"
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "2093e736c094bca36fe88b83fe3c6d52a56f00dcb041e52b4106f160da82904f",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "start",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "ai-03",
+      "group": "ai",
+      "title": [
+        "工具调用",
+        "Tool call"
+      ],
+      "scenario": [
+        "工具卡片展开输入与输出，不把预览当执行",
+        "Expand tool inputs and output without claiming execution"
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "4da56cdfe689242211c3edb85a63ecbe48f338db7df1edc1eb4a319e249bae5b",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "native-disclosure",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "ai-04",
+      "group": "ai",
+      "title": [
+        "来源引用",
+        "Source citation"
+      ],
+      "scenario": [
+        "来源编号能打开对应片段，并标明合成来源",
+        "Open the cited excerpt and label it as synthetic"
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "ccb66428088d00f1fc81f798c1692633ece83346d73c37100cfc53f01feae761",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "cite",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "ai-05",
+      "group": "ai",
+      "title": [
+        "模型选择",
+        "Model picker"
+      ],
+      "scenario": [
+        "模型选项展示能力差异和未连接状态",
+        "Model choices expose capability differences and disconnected status"
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "50ee047b5d51b649380a6bef01ac5df4e549e5c376af7d86a1eac48bfdb855ce",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "select",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "ai-06",
+      "group": "ai",
+      "title": [
+        "提示词输入",
+        "Prompt composer"
+      ],
+      "scenario": [
+        "变量插值预览保留原始提示词，不调用模型",
+        "Preview variable interpolation without changing the prompt or calling a model"
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "9c2d07e80ceb522be6386e23e78ac110ec52f9bb37dfbca557401d9fe9e5e9eb",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "preview",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "ai-07",
+      "group": "ai",
+      "title": [
+        "上下文附件",
+        "Context attachments"
+      ],
+      "scenario": [
+        "附件明确显示本地文件名和字节，不虚构 token 数",
+        "Show local attachment names and bytes without inventing token counts"
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "a65ecfdcce39b592fae432317c89b3121cba7365f93f01d8e76006cfdfd9334c",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "native-file",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "ai-08",
+      "group": "ai",
+      "title": [
+        "思考进度",
+        "Reasoning status"
+      ],
+      "scenario": [
+        "显示任务阶段，不制造内部思考过程",
+        "Show task stages without fabricating internal reasoning"
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "f84dfaf06cb7ff9b762ebf9b534187b8d29093153c429632f9419d5f96e1cf2f",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "next",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "ai-09",
+      "group": "ai",
+      "title": [
+        "审批请求",
+        "Action approval"
+      ],
+      "scenario": [
+        "先展示变更和影响，批准后仅更新本地草案",
+        "Preview scope and changes before updating a local draft"
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "9543213a3940952a7bb1fe17b542890ecc0b7f1a2246e2d77d4e7236e83f3054",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "approve",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "ai-10",
+      "group": "ai",
+      "title": [
+        "执行日志",
+        "Execution log"
+      ],
+      "scenario": [
+        "日志记录实际点击步骤，并可按级别过滤",
+        "Record actual local actions and filter log severity"
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "0c2845bc8750bab7967cbb1778ada5d8922658894c5a7ee4214d4903f3203ef2",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "check",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "ai-11",
+      "group": "ai",
+      "title": [
+        "运行轨迹",
+        "Run trace"
+      ],
+      "scenario": [
+        "运行轨迹展开每一步的输入输出与耗时标签",
+        "Expand a fixture run trace with inputs, outputs, and labeled sample timing"
+      ],
+      "level": "native-interaction",
+      "limits": null,
+      "has_action_handler": false,
+      "has_special_mount": false,
+      "render_source_sha256": "b7be762f451447643b667de91d9ee436a4f4ac430dae3fab5252aa8fe18535c0",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "native-disclosure",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "ai-12",
+      "group": "ai",
+      "title": [
+        "差异补丁",
+        "Patch diff"
+      ],
+      "scenario": [
+        "差异能应用到本地文本，也能恢复原文",
+        "Apply a diff to local text and restore the original"
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "2111f0bc988a76bcc2e708e053566d7a0f1dd78249b41a272dc3597bcbdbb313",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "apply",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "ai-13",
+      "group": "ai",
+      "title": [
+        "终端",
+        "Terminal"
+      ],
+      "scenario": [
+        "终端只执行列明的本地演示命令，不访问系统",
+        "Terminal accepts allowlisted demo commands only, never the system shell"
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": true,
+      "render_source_sha256": "5880b08256c67200dbe429df626e1524e34c13adaf9f7b7c60f0a3ab6fe8858a",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "run",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "ai-14",
+      "group": "ai",
+      "title": [
+        "代码单元",
+        "Code cell"
+      ],
+      "scenario": [
+        "代码单元演示受限算术解释器，不使用 eval",
+        "A code-cell specimen uses a restricted arithmetic parser, not eval"
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "edda39fe52afb29db53e3457061018966224dc17dc851f11f51274d70dbf901b",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "run",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "ai-15",
+      "group": "ai",
+      "title": [
+        "测试报告",
+        "Test report"
+      ],
+      "scenario": [
+        "测试报告基于本地样例断言重算，不伪造工程 PASS",
+        "Recompute fixture assertions rather than inventing project test results"
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "6526ae118b0601ceb1465f9a19f97d6085b106cc18cb5899e0b5ba088cd4b716",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "test",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "ai-16",
+      "group": "ai",
+      "title": [
+        "能力缺失提示",
+        "Capability fallback"
+      ],
+      "scenario": [
+        "能力缺失时说明不可做什么，并提供真实本地替代",
+        "Explain unavailable capabilities and provide a real local fallback"
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "8fd6c5847633567a54e7f5857a4fed779cded04e1d25e44f6f14f3912048587f",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "export",
+        "scope": "first-action probe only"
+      }
+    },
+    {
+      "id": "ai-17",
+      "group": "ai",
+      "title": [
+        "权限确认",
+        "Permission confirmation"
+      ],
+      "scenario": [
+        "权限确认列明对象、范围和撤销方式",
+        "Permission confirmation names the object, scope and revocation path"
+      ],
+      "level": "interactive",
+      "limits": null,
+      "has_action_handler": true,
+      "has_special_mount": false,
+      "render_source_sha256": "1745ba5d399bccc3c2f9a60d77e43abe7164ed516c5db0f8cd86016e435db783",
+      "initial_probe": {
+        "status": "PROBED",
+        "control": "allow",
+        "scope": "first-action probe only"
+      }
+    }
+  ]
+}
