@@ -1,0 +1,113 @@
+apps/web/src/public/renderer-helper.ts
+  s_07756e806a3fa5::t_4874821541c0ea 13-15,21-23
+  s_07756e806a3fa5::t_4b243a36773694 12,16-17
+  s_07756e806a3fa5::t_4b984d927d000c 1-11,18-20,24-25
+README.en.md
+  s_07756e806a3fa5::t_786e1136ae079a 219-220
+README.md
+  s_07756e806a3fa5::t_786e1136ae079a 218-219
+apps/web/tests/public/gds-performance.spec.ts
+  s_07756e806a3fa5::t_032d97f3a2b21f 157
+  s_07756e806a3fa5::t_887be4cf4c0762 62,67,92,181
+  s_07756e806a3fa5::t_46b3b580f8df85 156
+  s_07756e806a3fa5::t_2b4944cd9c3414 139,155
+  s_07756e806a3fa5::t_450ca79decf0a0 1-61,63-66,68-91,93-138,140-154,158-180,182-197
+docs/PUBLIC-PREVIEW.md
+  s_07756e806a3fa5::t_786e1136ae079a 23-26,30
+apps/web/src/public/gds.ts
+  s_07756e806a3fa5::t_aa7664e77a3153 713
+  s_07756e806a3fa5::t_5e01e495dc4d07 2,44-45,48-68
+  s_07756e806a3fa5::t_6ceea574fc9a3c 502-543,545,547,549-567
+  s_07756e806a3fa5::t_8aa610a36504ae 149,424
+  s_07756e806a3fa5::t_8798de3f0d8eea 619-638,640-646,648-665,667-668,672,684-702
+  s_07756e806a3fa5::t_ae555339089014 47,175-176
+  s_07756e806a3fa5::t_863f2b4114b231 709,714-715,720
+  s_07756e806a3fa5::t_1f08748c9f3093 420-421,724
+  s_07756e806a3fa5::t_66f94fce8d8d99 570-613,615
+  s_07756e806a3fa5::t_31ade3d45b09c4 389,391,438
+  s_07756e806a3fa5::t_a290f890276817 46
+  s_07756e806a3fa5::t_d824ec1681c9b2 154,169-174,177-179,184,197,200,209,265
+  s_07756e806a3fa5::t_a03449e83f7791 260,273,284,303,306-307
+  s_07756e806a3fa5::t_d454e8b6a8a7a9 369,376
+  s_07756e806a3fa5::t_abc390e5db2ed2 317-321,335-337,340-342,458-461,472-473
+  s_07756e806a3fa5::t_a380d765e198b0 405,500,544,548
+  s_07756e806a3fa5::t_2a0832bdefb8df 442-445
+  s_07756e806a3fa5::t_a3dbcb7d6cfd25 712
+apps/web/src/public/parser.worker.ts
+  s_07756e806a3fa5::t_71f4885fe885b3 9,13
+apps/web/src/public/translations.en.ts
+  s_07756e806a3fa5::t_e3ccfca878c212 2,5-7
+  s_07756e806a3fa5::t_6d11a40c281029 3-4
+apps/web/tests/public/instancing.spec.ts
+  s_07756e806a3fa5::t_aff7a9513d058c 33-41
+apps/web/src/public/Viewer.tsx
+  s_07756e806a3fa5::t_4b243a36773694 524-529,557-558,569,574-575,595-603
+  s_07756e806a3fa5::t_4b984d927d000c 7,15,119-123,269-271,273,275-279,299-300,371-390,399-406,409-410,415,497,523
+  s_07756e806a3fa5::t_11e72949fc320b 328,550
+  s_07756e806a3fa5::t_da21f7b85ed623 396-398
+apps/web/src/public/Workbench.tsx
+  s_07756e806a3fa5::t_6d11a40c281029 305-306
+  s_07756e806a3fa5::t_e3ccfca878c212 1462
+  s_07756e806a3fa5::t_71f4885fe885b3 271-272,292,298,301-304,307-308,1330,1345,1406
+apps/web/tests/public/renderer-performance.spec.ts
+  s_07756e806a3fa5::t_91c8716ea9f0f1 1-38
+apps/web/tests/public/workbench.spec.ts
+  s_07756e806a3fa5::t_aff7a9513d058c 171-174,195-196,198-199
+  s_07756e806a3fa5::t_a6b82225d2d74f 200
+apps/web/tests/public/import-performance.spec.ts
+  s_07756e806a3fa5::t_aff7a9513d058c 1-42
+apps/web/tests/public/parsers.spec.ts
+  s_07756e806a3fa5::t_6d11a40c281029 133,155-165
+apps/web/src/public/types.ts
+  s_07756e806a3fa5::t_71f4885fe885b3 68-73
+.agent-project-control/generated/TREE.html
+  s_07756e806a3fa5::t_9894fef7284022 2
+.agent-project-control/generated/TREE.md
+  s_07756e806a3fa5::t_cf6c047a03d37a 67-73,81-83,206,220,222,230
+.agent-project-control/iterations/INDEX.md
+  s_07756e806a3fa5::t_7df7fb3bcb15df 8
+.agent-project-control/iterations/IT-0003_20261009T022233-0700_full-gds-performance/.apcf-dir.yaml
+  s_07756e806a3fa5::t_e605b75a20dae9 1-3
+.agent-project-control/iterations/IT-0003_20261009T022233-0700_full-gds-performance/ITERATION.md
+  s_07756e806a3fa5::t_ea433a646ca1eb 1-6
+.agent-project-control/iterations/IT-0003_20261009T022233-0700_full-gds-performance/turns/.apcf-dir.yaml
+  s_07756e806a3fa5::t_1186a0e250114e 1-3
+.agent-project-control/iterations/IT-0003_20261009T022233-0700_full-gds-performance/turns/TR-0003_20261009T022233-0700_full-gds-performance/.apcf-dir.yaml
+  s_07756e806a3fa5::t_42fe964babe0d4 1-3
+.agent-project-control/iterations/IT-0003_20261009T022233-0700_full-gds-performance/turns/TR-0003_20261009T022233-0700_full-gds-performance/CHECKLIST.md
+  s_07756e806a3fa5::t_21f3591866c05e 1-8
+.agent-project-control/iterations/IT-0003_20261009T022233-0700_full-gds-performance/turns/TR-0003_20261009T022233-0700_full-gds-performance/TEST.md
+  s_07756e806a3fa5::t_e077c4123a73fa 1-12
+.agent-project-control/iterations/IT-0003_20261009T022233-0700_full-gds-performance/turns/TR-0003_20261009T022233-0700_full-gds-performance/TURN.md
+  s_07756e806a3fa5::t_dc175a40b4fe50 1-9
+.agent-project-control/regressions/INDEX.md
+  s_07756e806a3fa5::t_10b22dd81b2f19 7
+.agent-project-control/regressions/REG-0002_20261009T024722-0700_gds-full-capacity/.apcf-dir.yaml
+  s_07756e806a3fa5::t_4f546e0ed26d64 1-3
+.agent-project-control/regressions/REG-0002_20261009T024722-0700_gds-full-capacity/REGRESSION.md
+  s_07756e806a3fa5::t_8402ca84e4b537 1-38
+.agent-project-control/regressions/REG-0002_20261009T024722-0700_gds-full-capacity/repro/.apcf-dir.yaml
+  s_07756e806a3fa5::t_9f3950b89eb543 1-3
+docs/agent-locks.md
+  s_07756e806a3fa5::t_5ed982d9d8f308 5-7
+docs/coordination.md
+  s_07756e806a3fa5::t_4e0bbbdc270d7c 60-63
+docs/security/publication-risk-notes.md
+  s_07756e806a3fa5::t_157bfa8a084a1e 5,14,17,20,23,27
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "7d8b03e56d6eea8a6942df8989ee6e8f7266a84d",
+  "prompts": {},
+  "sessions": {
+    "s_07756e806a3fa5": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a11a40-20dc-7732-a5b7-49adf5fb1016",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "AIALRA-0 <aialra@163.com>"
+    }
+  }
+}
