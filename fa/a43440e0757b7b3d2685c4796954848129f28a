@@ -1,0 +1,278 @@
+.agent-project-control/scripts/lint_framework.py
+  s_07756e806a3fa5::t_ecd8d3d6ba0b2c 1-87
+.agent-project-control/scripts/audit_routes.py
+  s_07756e806a3fa5::t_ecf38a27293f9d 1-417
+.agent-project-control/scripts/selfcheck.py
+  s_07756e806a3fa5::t_1cecc4770c0425 1-1355,1372-1373,1375-3511
+  s_07756e806a3fa5::t_f585eaf017098c 1356-1371,1374
+.agent-project-control/scripts/bootstrap.py
+  s_07756e806a3fa5::t_ecd8d3d6ba0b2c 1-289
+.agent-project-control/.apcf-dir.yaml
+  s_07756e806a3fa5::t_c4c7f1fda3b1e4 1-3
+.agent-project-control/ARCHITECTURE.md
+  s_07756e806a3fa5::t_90eb8c5d838444 1-30
+.agent-project-control/DESIGN.md
+  s_07756e806a3fa5::t_b68ddd7c24ed71 1-32
+.agent-project-control/PROJECT.md
+  s_07756e806a3fa5::t_bb5741d6779fe2 1-27
+.agent-project-control/decisions/.apcf-dir.yaml
+  s_07756e806a3fa5::t_99cc3a0da0110c 1-3
+.agent-project-control/decisions/INDEX.md
+  s_07756e806a3fa5::t_ecec5677ac4613 1-6
+.agent-project-control/design/.apcf-dir.yaml
+  s_07756e806a3fa5::t_e84ea6b6afce34 1-3
+.agent-project-control/design/.gitattributes
+  s_07756e806a3fa5::t_5206cb32b13455 1-4
+.agent-project-control/design/BASELINES.lock.yaml
+  s_07756e806a3fa5::t_5aa259108f354b 1-16
+.agent-project-control/design/INDEX.md
+  s_07756e806a3fa5::t_4265f890a2eee6 1-60
+.agent-project-control/design/PROVENANCE.md
+  s_07756e806a3fa5::t_39eb0239c57b0a 1-40
+.agent-project-control/design/RULES.md
+  s_07756e806a3fa5::t_f899704345652e 1-855
+.agent-project-control/design/SOURCES.md
+  s_07756e806a3fa5::t_33032f159c724b 1-30
+.agent-project-control/design/VERIFICATION.md
+  s_07756e806a3fa5::t_a47afd10f1cfaf 1-36
+.agent-project-control/design/components/.apcf-dir.yaml
+  s_07756e806a3fa5::t_2c655bef49edad 1-3
+.agent-project-control/design/components/design-atlas-v0.5-r1/.apcf-dir.yaml
+  s_07756e806a3fa5::t_83fbb7e2fa87a7 1-3
+.agent-project-control/design/components/design-atlas-v0.5-r1/CASE-COVERAGE.json
+  s_07756e806a3fa5::t_e5e664687eda13 1-6364
+.agent-project-control/design/components/design-atlas-v0.5-r1/CASE-COVERAGE.json.apcf-meta.yaml
+  s_07756e806a3fa5::t_df791fd446342b 1-4
+.agent-project-control/design/components/design-atlas-v0.5-r1/COMPONENT.lock.json
+  s_07756e806a3fa5::t_2e7926e6d1e63b 1-22
+.agent-project-control/design/components/design-atlas-v0.5-r1/COMPONENT.lock.json.apcf-meta.yaml
+  s_07756e806a3fa5::t_c13eabb5854026 1-3
+.agent-project-control/design/components/design-atlas-v0.5-r1/COMPONENT.md
+  s_07756e806a3fa5::t_77b83449d030f9 1-14
+.agent-project-control/design/components/design-atlas-v0.5-r1/COMPONENT.md.apcf-meta.yaml
+  s_07756e806a3fa5::t_9d349764ee2de6 1-4
+.agent-project-control/design/components/design-atlas-v0.5-r1/UI-CONSTRAINTS.md
+  s_07756e806a3fa5::t_47f4669e564ac1 1-80
+.agent-project-control/design/components/design-atlas-v0.5-r1/UI-CONSTRAINTS.md.apcf-meta.yaml
+  s_07756e806a3fa5::t_435d254b6bdcc0 1-4
+.agent-project-control/design/components/design-atlas-v0.5-r1/Workbench-v0.5-r1.html
+  s_07756e806a3fa5::t_6e354d1be82350 1-2085
+.agent-project-control/design/components/design-atlas-v0.5-r1/Workbench-v0.5-r1.html.apcf-meta.yaml
+  s_07756e806a3fa5::t_6aeb9291a2d559 1-4
+.agent-project-control/design/components/design-atlas-v0.5-r1/source.zip.apcf-meta.yaml
+  s_07756e806a3fa5::t_945aecdb6d27e2 1-4
+.agent-project-control/design/components/design-atlas-v0.5-r1/verify.py
+  s_07756e806a3fa5::t_74d298f2121ab6 1-16
+.agent-project-control/design/components/design-atlas-v0.5-r1/verify.py.apcf-meta.yaml
+  s_07756e806a3fa5::t_9912b65915611a 1-4
+.agent-project-control/design/profiles/.apcf-dir.yaml
+  s_07756e806a3fa5::t_8f23d073943c4c 1-3
+.agent-project-control/design/profiles/tool-workbench-2.3.1/.apcf-dir.yaml
+  s_07756e806a3fa5::t_6f08475ea2ba93 1-3
+.agent-project-control/design/profiles/tool-workbench-2.3.1/PROFILE.md
+  s_07756e806a3fa5::t_b67797294798ee 1-102
+.agent-project-control/design/profiles/tool-workbench-2.3.1/reference-template.zip.apcf-meta.yaml
+  s_07756e806a3fa5::t_3d0db5f2d259ec 1-4
+.agent-project-control/design/profiles/tool-workbench-2.3.1/tokens.json
+  s_07756e806a3fa5::t_b3e6c1eee77735 1-92
+.agent-project-control/design/profiles/tool-workbench-2.3.1/tokens.json.apcf-meta.yaml
+  s_07756e806a3fa5::t_0079855bbb42ad 1-4
+.agent-project-control/framework.yaml
+  s_07756e806a3fa5::t_dc3108e38a7fa3 1-20
+.agent-project-control/gate.toml
+  s_07756e806a3fa5::t_dabe1fe0e7e5d9 1-77
+.agent-project-control/generated/.apcf-dir.yaml
+  s_07756e806a3fa5::t_a5db7afefb2716 1-3
+.agent-project-control/generated/TREE.html
+  s_07756e806a3fa5::t_fecc58dc821898 1-2
+.agent-project-control/generated/TREE.md
+  s_07756e806a3fa5::t_f354221057e24f 1-289
+.agent-project-control/interfaces/.apcf-dir.yaml
+  s_07756e806a3fa5::t_0fef60820de416 1-3
+.agent-project-control/interfaces/STYLE_STANDARD.md
+  s_07756e806a3fa5::t_a412e728c69e34 1-21
+.agent-project-control/interfaces/WRITING_STANDARD.md
+  s_07756e806a3fa5::t_7b1b949c96a560 1-22
+.agent-project-control/iterations/.apcf-dir.yaml
+  s_07756e806a3fa5::t_56cbcfb01c4d91 1-3
+.agent-project-control/iterations/INDEX.md
+  s_07756e806a3fa5::t_c9cd638eb76b4f 1-6
+.agent-project-control/iterations/IT-0001_20261008T164827-0700_framework-adoption-ui-network/.apcf-dir.yaml
+  s_07756e806a3fa5::t_2c28343c1a7936 1-3
+.agent-project-control/iterations/IT-0001_20261008T164827-0700_framework-adoption-ui-network/ITERATION.md
+  s_07756e806a3fa5::t_7100e8b0b47f12 1-6
+.agent-project-control/iterations/IT-0001_20261008T164827-0700_framework-adoption-ui-network/turns/.apcf-dir.yaml
+  s_07756e806a3fa5::t_0d52689e612c3a 1-3
+.agent-project-control/iterations/IT-0001_20261008T164827-0700_framework-adoption-ui-network/turns/TR-0001_20261008T165228-0700_framework-ui-local-network/.apcf-dir.yaml
+  s_07756e806a3fa5::t_e547e20f723309 1-3
+.agent-project-control/iterations/IT-0001_20261008T164827-0700_framework-adoption-ui-network/turns/TR-0001_20261008T165228-0700_framework-ui-local-network/CHECKLIST.md
+  s_07756e806a3fa5::t_2b7d7ac8407d46 1-9
+.agent-project-control/iterations/IT-0001_20261008T164827-0700_framework-adoption-ui-network/turns/TR-0001_20261008T165228-0700_framework-ui-local-network/TEST.md
+  s_07756e806a3fa5::t_944d8fd46348fd 1-11
+.agent-project-control/iterations/IT-0001_20261008T164827-0700_framework-adoption-ui-network/turns/TR-0001_20261008T165228-0700_framework-ui-local-network/TURN.md
+  s_07756e806a3fa5::t_22245486729acc 1-9
+.agent-project-control/materials/.apcf-dir.yaml
+  s_07756e806a3fa5::t_cce4090ea72d57 1-3
+.agent-project-control/materials/INDEX.md
+  s_07756e806a3fa5::t_f0a3bdef4302e5 1-6
+.agent-project-control/regressions/.apcf-dir.yaml
+  s_07756e806a3fa5::t_8d59805e5f36c7 1-3
+.agent-project-control/regressions/INDEX.md
+  s_07756e806a3fa5::t_4f275c8c5787d8 1-6
+.agent-project-control/routing.toml
+  s_07756e806a3fa5::t_90b78b322da64f 1-143
+.agent-project-control/rules/.apcf-dir.yaml
+  s_07756e806a3fa5::t_c77243c2a7360b 1-3
+.agent-project-control/rules/01-context-state.md
+  s_07756e806a3fa5::t_94f9a5bd36bc3e 1-419
+.agent-project-control/rules/02-execution-scope.md
+  s_07756e806a3fa5::t_768286ea26bbc0 1-519
+.agent-project-control/rules/03-verification-regression.md
+  s_07756e806a3fa5::t_de23b5cb28d2a9 1-329
+.agent-project-control/rules/04-tools-parallel.md
+  s_07756e806a3fa5::t_e838af811f7460 1-474
+.agent-project-control/rules/05-delivery-lifecycle.md
+  s_07756e806a3fa5::t_3ba084006b21ae 1-237
+.agent-project-control/rules/06-framework-contract.md
+  s_07756e806a3fa5::t_eaa9877f904062 1-493
+.agent-project-control/rules/COVERAGE.md
+  s_07756e806a3fa5::t_6f9dffe2f12600 1-27
+.agent-project-control/rules/INDEX.md
+  s_07756e806a3fa5::t_d46e7e2de8f024 1-46
+.agent-project-control/runbooks/.apcf-dir.yaml
+  s_07756e806a3fa5::t_9bd37915dd3eb3 1-3
+.agent-project-control/runbooks/INDEX.md
+  s_07756e806a3fa5::t_c51728e1760b55 1-6
+.agent-project-control/runtime/.apcf-dir.yaml
+  s_07756e806a3fa5::t_90d093e2a062f1 1-3
+.agent-project-control/runtime/cache/.apcf-dir.yaml
+  s_07756e806a3fa5::t_90c5cd80c37ff4 1-3
+.agent-project-control/runtime/distribution/.apcf-dir.yaml
+  s_07756e806a3fa5::t_e3a6d4471c9b2c 1-3
+.agent-project-control/runtime/downloads/.apcf-dir.yaml
+  s_07756e806a3fa5::t_e7fb8b0b097b3c 1-3
+.agent-project-control/runtime/large/.apcf-dir.yaml
+  s_07756e806a3fa5::t_d01146cc333fd0 1-3
+.agent-project-control/runtime/runs/.apcf-dir.yaml
+  s_07756e806a3fa5::t_575f19c945356d 1-3
+.agent-project-control/runtime/testbed/.apcf-dir.yaml
+  s_07756e806a3fa5::t_0535833e605cfc 1-3
+.agent-project-control/runtime/tmp/.apcf-dir.yaml
+  s_07756e806a3fa5::t_c1791eb755f474 1-3
+.agent-project-control/scripts/.apcf-dir.yaml
+  s_07756e806a3fa5::t_14bab5eecff6b3 1-3
+.agent-project-control/scripts/cleanup_runtime.py
+  s_07756e806a3fa5::t_db13369ab4cf75 1-61
+.agent-project-control/scripts/common.py
+  s_07756e806a3fa5::t_82e6a0dbee2dda 1-35
+.agent-project-control/scripts/compact_template_source.py
+  s_07756e806a3fa5::t_4b519af993d98b 1-78
+.agent-project-control/scripts/design_contract.py
+  s_07756e806a3fa5::t_71d4952cc2431c 1-167
+.agent-project-control/scripts/finalize_turn.py
+  s_07756e806a3fa5::t_87af0f45f157a1 1-560
+.agent-project-control/scripts/gate_check.py
+  s_07756e806a3fa5::t_3d39435cf69d1e 1-537
+.agent-project-control/scripts/gate_enforce.py
+  s_07756e806a3fa5::t_b67e409ddf47cd 1-276
+.agent-project-control/scripts/gate_kernel.py
+  s_07756e806a3fa5::t_cfba92c2884607 1-439
+.agent-project-control/scripts/import_material.py
+  s_07756e806a3fa5::t_0e09aa53278211 1-9
+.agent-project-control/scripts/new_adr.py
+  s_07756e806a3fa5::t_85fd23a0db0521 1-6
+.agent-project-control/scripts/new_iteration.py
+  s_07756e806a3fa5::t_36667387213b02 1-14
+.agent-project-control/scripts/new_parallel.py
+  s_07756e806a3fa5::t_2a294fca3a48c5 1-19
+.agent-project-control/scripts/new_regression.py
+  s_07756e806a3fa5::t_d1926fd641cf93 1-8
+.agent-project-control/scripts/new_runbook.py
+  s_07756e806a3fa5::t_f7ff80dfc9ea5d 1-6
+.agent-project-control/scripts/new_turn.py
+  s_07756e806a3fa5::t_1e39af76e826f7 1-61
+.agent-project-control/scripts/pilot_readiness.py
+  s_07756e806a3fa5::t_1b5d913346d162 1-123
+.agent-project-control/scripts/prepare_distribution.py
+  s_07756e806a3fa5::t_605e3d507557f3 1-179
+.agent-project-control/scripts/publish_guard.py
+  s_07756e806a3fa5::t_07592d3f276979 1-983
+.agent-project-control/scripts/refresh_indexes.py
+  s_07756e806a3fa5::t_2e8ba1c84f7a19 1-14
+.agent-project-control/scripts/render_tree.py
+  s_07756e806a3fa5::t_d441b03c344678 1-39
+.agent-project-control/scripts/repair_current_state.py
+  s_07756e806a3fa5::t_31047ca51fb89a 1-79
+.agent-project-control/scripts/report_contract.py
+  s_07756e806a3fa5::t_80f91b91f46439 1-164
+.agent-project-control/scripts/report_contract_selfcheck.py
+  s_07756e806a3fa5::t_abe0582daff8c3 1-103
+.agent-project-control/scripts/route_context.py
+  s_07756e806a3fa5::t_80dddd27b9f9ca 1-446
+.agent-project-control/scripts/routing_activity.py
+  s_07756e806a3fa5::t_353874ea5f726f 1-791
+.agent-project-control/scripts/routing_receipt.py
+  s_07756e806a3fa5::t_52cede8862d72d 1-367
+.agent-project-control/scripts/rule_sync.py
+  s_07756e806a3fa5::t_f2807e67a23e64 1-74
+.agent-project-control/scripts/set_iteration_status.py
+  s_07756e806a3fa5::t_89fbac00587e8f 1-11
+.agent-project-control/scripts/standards_contract.py
+  s_07756e806a3fa5::t_344028992d2929 1-112
+.agent-project-control/scripts/state_integrity.py
+  s_07756e806a3fa5::t_0871d0e4729b31 1-72
+.agent-project-control/scripts/sync_skills.py
+  s_07756e806a3fa5::t_2c0ae773618d5f 1-74
+.agent-project-control/scripts/test_ledger.py
+  s_07756e806a3fa5::t_b4617b1de56a5a 1-160
+.agent-project-control/skills/.apcf-dir.yaml
+  s_07756e806a3fa5::t_6980db1640efad 1-3
+.agent-project-control/skills/SKILLS.lock.yaml
+  s_07756e806a3fa5::t_efc806b0a55a79 1-24
+.agent-project-control/standards/.apcf-dir.yaml
+  s_07756e806a3fa5::t_5e0dddd769ff30 1-3
+.agent-project-control/standards/LOCK.yaml
+  s_07756e806a3fa5::t_55ad1857fc91da 1-7
+.agent-project-control/standards/human-readable-chinese-style-v0.1.md
+  s_07756e806a3fa5::t_a98df5f94eb479 1-1547
+.agent-project-control/standards/human-readable-chinese-writing-v0.1.md
+  s_07756e806a3fa5::t_6d26aa57a2eb66 1-1906
+.codex/.apcf-dir.yaml
+  s_07756e806a3fa5::t_dcaf938da5ffbe 1-3
+.codex/skills/.apcf-dir.yaml
+  s_07756e806a3fa5::t_100785246d2abf 1-3
+.github/workflows/ci.yml
+  s_07756e806a3fa5::t_14bd57d0bd0d9c 33-41
+.gitignore
+  s_07756e806a3fa5::t_bfd75d89608a5c 1,34-43
+AGENTS.md
+  s_07756e806a3fa5::t_b99ae5652e2d38 1-118
+CURRENT.md
+  s_07756e806a3fa5::t_58db6b84140df8 1-5
+README.en.md
+  s_07756e806a3fa5::t_e0a4728cd7edc8 1,299-300
+README.md
+  s_07756e806a3fa5::t_7ed1a840c49b61 1,290-291
+docs/AGENT-WORKFLOW.md
+  s_07756e806a3fa5::t_d99f24671e59eb 1-40
+docs/NETWORK-TROUBLESHOOTING.md
+  s_07756e806a3fa5::t_7ad9e78d97efef 1,45-52
+docs/agent-locks.md
+  s_07756e806a3fa5::t_6c7877560697dd 5
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "faa43440e0757b7b3d2685c4796954848129f28a",
+  "prompts": {},
+  "sessions": {
+    "s_07756e806a3fa5": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a11a40-20dc-7732-a5b7-49adf5fb1016",
+        "model": "gpt-6-luna"
+      },
+      "human_author": "AIALRA-0 <aialra@163.com>"
+    }
+  }
+}
