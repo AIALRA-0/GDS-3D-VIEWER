@@ -1128,6 +1128,41 @@ activity.record_semantic_review(tr, observations, ['evidence/selfcheck-semantic-
             assert report['activity']['git_head_changed'] and 'delivery' in report['required']['phases']
             assert 'src/server.py' in report['activity']['changed_paths']
             done(13, clean_before_audit=True, report=report)
+
+        # A committed copy of pre-existing dirty bytes must remain outside this
+        # Turn's editable content, while later edits and new committed files
+        # remain observable and HEAD movement still requires delivery.
+        initial_dirty = fixture / 'src/preexisting.py'
+        modified_dirty = fixture / 'src/server.py'
+        initial_dirty_bytes = b'print("baseline pre-existing dirty bytes")\n'
+        modified_dirty_bytes = b'print("baseline dirty bytes later changed")\n'
+        initial_dirty.write_bytes(initial_dirty_bytes)
+        modified_dirty.write_bytes(modified_dirty_bytes)
+        committed_turn = turn(51)
+        committed_baseline = json.loads((committed_turn / 'evidence/activity-baseline.json').read_text(encoding='utf-8'))
+        baseline_rows = {row['path']: row for row in committed_baseline['dirty_rows']}
+        assert baseline_rows['src/preexisting.py']['state'] == 'file'
+        assert baseline_rows['src/preexisting.py']['sha256'] == hashlib.sha256(initial_dirty_bytes).hexdigest()
+        assert baseline_rows['src/server.py']['state'] == 'file'
+        assert baseline_rows['src/server.py']['sha256'] == hashlib.sha256(modified_dirty_bytes).hexdigest()
+
+        modified_dirty.write_bytes(modified_dirty_bytes + b'print("changed after this Turn baseline")\n')
+        post_baseline = fixture / 'src/post-baseline-committed.py'
+        post_baseline.write_bytes(b'print("new after this Turn baseline")\n')
+        git('add', '--all'); git('commit', '-q', '-m', 'Synthetic committed Turn activity')
+        assert git('status', '--porcelain') == ''
+        committed_report = audit(51, committed_turn, '--semantic-reviewed')
+        committed_activity = committed_report['activity']
+        committed_paths = set(committed_activity['changed_paths'])
+        assert 'src/preexisting.py' not in committed_paths
+        assert {'src/server.py', 'src/post-baseline-committed.py'} <= committed_paths
+        assert committed_activity['git_head_changed'] and 'delivery' in committed_report['required']['phases']
+        done(51, unchanged_preexisting_dirty_excluded=True,
+             modified_preexisting_dirty_retained='src/server.py' in committed_paths,
+             new_post_baseline_commit_retained='src/post-baseline-committed.py' in committed_paths,
+             head_movement_requires_delivery=committed_activity['git_head_changed'] and
+             'delivery' in committed_report['required']['phases'], report=committed_report)
+
         tr = turn(14)
         fw_script = scripts / 'common.py'
         with mutate(fw_script, fw_script.read_bytes() + b'\n# Synthetic activity\n'):
@@ -1385,13 +1420,13 @@ print(json.dumps({'targets':record['targets'],'tests':record['tests'],
                 sys.modules.pop(name, None)
                 if saved_modules[name] is not None: sys.modules[name] = saved_modules[name]
             sys.path.remove(str(scripts))
-        expected_cases = set(range(1, 51)) | {'25-legacy-hint'}
+        expected_cases = set(range(1, 52)) | {'25-legacy-hint'}
         assert passed == expected_cases, (sorted(expected_cases - passed), sorted(passed - expected_cases))
         assert module_before == {rel: hashlib.sha256((ROOT / rel).read_bytes()).hexdigest() for rel in MODULES}
         done(60, canonical_sha256=module_before)
         ROWS.append({'case': 'Step1D/summary', 'exit_code': 0, 'stdout': 'PASS', 'stderr': '',
                      'matrix_cases': sorted(passed, key=str), 'byte_restored_mutations': restored})
-        print('PASS: Post-route Audit matrix 1-50 and 60; immutable baseline, shared resolver, receipt gaps, fact consumption; ' + str(len(restored)) + ' byte-restored mutations')
+        print('PASS: Post-route Audit matrix 1-51 and 60; immutable baseline, committed pre-existing paths, delivery, shared resolver, receipt gaps, fact consumption; ' + str(len(restored)) + ' byte-restored mutations')
     finally:
         assert fixture.resolve().parent == CASE.parent.resolve()
         remove_core_test_fixture(fixture, CASE.parent)
@@ -2539,7 +2574,7 @@ def check_gate_routes():
         done(60, agents_sha256=expected_agents, canonical_sha256=canonical, writing='RESOLVED', style='RESOLVED', style_enabled=True)
         earlier = [row for row in ROWS if row.get('case') == 'Step1D/summary']
         if earlier:
-            assert set(earlier[-1]['matrix_cases']) == set(range(1, 51)) | {'25-legacy-hint', 60}
+            assert set(earlier[-1]['matrix_cases']) == set(range(1, 52)) | {'25-legacy-hint', 60}
             assert any(row.get('case') == 'AGENTS/normal-coverage' for row in ROWS)
             done(58, original_checks='Step 1A-1D completed before Gate cases', audit_summary=earlier[-1])
         expected = set(range(1, 58)) | {60}

@@ -334,7 +334,15 @@ def collect_activity(turn_dir_raw: str | Path) -> dict:
 
     current_head = git_head()
     committed = _committed_paths_between(str(baseline["git_head"]), current_head)
-    changed_since_baseline |= committed
+    # A commit still creates delivery activity through git_head_changed, but an
+    # already-dirty baseline path is not new content when its current bytes are
+    # exactly the state captured for this Turn. Keep committed paths that are
+    # new or whose state differs from the immutable baseline.
+    committed_content = {
+        rel for rel in committed
+        if rel not in baseline_rows or file_state(rel) != baseline_rows[rel]
+    }
+    changed_since_baseline |= committed_content
 
     current_turn_files = tr_file_hashes(turn_dir)
     turn_file_changes = sorted(
