@@ -62,6 +62,8 @@
 .agent-project-control/PROJECT.md
 .agent-project-control/regressions/.apcf-dir.yaml
 .agent-project-control/regressions/INDEX.md
+.agent-project-control/regressions/REG-0001_20261008T174550-0700_committed-baseline-content/.apcf-dir.yaml
+.agent-project-control/regressions/REG-0001_20261008T174550-0700_committed-baseline-content/REGRESSION.md
 .agent-project-control/routing.toml
 .agent-project-control/rules/.apcf-dir.yaml
 .agent-project-control/rules/01-context-state.md
